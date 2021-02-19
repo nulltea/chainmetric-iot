@@ -16,6 +16,7 @@ func (s *SensorsReader) SubscribeToTemperatureReadings(sensor string, pin int) e
 			model.Temperature: temperature,
 			model.Humidity: humidity,
 		}
+		s.waitGroup.Done()
 	})
 
 	return nil

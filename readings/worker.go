@@ -2,6 +2,7 @@ package readings
 
 import (
 	"context"
+	"sync"
 
 	"sensorsys/model"
 )
@@ -10,6 +11,7 @@ type sensorReadingRoutine func(ctx context.Context)
 
 type SensorsReader struct {
 	ctx context.Context
+	waitGroup sync.WaitGroup
 	routines []sensorReadingRoutine
 	readings chan model.MetricReadings
 }
@@ -23,6 +25,11 @@ func NewSensorsReader(ctx context.Context) *SensorsReader {
 
 func (s *SensorsReader) Execute() model.MetricReadings {
 	s.readings = make(chan model.MetricReadings, len(s.routines))
+	s.waitGroup.Add(len(s.routines))
+	go func() {
+		s.waitGroup.Wait()
+		close(s.readings)
+	}()
 	for _, routine := range s.routines {
 		go routine(s.ctx)
 	}
