@@ -10,7 +10,7 @@ import (
 	"github.com/op/go-logging"
 	"github.com/stianeikeland/go-rpio/v4"
 
-	"sensor/readings"
+	"sensorsys/readings"
 )
 
 var (

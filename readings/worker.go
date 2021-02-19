@@ -3,7 +3,7 @@ package readings
 import (
 	"context"
 
-	"sensor/model"
+	"sensorsys/model"
 )
 
 type sensorReadingRoutine func(ctx context.Context)

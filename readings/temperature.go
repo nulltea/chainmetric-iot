@@ -6,7 +6,7 @@ import (
 
 	"github.com/d2r2/go-dht"
 
-	"sensor/model"
+	"sensorsys/model"
 )
 
 func (s *SensorsReader) SubscribeToTemperatureReadings(sensor string, pin int) error {
