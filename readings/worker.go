@@ -2,6 +2,7 @@ package readings
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"sensorsys/model"
@@ -14,12 +15,14 @@ type SensorsReader struct {
 	waitGroup sync.WaitGroup
 	routines []sensorReadingRoutine
 	readings chan model.MetricReadings
+	cleanQueue []func() error
 }
 
 func NewSensorsReader(ctx context.Context) *SensorsReader {
 	return &SensorsReader{
 		ctx: ctx,
 		routines: []sensorReadingRoutine{},
+		cleanQueue: []func() error {},
 	}
 }
 
@@ -44,4 +47,12 @@ func (s *SensorsReader) Execute() model.MetricReadings {
 
 func (s *SensorsReader) subscribe(routine sensorReadingRoutine) {
 	s.routines = append(s.routines, routine)
+}
+
+func (s *SensorsReader) Clean() {
+	for _, cf := range s.cleanQueue {
+		if err := cf(); err != nil {
+			fmt.Println(err)
+		}
+	}
 }
