@@ -1,5 +1,5 @@
-OUTPUT=./bin/sensor
-REMOTE_IP=192.168.31.170
+OUTPUT=bin/sensor
+REMOTE_IP=192.168.31.180
 REMOTE_DIR=/home/pi/sensorsys
 
 build:
@@ -10,8 +10,8 @@ build-remote:
         CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=6 \
         go build -v  -o $(OUTPUT)
 
-upload:
+sync:
 	rsync -r . pi@$(REMOTE_IP):$(REMOTE_DIR)
 
 run:
-	bash $(OUTPUT)
+	sudo ./$(OUTPUT)
