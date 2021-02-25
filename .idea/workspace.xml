@@ -8,16 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/readings/airQuality.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readings/luminosity.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readings/pressure.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/readings/ambientLight.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/metricModel.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/metricModel.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/airQuality.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/airQuality.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,11 +141,11 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4531" y="338" width="538" height="446" key="#com.intellij.tools.ToolEditorDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666617272" />
-    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614195111753">
+    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614209117040">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613752397178" />
-    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614195111753" />
+    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614209117040" />
     <state x="4638" y="285" key="EnvironmentVariablesDialog" timestamp="1613747591520">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
@@ -203,9 +198,9 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4490" y="283" width="618" height="552" key="find.popup/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613667289446" />
-    <state x="4465" y="268" width="672" height="678" key="search.everywhere.popup" timestamp="1613689603628">
+    <state x="4466" y="269" width="672" height="678" key="search.everywhere.popup" timestamp="1614208705991">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
-    <state x="4465" y="268" width="672" height="678" key="search.everywhere.popup/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613689603628" />
+    <state x="4466" y="269" width="672" height="678" key="search.everywhere.popup/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614208705991" />
   </component>
 </project>

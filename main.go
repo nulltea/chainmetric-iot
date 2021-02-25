@@ -27,6 +27,7 @@ func main() {
 
 	log.ChangePackageLogLevel("dht", log.ErrorLevel)
 	log.ChangePackageLogLevel("i2c", log.ErrorLevel)
+
 	go process()
 	go shutdown(quit, done)
 
@@ -42,6 +43,9 @@ func process() {
 		logger.Error(err)
 	}
 	if err := reader.SubscribeToAirQualityReadings(0x5a, 3); err != nil {
+		logger.Error(err)
+	}
+	if err := reader.SubscribeToAmbientLightReadings(0x60, 4); err != nil {
 		logger.Error(err)
 	}
 	// reader.SubscribeToPressureReadings("BMP280", 0x76, 3)

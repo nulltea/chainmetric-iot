@@ -18,6 +18,10 @@ var(
 	Luminosity Metric = "luminosity"
 	Magnetism Metric = "magnetism"
 	Pressure Metric = "pressure"
-	AirC02Concentration Metric = "air_C02_cc"
-	AirTVOCsConcentration Metric = "air_TVOC_cc"
+	Altitude Metric = "altitude"
+	UVLight Metric = "uv_light"
+	VisibleLight Metric = "visible_light"
+	IRLight Metric = "ir_light"
+	AirC02Concentration Metric = "air_C02_concentration"
+	AirTVOCsConcentration Metric = "air_TVOC_concentration"
 )
