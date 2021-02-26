@@ -8,11 +8,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/readings/ambientLight.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sensors/bmpXXX.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sensors/ccs811.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sensors/dhtXX.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sensors/max44009.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sensors/si1145.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/metricModel.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/metricModel.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/readings/airQuality.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/airQuality.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/ambientLight.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/ambientLight.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/luminosity.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/luminosity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/pressure.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/pressure.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/temperature.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/temperature.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +63,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
       <recent name="C:\source\repos\iot-blockchain\sensor\readings" />
       <recent name="C:\source\repos\iot-blockchain\sensor\config" />
       <recent name="C:\source\repos\iot-blockchain\sensor" />
@@ -124,6 +133,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="4427" y="238" key="#Inspections" timestamp="1614292901793">
+      <screen x="3840" y="50" width="1920" height="1030" />
+    </state>
+    <state x="4427" y="238" key="#Inspections/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614292901793" />
     <state x="4256" y="207" width="1086" height="814" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1613748774015">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
@@ -141,11 +154,11 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4531" y="338" width="538" height="446" key="#com.intellij.tools.ToolEditorDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666617272" />
-    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614209117040">
+    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614297471328">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613752397178" />
-    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614209117040" />
+    <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614297471328" />
     <state x="4638" y="285" key="EnvironmentVariablesDialog" timestamp="1613747591520">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
@@ -154,10 +167,10 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4578" y="315" key="FileChooserDialogImpl/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666262989" />
-    <state x="4523" y="480" key="GitCloneDialog" timestamp="1614202832440">
+    <state x="4523" y="480" key="GitCloneDialog" timestamp="1614295536128">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
-    <state x="4523" y="480" key="GitCloneDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614202832440" />
+    <state x="4523" y="480" key="GitCloneDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614295536128" />
     <state width="1880" height="367" key="GridCell.Tab.0.bottom" timestamp="1613753145054">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
