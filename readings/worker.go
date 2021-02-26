@@ -11,18 +11,18 @@ import (
 type sensorReadingRoutine func(ctx context.Context)
 
 type SensorsReader struct {
-	ctx context.Context
-	waitGroup sync.WaitGroup
-	routines []sensorReadingRoutine
-	readings chan model.MetricReadings
-	cleanQueue []func() error
+	ctx        context.Context
+	waitGroup  sync.WaitGroup
+	routines   []sensorReadingRoutine
+	readings   chan model.MetricReadings
+	deferQueue []func() error
 }
 
 func NewSensorsReader(ctx context.Context) *SensorsReader {
 	return &SensorsReader{
-		ctx: ctx,
-		routines: []sensorReadingRoutine{},
-		cleanQueue: []func() error {},
+		ctx:        ctx,
+		routines:   []sensorReadingRoutine{},
+		deferQueue: []func() error {},
 	}
 }
 
@@ -50,7 +50,7 @@ func (s *SensorsReader) subscribe(routine sensorReadingRoutine) {
 }
 
 func (s *SensorsReader) Clean() {
-	for _, cf := range s.cleanQueue {
+	for _, cf := range s.deferQueue {
 		if err := cf(); err != nil {
 			fmt.Println(err)
 		}
