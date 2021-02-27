@@ -48,6 +48,9 @@ func process() {
 	if err := reader.SubscribeToAmbientLightReadings(0x60, 4); err != nil {
 		logger.Error(err)
 	}
+	if err := reader.SubscribeToVitalsReadings(0x57, 2); err != nil {
+		logger.Error(err)
+	}
 	// reader.SubscribeToPressureReadings("BMP280", 0x76, 3)
 	err := rpio.Open(); if err != nil{
 		logger.Fatal(err)

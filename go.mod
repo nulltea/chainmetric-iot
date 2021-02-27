@@ -11,4 +11,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/stianeikeland/go-rpio/v4 v4.4.0
+	github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea
 )
+
+replace github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea => github.com/timoth-y/max3010x v0.0.0-20210227142301-7a3d7c5be5c7
