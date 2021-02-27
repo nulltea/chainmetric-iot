@@ -15,3 +15,10 @@ sync:
 
 run:
 	sudo ./$(OUTPUT)
+
+i2c:
+	sudo i2cdetect -l
+	sudo i2cdetect -y 1
+	sudo i2cdetect -y 2
+	sudo i2cdetect -y 3
+	sudo i2cdetect -y 4
