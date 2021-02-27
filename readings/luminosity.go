@@ -10,11 +10,11 @@ import (
 
 func (s *SensorsReader) SubscribeToLuminosityReadings(addr uint8, bus int) error {
 	sensor := sensors.NewMAX44009(addr, bus)
-	s.deferQueue = append(s.deferQueue, sensor.Close)
 
 	if err := sensor.Init(); err != nil {
 		return err
 	}
+	s.deferQueue = append(s.deferQueue, sensor.Close)
 
 	s.subscribe(func(ctx context.Context) {
 		defer s.waitGroup.Done()

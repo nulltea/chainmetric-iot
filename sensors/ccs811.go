@@ -89,8 +89,8 @@ func (s *CCS811) Init() (err error) {
 		return fmt.Errorf("not that sensorType")
 	}
 
-	// setReset(i2c)
-	// time.Sleep(CCS811_RESET_TIME * time.Millisecond)
+	s.setReset()
+	time.Sleep(CCS811_RESET_TIME * time.Millisecond)
 
 	s.getStatus()
 
@@ -112,9 +112,9 @@ func (s *CCS811) Init() (err error) {
 		return fmt.Errorf("CCS811 device is in FW mode")
 	}
 
-	// setConfig(i2c); if err != nil {
-	// 	return err
-	// }
+	s.setConfig(); if err != nil {
+		return err
+	}
 
 	return
 }

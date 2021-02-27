@@ -12,7 +12,7 @@ type Metric string
 // gas
 // accelerometer - ADXL345
 
-var(
+var (
 	Temperature           Metric = "temperature"
 	Humidity              Metric = "humidity"
 	Luminosity            Metric = "luminosity"
@@ -25,4 +25,6 @@ var(
 	AirCO2Concentration   Metric = "air_CO2_concentration"
 	AirTVOCsConcentration Metric = "air_TVOC_concentration"
 	Acceleration          Metric = "acceleration"
+	HeartRate             Metric = "heart_rate"
+	BloodOxidation        Metric = "blood_oxidation"
 )

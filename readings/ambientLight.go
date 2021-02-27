@@ -10,11 +10,11 @@ import (
 
 func (s *SensorsReader) SubscribeToAmbientLightReadings(addr uint8, bus int) error {
 	sensor := sensors.NewSI1145(addr, bus)
-	s.deferQueue = append(s.deferQueue, sensor.Close)
 
 	err := sensor.Init(); if err != nil {
 		return err
 	}
+	s.deferQueue = append(s.deferQueue, sensor.Close)
 
 	s.subscribe(func(ctx context.Context) {
 		defer s.waitGroup.Done()
