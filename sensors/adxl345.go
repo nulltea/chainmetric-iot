@@ -6,6 +6,8 @@ import (
 	"github.com/d2r2/go-i2c"
 
 	"sensorsys/model"
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 // Earth Gravity constant in [m/s^2]
@@ -65,6 +67,10 @@ func NewADXL345(addr uint8, bus int) *ADXL345 {
 	}
 }
 
+func (s *ADXL345) ID() string {
+	return "ADXL345"
+}
+
 func (s *ADXL345) Init() (err error) {
 	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
 		return
@@ -87,17 +93,17 @@ func (s *ADXL345) Init() (err error) {
 	return
 }
 
-// Read retrieves axes acceleration data as multiplications of G
-func (s *ADXL345) Read() (*model.Vector, error) {
+// ReadAxesG retrieves axes acceleration data as multiplications of G
+func (s *ADXL345) ReadAxesG() (model.Vector, error) {
 	buf, _, err := s.i2c.ReadRegBytes(dataX0, 6); if err != nil {
-		return nil, err
+		return model.Vector{}, err
 	}
 
 	x := int16(buf[0]) | (int16(buf[1]) << 8)
 	y := int16(buf[2]) | (int16(buf[3]) << 8)
 	z := int16(buf[4]) | (int16(buf[5]) << 8)
 
-	return &model.Vector{
+	return model.Vector {
 		X: round(float64(x) * scaleMultiplier, 4),
 		Y: round(float64(y) * scaleMultiplier, 4),
 		Z: round(float64(z) * scaleMultiplier, 4),
@@ -105,16 +111,21 @@ func (s *ADXL345) Read() (*model.Vector, error) {
 }
 
 // ReadAxesMS2 parses data returned by GetAxesG and returns them in [m/s^2]
-func (s *ADXL345) ReadAxesMS2() (*model.Vector, error) {
-	gAxes, err := s.Read(); if err != nil {
-		return nil, err
+func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
+	gAxes, err := s.ReadAxesG(); if err != nil {
+		return model.Vector{}, err
 	}
 
-	return &model.Vector {
+	return model.Vector {
 		X: round(gAxes.X*earthGravityMS2, 4),
 		Y: round(gAxes.Y*earthGravityMS2, 4),
 		Z: round(gAxes.Z*earthGravityMS2, 4),
 	}, nil
+}
+
+func (s *ADXL345) Harvest(ctx *worker.Context) {
+	ctx.For(metrics.AccelerationInG).WriteWithError(s.ReadAxesG())
+	ctx.For(metrics.AccelerationInMS2).WriteWithError(s.ReadAxesMS2())
 }
 
 func (s *ADXL345) Verify() bool {

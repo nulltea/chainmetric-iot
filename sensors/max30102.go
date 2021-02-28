@@ -4,6 +4,9 @@ import (
 	"fmt"
 
 	"github.com/cgxeiji/max3010x"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 type MAX30102 struct {
@@ -19,6 +22,10 @@ func NewMAX30102(addr uint8, bus int) *MAX30102 {
 	}
 }
 
+func (s *MAX30102) ID() string {
+	return "MAX30102"
+}
+
 func (s *MAX30102) Init() (err error) {
 	s.dev, err = max3010x.NewOnBus(fmt.Sprintf("/dev/i2c-%d", s.bus)); if err != nil {
 		return
@@ -31,15 +38,9 @@ func (s *MAX30102) Init() (err error) {
 	return
 }
 
-func (s *MAX30102) Read() (bpm float64, o2 float64, err error) {
-	if bpm, err = s.ReadHeartRate(); err != nil {
-		return 0, 0, err
-	}
-	if o2, err = s.ReadSpO2(); err != nil {
-		return bpm, 0, err
-	}
-
-	return
+func (s *MAX30102) Harvest(ctx *worker.Context) {
+	ctx.For(metrics.HeartRate).WriteWithError(s.ReadHeartRate())
+	ctx.For(metrics.BloodOxidation).WriteWithError(s.ReadSpO2())
 }
 
 func (s *MAX30102) ReadHeartRate() (float64, error) {

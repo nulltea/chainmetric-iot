@@ -4,6 +4,9 @@ import (
 	"fmt"
 
 	"github.com/d2r2/go-i2c"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 const(
@@ -140,6 +143,10 @@ func NewSI1145(addr uint8, bus int) *SI1145 {
 	}
 }
 
+func (s *SI1145) ID() string {
+	return "SI1145"
+}
+
 func (s *SI1145) Init() (err error) {
 	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
 		return
@@ -207,20 +214,35 @@ func (s *SI1145) Init() (err error) {
 	return nil
 }
 
-func (s *SI1145) Read() (uv float32, visible float32, ir float32, err error) {
-	uv, err = s.ReadUV(); if err != nil {
-		fmt.Println(err)
-	}
+// ReadUV returns the UV index * 100 (divide by 100 to get the index)
+func (s *SI1145) ReadUV() (float32, error) {
+	res, err := s.i2c.ReadRegU16LE(SI1145_REG_UVINDEX0)
+	return float32(res), err
+}
 
-	visible, err = s.ReadVisible(); if err != nil {
-		fmt.Println(err)
-	}
+// ReadVisible returns visible + IR light levels
+func (s *SI1145) ReadVisible() (float32, error) {
+	res, err := s.i2c.ReadRegU16LE(SI1145_REG_ALSVISDATA0)
+	return float32(res), err
+}
 
-	ir, err = s.ReadIR(); if err != nil {
-		fmt.Println(err)
-	}
+// ReadIR returns IR light levels
+func (s *SI1145) ReadIR() (float32, error) {
+	res, err := s.i2c.ReadRegU16LE(SI1145_REG_ALSIRDATA0)
+	return float32(res), err
+}
 
-	return
+// ReadProximity returns "Proximity" - assumes an IR LED is attached to LED
+func (s *SI1145) ReadProximity() (float32, error) {
+	res, err := s.i2c.ReadRegU16LE(SI1145_REG_PS1DATA0)
+	return float32(res), err
+}
+
+func (s *SI1145) Harvest(ctx *worker.Context) {
+	ctx.For(metrics.UVLight).WriteWithError(s.ReadUV())
+	ctx.For(metrics.VisibleLight).WriteWithError(s.ReadVisible())
+	ctx.For(metrics.IRLight).WriteWithError(s.ReadIR())
+	ctx.For(metrics.Proximity).WriteWithError(s.ReadProximity())
 }
 
 func (s *SI1145) Verify() bool {
@@ -229,30 +251,6 @@ func (s *SI1145) Verify() bool {
 
 func (s *SI1145) Close() error {
 	return s.i2c.Close()
-}
-
-// readUV returns the UV index * 100 (divide by 100 to get the index)
-func (s *SI1145) ReadUV() (float32, error) {
-	res, err := s.i2c.ReadRegU16LE(SI1145_REG_UVINDEX0)
-	return float32(res), err
-}
-
-// readVisible returns visible + IR light levels
-func (s *SI1145) ReadVisible() (float32, error) {
-	res, err := s.i2c.ReadRegU16LE(SI1145_REG_ALSVISDATA0)
-	return float32(res), err
-}
-
-// readIR returns IR light levels
-func (s *SI1145) ReadIR() (float32, error) {
-	res, err := s.i2c.ReadRegU16LE(SI1145_REG_ALSIRDATA0)
-	return float32(res), err
-}
-
-// readProximity returns "Proximity" - assumes an IR LED is attached to LED
-func (s *SI1145) ReadProximity() (float32, error) {
-	res, err := s.i2c.ReadRegU16LE(SI1145_REG_PS1DATA0)
-	return float32(res), err
 }
 
 func (s *SI1145) writeParam(p, v uint8) (uint8, error) {

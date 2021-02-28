@@ -2,6 +2,9 @@ package sensors
 
 import (
 	"github.com/d2r2/go-dht"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 type DHTxx struct {
@@ -16,10 +19,38 @@ func NewDHTxx(deviceID string, pin int) *DHTxx {
 	}
 }
 
-func (s *DHTxx) Read() (float32, float32, error) {
+func NewDHT11(pin int) *DHTxx {
+	return &DHTxx{
+		sensorType: dht.DHT11,
+		pin:        pin,
+	}
+}
+
+func NewDHT22(pin int) *DHTxx {
+	return &DHTxx{
+		sensorType: dht.DHT22,
+		pin:        pin,
+	}
+}
+
+func (s *DHTxx) ID() string {
+	return s.sensorType.String()
+}
+
+func (s *DHTxx) Init() error {
+	return nil
+}
+
+func (s *DHTxx) Harvest(ctx *worker.Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
-	return temperature, humidity, err
+	ctx.For(metrics.Temperature).Write(temperature)
+	ctx.For(metrics.Humidity).Write(humidity)
+	ctx.Error(err)
+}
+
+func (s *DHTxx) Close() error {
+	return nil
 }
 
 func sensorTypeDHT(deviceID string) dht.SensorType {

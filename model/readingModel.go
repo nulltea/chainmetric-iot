@@ -1,3 +1,10 @@
 package model
 
-type MetricReadings map[Metric]interface{}
+type MetricReading struct {
+	Source string
+	Value interface{}
+}
+
+type MetricReadings map[Metric] MetricReading
+
+type MetricReadingsPipe map[Metric] chan MetricReading

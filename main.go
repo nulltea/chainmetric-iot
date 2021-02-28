@@ -2,23 +2,24 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"os"
 	"os/signal"
-	"time"
 
 	log "github.com/d2r2/go-logger"
 	"github.com/op/go-logging"
-	"github.com/stianeikeland/go-rpio/v4"
 
-	"sensorsys/readings"
+	"sensorsys/model"
+	"sensorsys/model/metrics"
+	"sensorsys/sensors"
+	"sensorsys/worker"
 )
 
 var (
 	logger = logging.MustGetLogger("sensor")
-	reader = readings.NewSensorsReader(context.Background())
+	ctx = worker.NewContext(context.Background()).SetLogger(logger)
+	reader = worker.NewSensorsReader(ctx)
 )
-
 
 func main() {
 	done := make(chan struct{}, 1)
@@ -28,48 +29,42 @@ func main() {
 	log.ChangePackageLogLevel("dht", log.ErrorLevel)
 	log.ChangePackageLogLevel("i2c", log.ErrorLevel)
 
-	go process()
+	go run()
 	go shutdown(quit, done)
 
 	<-done
 	logger.Info("Shutdown")
 }
 
-func process() {
-	if err := reader.SubscribeToTemperatureReadings("DHT22", 5); err != nil {
-		logger.Error(err)
-	}
-	if err := reader.SubscribeToLuminosityReadings(0x4A, 1); err != nil {
-		logger.Error(err)
-	}
-	if err := reader.SubscribeToAirQualityReadings(0x5a, 3); err != nil {
-		logger.Error(err)
-	}
-	if err := reader.SubscribeToAmbientLightReadings(0x60, 4); err != nil {
-		logger.Error(err)
-	}
-	if err := reader.SubscribeToVitalsReadings(0x57, 2); err != nil {
-		logger.Error(err)
-	}
-	// reader.SubscribeToPressureReadings("BMP280", 0x76, 3)
-	err := rpio.Open(); if err != nil{
-		logger.Fatal(err)
-	}
-	pin := rpio.Pin(4)
-	pin.Input()
-	for {
-		readings := reader.Execute()
-		// readings := pin.Read()
-		fmt.Println(readings)
-		time.Sleep(1 * time.Second)
-	}
+func run() {
+	reader.RegisterSensors(
+		sensors.NewDHT22(5),
+		sensors.NewMAX44009(0x4A, 1),
+		sensors.NewMAX30102(0x57, 2),
+		sensors.NewCCS811(0x5a, 3),
+		sensors.NewSI1145(0x60, 4),
+	)
+
+	reader.SubscribeReceiver(func(readings model.MetricReadings) {
+		s, _ := json.MarshalIndent(readings, "", "\t")
+		logger.Info(string(s))
+	}, metrics.Temperature,
+		metrics.Humidity,
+		metrics.Luminosity,
+		metrics.UVLight,
+		metrics.VisibleLight,
+		metrics.IRLight,
+		metrics.HeartRate,
+		metrics.BloodOxidation,
+		metrics.AirCO2Concentration,
+		metrics.AirTVOCsConcentration,
+	)
 }
 
 func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
 	logger.Info("Shutting down...")
 
-	rpio.Close()
 	reader.Clean()
 
 	close(done)

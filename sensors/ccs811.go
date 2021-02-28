@@ -5,6 +5,9 @@ import (
 	"time"
 
 	"github.com/d2r2/go-i2c"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 const(
@@ -80,6 +83,10 @@ func NewCCS811(addr uint8, bus int) *CCS811 {
 	}
 }
 
+func (s *CCS811) ID() string {
+	return "CCS811"
+}
+
 func (s *CCS811) Init() (err error) {
 	s. i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
 		return
@@ -137,6 +144,14 @@ func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
 	}
 	err = nil
 	return
+}
+
+func (s *CCS811) Harvest(ctx *worker.Context) {
+	eCO2, eTVOC, err := s.Read()
+
+	ctx.For(metrics.AirCO2Concentration).Write(eCO2)
+	ctx.For(metrics.AirTVOCsConcentration).Write(eTVOC)
+	ctx.Error(err)
 }
 
 func (s *CCS811) Verify() bool {

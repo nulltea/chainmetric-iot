@@ -5,17 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/readings/vitals.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sensors/max30102.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model/metrics/metrics.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/context.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/sensor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/writer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/metricModel.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/metricModel.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/ambientLight.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/ambientLight.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/luminosity.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/luminosity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/pressure.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/pressure.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/readingModel.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/readingModel.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/acceleration.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/airQuality.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/ambientLight.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/luminosity.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/pressure.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/temperature.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/vitals.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/adxl345.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/adxl345.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/bmpXXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/bmpXXX.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors/ccs811.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/ccs811.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/dhtXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/dhtXX.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/max30102.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max30102.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/max44009.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max44009.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/si1145.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/si1145.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,11 +71,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\worker" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\worker\sensor" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
       <recent name="C:\source\repos\iot-blockchain\sensorsys\readings" />
       <recent name="C:\source\repos\iot-blockchain\sensorsys" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
-      <recent name="C:\source\repos\iot-blockchain\sensor\readings" />
-      <recent name="C:\source\repos\iot-blockchain\sensor\config" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />

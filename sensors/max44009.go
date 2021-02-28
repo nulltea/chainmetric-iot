@@ -5,6 +5,9 @@ import (
 	"math"
 
 	"github.com/d2r2/go-i2c"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
 const(
@@ -22,6 +25,10 @@ func NewMAX44009(addr uint8, bus int) *MAX44009 {
 		addr: addr,
 		bus: bus,
 	}
+}
+
+func (s *MAX44009) ID() string {
+	return "MAX44009"
 }
 
 func (s *MAX44009) Init() (err error) {
@@ -50,6 +57,9 @@ func (s *MAX44009) Read() (lux float64, err error) {
 	return
 }
 
+func (s *MAX44009) Harvest(ctx *worker.Context) {
+	ctx.For(metrics.Luminosity).WriteWithError(s.Read())
+}
 
 func (s *MAX44009) Verify() bool {
 	return true // TODO verify by device ID

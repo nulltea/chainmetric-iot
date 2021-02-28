@@ -3,9 +3,12 @@ package sensors
 import (
 	"github.com/d2r2/go-bsbmp"
 	"github.com/d2r2/go-i2c"
+
+	"sensorsys/model/metrics"
+	"sensorsys/worker"
 )
 
-type BMPxxx struct {
+type BMPxx struct {
 	sensorType bsbmp.SensorType
 	addr uint8
 	bus int
@@ -13,13 +16,17 @@ type BMPxxx struct {
 	bmp *bsbmp.BMP
 }
 
-func NewBMPxxx(deviceID string, addr uint8, bus int) *BMPxxx {
-	return &BMPxxx{
+func NewBMPxxx(deviceID string, addr uint8, bus int) *BMPxx {
+	return &BMPxx{
 		sensorType: sensorTypeBMP(deviceID),
 	}
 }
 
-func (s *BMPxxx) Init() (err error) {
+func (s *BMPxx) ID() string {
+	return s.sensorType.String()
+}
+
+func (s *BMPxx) Init() (err error) {
 	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
 		return
 	}
@@ -31,11 +38,11 @@ func (s *BMPxxx) Init() (err error) {
 	return
 }
 
-func (s *BMPxxx) Read() (pa float32, err error) {
-	return s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD)
+func (s *BMPxx) Harvest(ctx *worker.Context) {
+	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
 }
 
-func (s *BMPxxx) Close() error {
+func (s *BMPxx) Close() error {
 	return s.Close()
 }
 
