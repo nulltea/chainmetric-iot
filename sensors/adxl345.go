@@ -7,7 +7,7 @@ import (
 
 	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 // Earth Gravity constant in [m/s^2]
@@ -123,9 +123,16 @@ func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
 	}, nil
 }
 
-func (s *ADXL345) Harvest(ctx *worker.Context) {
+func (s *ADXL345) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.AccelerationInG).WriteWithError(s.ReadAxesG())
 	ctx.For(metrics.AccelerationInMS2).WriteWithError(s.ReadAxesMS2())
+}
+
+func (s *ADXL345) Metrics() []model.Metric {
+	return []model.Metric{
+		metrics.AccelerationInG,
+		metrics.AccelerationInMS2,
+	}
 }
 
 func (s *ADXL345) Verify() bool {

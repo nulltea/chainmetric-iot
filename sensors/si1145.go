@@ -5,8 +5,9 @@ import (
 
 	"github.com/d2r2/go-i2c"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 const(
@@ -238,11 +239,20 @@ func (s *SI1145) ReadProximity() (float32, error) {
 	return float32(res), err
 }
 
-func (s *SI1145) Harvest(ctx *worker.Context) {
+func (s *SI1145) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.UVLight).WriteWithError(s.ReadUV())
 	ctx.For(metrics.VisibleLight).WriteWithError(s.ReadVisible())
 	ctx.For(metrics.IRLight).WriteWithError(s.ReadIR())
 	ctx.For(metrics.Proximity).WriteWithError(s.ReadProximity())
+}
+
+func (s *SI1145) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.UVLight,
+		metrics.VisibleLight,
+		metrics.IRLight,
+		metrics.Proximity,
+	}
 }
 
 func (s *SI1145) Verify() bool {

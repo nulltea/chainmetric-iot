@@ -1,6 +1,8 @@
-package worker
+package sensor
 
-import "sensorsys/model"
+import (
+	"sensorsys/model"
+)
 
 type metricWriter struct {
 	metric model.Metric
@@ -10,7 +12,7 @@ type metricWriter struct {
 func (w *metricWriter) Write(value interface{}) {
 	if ch, ok := w.ctx.Pipe[w.metric]; ok {
 		ch <- model.MetricReading {
-			Source: w.ctx.SensorID,
+			Source: w.ctx.Of,
 			Value: value,
 		}
 	}

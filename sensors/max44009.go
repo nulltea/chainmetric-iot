@@ -6,8 +6,9 @@ import (
 
 	"github.com/d2r2/go-i2c"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 const(
@@ -57,8 +58,14 @@ func (s *MAX44009) Read() (lux float64, err error) {
 	return
 }
 
-func (s *MAX44009) Harvest(ctx *worker.Context) {
+func (s *MAX44009) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Luminosity).WriteWithError(s.Read())
+}
+
+func (s *MAX44009) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.Luminosity,
+	}
 }
 
 func (s *MAX44009) Verify() bool {

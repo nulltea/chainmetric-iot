@@ -6,8 +6,9 @@ import (
 
 	"github.com/d2r2/go-i2c"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 const(
@@ -146,12 +147,19 @@ func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
 	return
 }
 
-func (s *CCS811) Harvest(ctx *worker.Context) {
+func (s *CCS811) Harvest(ctx *sensor.Context) {
 	eCO2, eTVOC, err := s.Read()
 
 	ctx.For(metrics.AirCO2Concentration).Write(eCO2)
 	ctx.For(metrics.AirTVOCsConcentration).Write(eTVOC)
 	ctx.Error(err)
+}
+
+func (s *CCS811) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.AirCO2Concentration,
+		metrics.AirTVOCsConcentration,
+	}
 }
 
 func (s *CCS811) Verify() bool {

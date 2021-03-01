@@ -4,8 +4,9 @@ import (
 	"github.com/d2r2/go-bsbmp"
 	"github.com/d2r2/go-i2c"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 type BMPxx struct {
@@ -38,8 +39,14 @@ func (s *BMPxx) Init() (err error) {
 	return
 }
 
-func (s *BMPxx) Harvest(ctx *worker.Context) {
+func (s *BMPxx) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
+}
+
+func (s *BMPxx) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.Pressure,
+	}
 }
 
 func (s *BMPxx) Close() error {

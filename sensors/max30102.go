@@ -5,8 +5,9 @@ import (
 
 	"github.com/cgxeiji/max3010x"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 type MAX30102 struct {
@@ -38,9 +39,16 @@ func (s *MAX30102) Init() (err error) {
 	return
 }
 
-func (s *MAX30102) Harvest(ctx *worker.Context) {
+func (s *MAX30102) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.HeartRate).WriteWithError(s.ReadHeartRate())
 	ctx.For(metrics.BloodOxidation).WriteWithError(s.ReadSpO2())
+}
+
+func (s *MAX30102) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.HeartRate,
+		metrics.BloodOxidation,
+	}
 }
 
 func (s *MAX30102) ReadHeartRate() (float64, error) {

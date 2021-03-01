@@ -3,8 +3,9 @@ package sensors
 import (
 	"github.com/d2r2/go-dht"
 
+	"sensorsys/model"
 	"sensorsys/model/metrics"
-	"sensorsys/worker"
+	"sensorsys/readings/sensor"
 )
 
 type DHTxx struct {
@@ -41,12 +42,19 @@ func (s *DHTxx) Init() error {
 	return nil
 }
 
-func (s *DHTxx) Harvest(ctx *worker.Context) {
+func (s *DHTxx) Harvest(ctx *sensor.Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
 	ctx.For(metrics.Temperature).Write(temperature)
 	ctx.For(metrics.Humidity).Write(humidity)
 	ctx.Error(err)
+}
+
+func (s *DHTxx) Metrics() []model.Metric {
+	return []model.Metric {
+		metrics.Temperature,
+		metrics.Humidity,
+	}
 }
 
 func (s *DHTxx) Close() error {

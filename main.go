@@ -5,20 +5,22 @@ import (
 	"encoding/json"
 	"os"
 	"os/signal"
+	"time"
 
 	log "github.com/d2r2/go-logger"
 	"github.com/op/go-logging"
 
 	"sensorsys/model"
 	"sensorsys/model/metrics"
+	"sensorsys/readings"
 	"sensorsys/sensors"
-	"sensorsys/worker"
 )
 
 var (
 	logger = logging.MustGetLogger("sensor")
-	ctx = worker.NewContext(context.Background()).SetLogger(logger)
-	reader = worker.NewSensorsReader(ctx)
+	ctx = readings.NewContext(context.Background()).
+		SetLogger(logger)
+	reader = readings.NewSensorsReader(ctx)
 )
 
 func main() {
@@ -45,10 +47,13 @@ func run() {
 		sensors.NewSI1145(0x60, 4),
 	)
 
+	go reader.Process()
+
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
 		logger.Info(string(s))
-	}, metrics.Temperature,
+	}, time.Second,
+		metrics.Temperature,
 		metrics.Humidity,
 		metrics.Luminosity,
 		metrics.UVLight,
