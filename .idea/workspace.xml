@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/readingModel.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/readingModel.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/receiver/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/receiver/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/sensor/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/sensor/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/sensor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/adxl345.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/adxl345.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/bmpXXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/bmpXXX.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/ccs811.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/ccs811.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/dhtXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/dhtXX.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/max30102.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max30102.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/max44009.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max44009.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/si1145.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/si1145.go" afterDir="false" />
-    </list>
+    <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

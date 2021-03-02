@@ -1,4 +1,4 @@
-package readings
+package receiver
 
 import (
 	"sensorsys/model"

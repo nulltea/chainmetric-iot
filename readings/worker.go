@@ -1,7 +1,6 @@
 package readings
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -13,14 +12,14 @@ import (
 type SensorsReader struct {
 	context   *Context
 	sensors   []sensor.Sensor
-	requests  chan Request
+	requests  chan receiver.Request
 }
 
 func NewSensorsReader(ctx *Context) *SensorsReader {
 	return &SensorsReader{
 		context:   ctx,
 		sensors:   make([]sensor.Sensor, 0),
-		requests:  make(chan Request),
+		requests:  make(chan receiver.Request),
 	}
 }
 
@@ -34,12 +33,12 @@ func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 	}
 }
 
-func (s *SensorsReader) SubscribeReceiver(receiver ReceiverFunc, period time.Duration, metrics ...model.Metric) {
+func (s *SensorsReader) SubscribeReceiver(handler receiver.ReceiverFunc, period time.Duration, metrics ...model.Metric) {
 	go func() {
 		for {
-			s.requests <- Request {
+			s.requests <- receiver.Request{
 				Metrics: metrics,
-				Handler: receiver,
+				Handler: handler,
 			}
 
 			time.Sleep(period)
@@ -58,7 +57,7 @@ func (s *SensorsReader) Process() {
 	}()
 }
 
-func (s *SensorsReader) handle(ctx *receiver.Context, req Request) {
+func (s *SensorsReader) handle(ctx *receiver.Context, req receiver.Request) {
 	ctx.WaitGroup = &sync.WaitGroup{}
 
 	for _, sn := range s.sensors {
@@ -105,6 +104,7 @@ func aggregate(ctx *receiver.Context) model.MetricReadings {
 	results := make(model.MetricReadings)
 	for metric, ch := range ctx.Pipe {
 		readings := make([]model.MetricReading, 0)
+
 		L:
 		for {
 			select {
@@ -114,12 +114,9 @@ func aggregate(ctx *receiver.Context) model.MetricReadings {
 				break L
 			}
 		}
-		if len(readings) != 0 {
-			// TODO config-based or precision-based aggregation here
 
-			results[metric] = readings[len(readings) - 1].Value
-		} else {
-			fmt.Println("empty")
+		if len(readings) != 0 {
+			results[metric] = readings[len(readings) - 1].Value // TODO: config-based or precision-based aggregation here
 		}
 	}
 

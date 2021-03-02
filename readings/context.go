@@ -15,7 +15,6 @@ import (
 
 type Context struct {
 	Parent context.Context
-	Of     string
 	Logger *logging.Logger
 	WaitGroup *sync.WaitGroup
 	Config config.Config
@@ -61,12 +60,12 @@ func (c *Context) SetConfig(config config.Config) *Context {
 
 func (c *Context) Error(err error) {
 	if err != nil {
-		c.Logger.Errorf("%v: %v", c.Of, err)
+		c.Logger.Errorf("worker: %v", err)
 	}
 }
 
 func (c *Context) Info(info string) {
-	c.Logger.Infof("%v: %v", c.Of, info)
+	c.Logger.Infof("worker: %v", info)
 }
 
 func (c *Context) Deadline() (deadline time.Time, ok bool) {

@@ -43,6 +43,10 @@ func (s *MockSensor) Metrics() []model.Metric {
 	}
 }
 
+func (s *MockSensor) Active() bool {
+	return true
+}
+
 func (s *MockSensor) Close() error {
 	return nil
 }
