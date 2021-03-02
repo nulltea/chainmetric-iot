@@ -12,7 +12,7 @@ type metricWriter struct {
 func (w *metricWriter) Write(value interface{}) {
 	if ch, ok := w.ctx.Pipe[w.metric]; ok {
 		ch <- model.MetricReading {
-			Source: w.ctx.Of,
+			Source: w.ctx.SensorID,
 			Value: value,
 		}
 	}

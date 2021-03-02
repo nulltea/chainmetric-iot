@@ -2,21 +2,22 @@ package readings
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/op/go-logging"
 
 	"sensorsys/config"
 	"sensorsys/model"
-	"sensorsys/readings/sensor"
 	"sensorsys/readings/receiver"
+	"sensorsys/readings/sensor"
 )
 
 type Context struct {
 	Parent context.Context
 	Of     string
 	Logger *logging.Logger
-	Pipe   model.MetricReadingsPipe
+	WaitGroup *sync.WaitGroup
 	Config config.Config
 }
 
@@ -28,13 +29,22 @@ func NewContext(parent context.Context) *Context {
 
 func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 	return &sensor.Context{
-		Context: c,
+		Parent: c,
+		Logger: c.Logger,
+		SensorID: s.ID(),
+		Pipe: make(model.MetricReadingsPipe),
 	}
 }
 
-func (c *Context) ForReceiver() *receiver.Context {
+func (c *Context) ForRequest(metrics []model.Metric) *receiver.Context {
+	pipe := make(model.MetricReadingsPipe)
+	for _, metric := range metrics {
+		pipe[metric] = make(chan model.MetricReading, 3)
+	}
 	return &receiver.Context {
-		Context: c,
+		Parent: c,
+		Logger: c.Logger,
+		Pipe: pipe,
 	}
 }
 
@@ -47,6 +57,7 @@ func (c *Context) SetConfig(config config.Config) *Context {
 	c.Config = config
 	return c
 }
+
 
 func (c *Context) Error(err error) {
 	if err != nil {
@@ -62,7 +73,7 @@ func (c *Context) Deadline() (deadline time.Time, ok bool) {
 	return c.Parent.Deadline()
 }
 
-func (c *Context) Done() <-chan struct{} {
+func (c *Context) Done() <- chan struct{} {
 	return c.Parent.Done()
 }
 
@@ -73,5 +84,3 @@ func (c *Context) Err() error {
 func (c *Context) Value(key interface{}) interface{} {
 	return c.Parent.Value(key)
 }
-
-

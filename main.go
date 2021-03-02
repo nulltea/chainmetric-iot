@@ -66,6 +66,23 @@ func run() {
 	)
 }
 
+// func mock() {
+// 	reader.RegisterSensors(
+// 		mocks.NewMockSensor(),
+// 	)
+//
+// 	go reader.Process()
+//
+// 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
+// 		s, _ := json.MarshalIndent(readings, "", "\t")
+// 		logger.Info(string(s))
+// 	}, 2 * time.Second,
+// 		metrics.Temperature,
+// 		metrics.Humidity,
+// 		metrics.Luminosity
+// 	)
+// }
+
 func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
 	logger.Info("Shutting down...")

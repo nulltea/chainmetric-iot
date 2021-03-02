@@ -5,24 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/readings/receiver.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readings/receiver/context.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readings/request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readings/sensor/context.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sensors/mock.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mocks/sensor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/adxl345.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/adxl345.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/bmpXXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/bmpXXX.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/ccs811.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/ccs811.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/dhtXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/dhtXX.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/max30102.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max30102.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/max44009.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/max44009.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors/si1145.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensors/si1145.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/sensor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/writer.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/writer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/receiver.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/receiver/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/receiver/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/sensor/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/sensor/writer.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/sensor/writer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/mock.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +55,12 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/readings/receiver" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="ssh.settings" />
   </component>
@@ -69,11 +70,11 @@
       <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\readings\receiver" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\mocks" />
       <recent name="C:\source\repos\iot-blockchain\sensorsys\readings\sensor" />
       <recent name="C:\source\repos\iot-blockchain\sensorsys\readings" />
       <recent name="C:\source\repos\iot-blockchain\sensorsys\worker" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\worker\sensor" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
     </key>
   </component>
   <component name="RemoteSynchronizer">
@@ -144,10 +145,10 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4427" y="238" key="#Inspections/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614292901793" />
-    <state x="4256" y="207" width="1086" height="814" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1613748774015">
+    <state x="4256" y="207" width="1086" height="814" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1614706385605">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state x="4256" y="207" width="1086" height="814" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613748774015" />
+    <state x="4256" y="207" width="1086" height="814" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614706385605" />
     <state x="4256" y="215" key="#com.intellij.execution.impl.EditConfigurationsDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613669585459" />
     <state x="4480" y="350" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1613672066417">
       <screen x="3840" y="50" width="1920" height="1030" />
@@ -161,11 +162,15 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4531" y="338" width="538" height="446" key="#com.intellij.tools.ToolEditorDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666617272" />
-    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614432616866">
+    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614699053427">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614432616866" />
+    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614699053427" />
     <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614297471328" />
+    <state width="624" height="646" key="DebuggerActiveHint" timestamp="1614708549015">
+      <screen x="3840" y="40" width="1920" height="1040" />
+    </state>
+    <state width="624" height="646" key="DebuggerActiveHint/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614708549015" />
     <state x="4638" y="285" key="EnvironmentVariablesDialog" timestamp="1613747591520">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
@@ -179,42 +184,46 @@
     </state>
     <state x="4523" y="474" key="GitCloneDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614355381924" />
     <state x="4523" y="480" key="GitCloneDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614295536128" />
-    <state width="1880" height="367" key="GridCell.Tab.0.bottom" timestamp="1614432473095">
+    <state width="1880" height="367" key="GridCell.Tab.0.bottom" timestamp="1614710645010">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.0.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614432473095" />
-    <state width="1880" height="367" key="GridCell.Tab.0.center" timestamp="1614432473095">
+    <state width="1880" height="367" key="GridCell.Tab.0.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710645010" />
+    <state width="1880" height="367" key="GridCell.Tab.0.center" timestamp="1614710645010">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.0.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614432473095" />
-    <state width="1880" height="367" key="GridCell.Tab.0.left" timestamp="1614432473094">
+    <state width="1880" height="367" key="GridCell.Tab.0.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710645010" />
+    <state width="1880" height="367" key="GridCell.Tab.0.left" timestamp="1614710645010">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.0.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614432473094" />
-    <state width="1880" height="367" key="GridCell.Tab.0.right" timestamp="1614432473095">
+    <state width="1880" height="367" key="GridCell.Tab.0.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710645010" />
+    <state width="1880" height="367" key="GridCell.Tab.0.right" timestamp="1614710645010">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.0.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614432473095" />
-    <state width="1880" height="367" key="GridCell.Tab.1.bottom" timestamp="1613753128699">
+    <state width="1880" height="367" key="GridCell.Tab.0.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710645010" />
+    <state width="1880" height="367" key="GridCell.Tab.1.bottom" timestamp="1614710644880">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.1.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613753128699" />
-    <state width="1880" height="367" key="GridCell.Tab.1.center" timestamp="1613753128699">
+    <state width="1880" height="367" key="GridCell.Tab.1.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710644880" />
+    <state width="1880" height="367" key="GridCell.Tab.1.center" timestamp="1614710644880">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.1.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613753128699" />
-    <state width="1880" height="367" key="GridCell.Tab.1.left" timestamp="1613753128698">
+    <state width="1880" height="367" key="GridCell.Tab.1.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710644880" />
+    <state width="1880" height="367" key="GridCell.Tab.1.left" timestamp="1614710644880">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.1.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613753128698" />
-    <state width="1880" height="367" key="GridCell.Tab.1.right" timestamp="1613753128699">
+    <state width="1880" height="367" key="GridCell.Tab.1.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710644880" />
+    <state width="1880" height="367" key="GridCell.Tab.1.right" timestamp="1614710644880">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state width="1880" height="367" key="GridCell.Tab.1.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1613753128699" />
+    <state width="1880" height="367" key="GridCell.Tab.1.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614710644880" />
     <state x="4138" y="210" width="1333" height="708" key="SettingsEditor" timestamp="1613669601904">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4138" y="210" width="1333" height="708" key="SettingsEditor/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613669601904" />
+    <state x="4548" y="273" key="com.goide.refactor.move.GoMoveDeclarationDialog" timestamp="1614699081793">
+      <screen x="3840" y="40" width="1920" height="1040" />
+    </state>
+    <state x="4548" y="273" key="com.goide.refactor.move.GoMoveDeclarationDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614699081793" />
     <state x="4490" y="283" width="618" height="552" key="find.popup" timestamp="1613667289446">
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>

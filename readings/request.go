@@ -2,11 +2,12 @@ package readings
 
 import (
 	"sensorsys/model"
-	"sensorsys/readings/receiver"
 )
+
+type ReceiverFunc func(model.MetricReadings)
 
 type Request struct {
 	Metrics []model.Metric
-	Context *receiver.Context
+	Handler ReceiverFunc
 }
 

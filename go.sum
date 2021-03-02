@@ -14,5 +14,9 @@ github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 h1:lDH9UUVJtmYCjyT0C
 github.com/op/go-logging v0.0.0-20160315200505-970db520ece7/go.mod h1:HzydrMdWErDVzsI23lYNej1Htcns9BCg93Dk0bBINWk=
 github.com/stianeikeland/go-rpio/v4 v4.4.0 h1:LScvNyXHF412co42LG5t7bvBDbtDAhLF828ebaGqmjA=
 github.com/stianeikeland/go-rpio/v4 v4.4.0/go.mod h1:BkK52zk+FRk8wCTDf88/86Sojc+NfUiCAHd1ZV3RuTM=
+github.com/timoth-y/max3010x v0.0.0-20210227142301-7a3d7c5be5c7 h1:cFKT1xpq07I6webrU6Vj7J/ukoWneEM5wYYkeV367jw=
+github.com/timoth-y/max3010x v0.0.0-20210227142301-7a3d7c5be5c7/go.mod h1:t553ts7ptTIMASPHACY/f8Rb2991hpAEnUiI2y0bWSk=
+periph.io/x/periph v3.6.4+incompatible h1:8FyXTbu9lcMVofz8mf+cj1pzTLN4V6EuPY2EF+DoJF4=
+periph.io/x/periph v3.6.4+incompatible/go.mod h1:EWr+FCIU2dBWz5/wSWeiIUJTriYv9v2j2ENBmgYyy7Y=
 periph.io/x/periph v3.6.7+incompatible h1:ZfRdHbcxVekgSJZmxp3873YpxNdWs6wg7waDCF7GB18=
 periph.io/x/periph v3.6.7+incompatible/go.mod h1:EWr+FCIU2dBWz5/wSWeiIUJTriYv9v2j2ENBmgYyy7Y=

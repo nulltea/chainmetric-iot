@@ -1,6 +1,7 @@
 package readings
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -10,19 +11,16 @@ import (
 )
 
 type SensorsReader struct {
-	ctx       *Context
-	waitGroup sync.WaitGroup
+	context   *Context
 	sensors   []sensor.Sensor
-	receivers []Receiver
 	requests  chan Request
 }
 
 func NewSensorsReader(ctx *Context) *SensorsReader {
 	return &SensorsReader{
-		ctx:     ctx,
-		sensors: make([]sensor.Sensor, 0),
-		receivers: make([]Receiver, 0),
-		requests: make(chan Request),
+		context:   ctx,
+		sensors:   make([]sensor.Sensor, 0),
+		requests:  make(chan Request),
 	}
 }
 
@@ -37,18 +35,13 @@ func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 }
 
 func (s *SensorsReader) SubscribeReceiver(receiver ReceiverFunc, period time.Duration, metrics ...model.Metric) {
-	s.receivers = append(s.receivers, Receiver {
-		Handler: receiver,
-		Metrics: metrics,
-		Period: period,
-	})
-
 	go func() {
 		for {
 			s.requests <- Request {
-				Context: s.ctx.ForReceiver(),
 				Metrics: metrics,
+				Handler: receiver,
 			}
+
 			time.Sleep(period)
 		}
 	}()
@@ -56,25 +49,39 @@ func (s *SensorsReader) SubscribeReceiver(receiver ReceiverFunc, period time.Dur
 
 func (s *SensorsReader) Process() {
 	s.initSensors()
+
 	go func() {
 		for {
 			// wait before receiver request
 			select {
 				case req := <- s.requests:
-					go s.handle(req.Context, req.Metrics)
+					go s.handle(s.context.ForRequest(req.Metrics), req)
 			}
 		}
 	}()
 }
 
-func (s *SensorsReader) handle(ctx *receiver.Context, metrics []model.Metric) {
-	for _, metric := range metrics {
+func (s *SensorsReader) handle(ctx *receiver.Context, req Request) {
+	ctx.WaitGroup = &sync.WaitGroup{}
+
+	for _, metric := range req.Metrics {
 		for _, sensor := range s.sensors {
 			if suitable(sensor, metric) {
-				go sensor.Harvest(s.ctx.ForSensor(sensor))
+				ctx.WaitGroup.Add(1)
+
+				go func() {
+					sensor.Harvest(ctx.ForSensor(sensor))
+					ctx.WaitGroup.Done()
+				}()
 			}
 		}
 	}
+
+	ctx.WaitGroup.Wait()
+
+	results := aggregate(ctx)
+	req.Handler(results)
+
 	return
 }
 
@@ -84,55 +91,40 @@ func suitable(sensor sensor.Sensor, metric model.Metric) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
-func (s *SensorsReader) ProcessSync() model.MetricReadings {
-	s.initSensors()
-	// s.readingsPipe = make(chan model.MetricReadings, len(s.routines))
-	// s.waitGroup.Add(len(s.routines))
-	// go func() {
-	// 	s.waitGroup.Wait()
-	// 	close(s.readingsPipe)
-	// }()
-	// for _, routine := range s.routines {
-	// 	go routine(s.ctx)
-	// }
-	readings := model.MetricReadings{}
-	// for reading := range s.readingsPipe {
-	// 	for metric, value := range reading {
-	// 		readings[metric] = value
-	// 	}
-	// }
-	return readings
-}
-
-func (s *SensorsReader) Aggregate() {
+func aggregate(ctx *receiver.Context) model.MetricReadings {
 	results := make(model.MetricReadings)
-	for metric, ch := range s.ctx.Pipe {
+	for metric, ch := range ctx.Pipe {
 		readings := make([]model.MetricReading, 0)
+		L:
 		for {
 			select {
 			case reading := <- ch:
 				readings = append(readings, reading)
 			default:
-				break
+				break L
 			}
 		}
 		if len(readings) != 0 {
 			// TODO config-based or precision-based aggregation here
 
 			results[metric] = readings[len(readings) - 1]
+		} else {
+			fmt.Println("empty")
 		}
 	}
-	return
+
+	return results
 }
 
 
 func (s *SensorsReader) Clean() {
 	for _, sensor := range s.sensors {
 		if err := sensor.Close(); err != nil {
-			s.ctx.ForSensor(sensor).Error(err)
+			s.context.ForSensor(sensor).Error(err)
 		}
 	}
 }
@@ -140,7 +132,7 @@ func (s *SensorsReader) Clean() {
 func (s *SensorsReader) initSensors() {
 	for i, sensor := range s.sensors {
 		if err := sensor.Init(); err != nil {
-			s.ctx.ForSensor(sensor).Error(err)
+			s.context.ForSensor(sensor).Error(err)
 			s.unregisterSensor(i)
 		}
 	}
