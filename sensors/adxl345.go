@@ -139,8 +139,13 @@ func (s *ADXL345) Verify() bool {
 	return true // TODO verify by device ID
 }
 
+func (s *ADXL345) Active() bool {
+	return s.i2c != nil
+}
+
 // Close disconnects from the device
 func (s *ADXL345) Close() error {
+	defer s.clean()
 	return s.i2c.Close()
 }
 
@@ -161,4 +166,8 @@ func (s *ADXL345) setRange(newRange byte) error {
 func round(f float64, places int) float64 {
 	shift := math.Pow(10, float64(places))
 	return math.Floor(f*shift+.5) / shift
+}
+
+func (s *ADXL345) clean() {
+	s.i2c = nil
 }

@@ -22,8 +22,9 @@ type Context struct {
 func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 	return &sensor.Context {
 		Parent: c,
-		SensorID: s.ID(),
 		Pipe: c.Pipe,
+		SensorID: s.ID(),
+		Logger: c.Logger,
 		WaitGroup: c.WaitGroup,
 	}
 }

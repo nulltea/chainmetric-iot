@@ -57,6 +57,10 @@ func (s *DHTxx) Metrics() []model.Metric {
 	}
 }
 
+func (s *DHTxx) Active() bool {
+	return true
+}
+
 func (s *DHTxx) Close() error {
 	return nil
 }

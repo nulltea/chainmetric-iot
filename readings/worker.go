@@ -48,14 +48,11 @@ func (s *SensorsReader) SubscribeReceiver(receiver ReceiverFunc, period time.Dur
 }
 
 func (s *SensorsReader) Process() {
-	s.initSensors()
-
 	go func() {
 		for {
-			// wait before receiver request
 			select {
-				case req := <- s.requests:
-					go s.handle(s.context.ForRequest(req.Metrics), req)
+			case req := <- s.requests:
+				go s.handle(s.context.ForRequest(req.Metrics), req)
 			}
 		}
 	}()
@@ -64,21 +61,30 @@ func (s *SensorsReader) Process() {
 func (s *SensorsReader) handle(ctx *receiver.Context, req Request) {
 	ctx.WaitGroup = &sync.WaitGroup{}
 
-	for _, metric := range req.Metrics {
-		for _, sensor := range s.sensors {
-			if suitable(sensor, metric) {
+	for _, sn := range s.sensors {
+		for _, metric := range req.Metrics {
+			if suitable(sn, metric) {
+				snCtx := ctx.ForSensor(sn)
+
+				if !sn.Active() {
+					if err := sn.Init(); err != nil {
+						snCtx.Error(err)
+						continue
+					}
+				}
+
 				ctx.WaitGroup.Add(1)
 
-				go func() {
-					sensor.Harvest(ctx.ForSensor(sensor))
+				go func(snCtx *sensor.Context, sensor sensor.Sensor) {
+					sensor.Harvest(snCtx)
 					ctx.WaitGroup.Done()
-				}()
+				}(snCtx, sn)
+				break
 			}
 		}
 	}
 
 	ctx.WaitGroup.Wait()
-
 	results := aggregate(ctx)
 	req.Handler(results)
 
@@ -111,7 +117,7 @@ func aggregate(ctx *receiver.Context) model.MetricReadings {
 		if len(readings) != 0 {
 			// TODO config-based or precision-based aggregation here
 
-			results[metric] = readings[len(readings) - 1]
+			results[metric] = readings[len(readings) - 1].Value
 		} else {
 			fmt.Println("empty")
 		}
@@ -123,22 +129,10 @@ func aggregate(ctx *receiver.Context) model.MetricReadings {
 
 func (s *SensorsReader) Clean() {
 	for _, sensor := range s.sensors {
-		if err := sensor.Close(); err != nil {
-			s.context.ForSensor(sensor).Error(err)
+		if sensor.Active() {
+			if err := sensor.Close(); err != nil {
+				s.context.ForSensor(sensor).Error(err)
+			}
 		}
 	}
-}
-
-func (s *SensorsReader) initSensors() {
-	for i, sensor := range s.sensors {
-		if err := sensor.Init(); err != nil {
-			s.context.ForSensor(sensor).Error(err)
-			s.unregisterSensor(i)
-		}
-	}
-}
-
-func (s *SensorsReader) unregisterSensor(i int) {
-	copy(s.sensors[i:], s.sensors[i+1:])
-	s.sensors = s.sensors[:len(s.sensors)-1]
 }

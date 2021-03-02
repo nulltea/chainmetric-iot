@@ -72,7 +72,12 @@ func (s *MAX44009) Verify() bool {
 	return true // TODO verify by device ID
 }
 
+func (s *MAX44009) Active() bool {
+	return s.i2c != nil
+}
+
 func (s *MAX44009) Close() error {
+	defer s.clean()
 	return s.i2c.Close()
 }
 
@@ -80,4 +85,8 @@ func dataToLuminance(d []byte) float64 {
 	exponent := int((d[0] & 0xF0) >> 4)
 	mantissa := int(((d[0] & 0x0F) << 4) | (d[1] & 0x0F))
 	return math.Pow(float64(2), float64(exponent)) * float64(mantissa) * 0.045
+}
+
+func (s *MAX44009) clean() {
+	s.i2c = nil
 }

@@ -52,17 +52,13 @@ func run() {
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
 		logger.Info(string(s))
-	}, time.Second,
+	}, 3 * time.Second,
 		metrics.Temperature,
 		metrics.Humidity,
 		metrics.Luminosity,
 		metrics.UVLight,
 		metrics.VisibleLight,
 		metrics.IRLight,
-		metrics.HeartRate,
-		metrics.BloodOxidation,
-		metrics.AirCO2Concentration,
-		metrics.AirTVOCsConcentration,
 	)
 }
 

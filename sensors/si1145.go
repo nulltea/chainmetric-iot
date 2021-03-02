@@ -259,7 +259,12 @@ func (s *SI1145) Verify() bool {
 	return true // TODO verify by ID
 }
 
+func (s *SI1145) Active() bool {
+	return s.i2c != nil
+}
+
 func (s *SI1145) Close() error {
+	defer s.clean()
 	return s.i2c.Close()
 }
 
@@ -268,4 +273,8 @@ func (s *SI1145) writeParam(p, v uint8) (uint8, error) {
 	s.i2c.WriteRegU8(SI1145_REG_COMMAND, p | SI1145_PARAM_SET)
 
 	return s.i2c.ReadRegU8(SI1145_REG_PARAMRD)
+}
+
+func (s *SI1145) clean() {
+	s.i2c = nil
 }

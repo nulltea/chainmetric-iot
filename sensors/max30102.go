@@ -59,10 +59,12 @@ func (s *MAX30102) ReadSpO2() (float64, error) {
 	return s.dev.SpO2()
 }
 
-func (s *MAX30102) Close() error {
-	s.dev.Close()
-	return nil
+func (s *MAX30102) Active() bool {
+	return s.dev != nil
 }
 
-
-
+func (s *MAX30102) Close() error {
+	s.dev.Close()
+	s.dev = nil
+	return nil
+}

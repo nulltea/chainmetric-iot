@@ -62,7 +62,7 @@ const(
 	// Time
 	CCS811_APP_START_TIME    = 100
 	CCS811_RESET_TIME    = 100
-	CCS811_RETRY_TIME = 1000
+	CCS811_RETRY_TIME = 250
 )
 
 var (
@@ -128,7 +128,9 @@ func (s *CCS811) Init() (err error) {
 }
 
 func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
-	for {
+	retry := 10
+	for retry > 0 {
+		retry--
 		ready, err := s.isDataReady(); if err != nil {
 			return 0, 0, err
 		}
@@ -171,7 +173,12 @@ func (s *CCS811) Verify() bool {
 	return false
 }
 
+func (s *CCS811) Active() bool {
+	return s.i2c != nil
+}
+
 func (s *CCS811) Close() error {
+	defer s.clean()
 	return s.i2c.Close()
 }
 
@@ -194,8 +201,6 @@ func (s *CCS811) getStatus() (byte, error) {
 	return data[0], nil
 }
 
-
-
 func (s *CCS811) setConfig() error {
 	buffer := make([]byte, 1)
 	bin1 := 0x01 & InterruptThreshold
@@ -212,4 +217,8 @@ func (s *CCS811) setReset() error {
 	_, err := s.i2c.WriteBytes([]byte {CCS811_SW_RESET, 0x11, 0xE5, 0x72, 0x8A})
 
 	return err
+}
+
+func (s *CCS811) clean() {
+	s.i2c = nil
 }

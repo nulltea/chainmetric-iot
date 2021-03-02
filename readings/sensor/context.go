@@ -40,6 +40,7 @@ func (c *Context) Deadline() (deadline time.Time, ok bool) {
 }
 
 func (c *Context) Done() <- chan struct{} {
+	c.WaitGroup.Done()
 	return c.Parent.Done()
 }
 

@@ -49,8 +49,13 @@ func (s *BMPxx) Metrics() []model.Metric {
 	}
 }
 
+func (s *BMPxx) Active() bool {
+	return s.i2c != nil && s.bmp != nil
+}
+
 func (s *BMPxx) Close() error {
-	return s.Close()
+	defer s.clean()
+	return s.i2c.Close()
 }
 
 func sensorTypeBMP(deviceID string) bsbmp.SensorType {
@@ -64,4 +69,9 @@ func sensorTypeBMP(deviceID string) bsbmp.SensorType {
 	default:
 		return bsbmp.BMP280
 	}
+}
+
+func (s *BMPxx) clean() {
+	s.i2c = nil
+	s.bmp = nil
 }
