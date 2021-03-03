@@ -58,14 +58,12 @@ func (s *SensorsReader) SendRequest(handler receiver.ReceiverFunc, metrics ...mo
 }
 
 func (s *SensorsReader) Process() {
-	go func() {
-		for {
-			select {
-			case req := <- s.requests:
-				go s.handleRequest(s.context.ForRequest(req.Metrics), req)
-			}
+	for {
+		select {
+		case req := <- s.requests:
+			go s.handleRequest(s.context.ForRequest(req.Metrics), req)
 		}
-	}()
+	}
 }
 
 func (s *SensorsReader) handleRequest(ctx *receiver.Context, req receiver.Request) {
@@ -151,13 +149,13 @@ func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
 			return err
 		}
 	}
-
+	duration := time.Duration(s.context.Config.Worker.CloseOnStandbyTime) * time.Millisecond
 	if timer, ok := s.standbyTimers[sn]; ok && timer != nil {
-		if !timer.Reset(1 * time.Minute) {
+		if !timer.Reset(duration) {
 			go handleStandby(timer, sn)
 		}
 	} else {
-		s.standbyTimers[sn] = time.NewTimer(1 * time.Minute)
+		s.standbyTimers[sn] = time.NewTimer(duration)
 		go handleStandby(s.standbyTimers[sn], sn)
 	}
 

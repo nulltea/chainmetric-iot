@@ -20,7 +20,8 @@ import (
 var (
 	logger = logging.MustGetLogger("sensor")
 	ctx = readings.NewContext(context.Background()).
-		SetLogger(logger)
+		SetLogger(logger).
+		SetConfig("config.yaml")
 	reader = readings.NewSensorsReader(ctx)
 )
 

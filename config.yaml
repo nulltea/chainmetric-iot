@@ -1,0 +1,23 @@
+worker:
+  closeOnStandbyTime: 60000
+
+sensors:
+  CCS811:
+    address: 0x5a
+    bus: 3
+    timeout: 2000
+  DHT22:
+    pin: 5
+    timeout: 2000
+  MAX44009:
+    address: 0x4A
+    bus: 1
+    timeout: 500
+  MAX30102:
+    address: 0x57
+    bus: 2
+    timeout: 1000
+  SI1145:
+    address: 0x60
+    bus: 4
+    timeout: 500

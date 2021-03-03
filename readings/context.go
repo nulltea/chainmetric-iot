@@ -52,8 +52,11 @@ func (c *Context) SetLogger(logger *logging.Logger) *Context {
 	return c
 }
 
-func (c *Context) SetConfig(config config.Config) *Context {
-	c.Config = config
+func (c *Context) SetConfig(configPath string) *Context {
+	cnf, err := config.ReadConfig(configPath); if err != nil {
+		c.Fatal(err)
+	}
+	c.Config = cnf
 	return c
 }
 
@@ -61,6 +64,12 @@ func (c *Context) SetConfig(config config.Config) *Context {
 func (c *Context) Error(err error) {
 	if err != nil {
 		c.Logger.Errorf("worker: %v", err)
+	}
+}
+
+func (c *Context) Fatal(err error) {
+	if err != nil {
+		c.Logger.Fatalf("worker: %v", err)
 	}
 }
 
