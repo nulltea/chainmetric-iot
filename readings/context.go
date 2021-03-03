@@ -27,7 +27,7 @@ func NewContext(parent context.Context) *Context {
 }
 
 func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
-	return &sensor.Context{
+	return &sensor.Context {
 		Parent: c,
 		Logger: c.Logger,
 		SensorID: s.ID(),

@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/op/go-logging"
@@ -14,7 +13,6 @@ type Context struct {
 	Parent    context.Context
 	SensorID  string
 	Logger    *logging.Logger
-	WaitGroup *sync.WaitGroup
 	Pipe      model.MetricReadingsPipe
 }
 
@@ -35,12 +33,17 @@ func (c *Context) Info(info string) {
 	c.Logger.Infof("%v: %v", c.SensorID, info)
 }
 
+func (c *Context) SetTimeout(timeout time.Duration) (*Context, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(c.Parent, timeout)
+	c.Parent = ctx
+	return c, cancel
+}
+
 func (c *Context) Deadline() (deadline time.Time, ok bool) {
 	return c.Parent.Deadline()
 }
 
 func (c *Context) Done() <- chan struct{} {
-	c.WaitGroup.Done()
 	return c.Parent.Done()
 }
 

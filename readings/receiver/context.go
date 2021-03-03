@@ -25,7 +25,6 @@ func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 		Pipe: c.Pipe,
 		SensorID: s.ID(),
 		Logger: c.Logger,
-		WaitGroup: c.WaitGroup,
 	}
 }
 

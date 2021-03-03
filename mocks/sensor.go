@@ -5,16 +5,19 @@ import (
 	"time"
 
 	"sensorsys/model"
-	"sensorsys/model/metrics"
 	"sensorsys/readings/sensor"
 )
 
 type MockSensor struct {
-
+	duration time.Duration
+	metrics []model.Metric
 }
 
-func NewMockSensor() *MockSensor {
-	return &MockSensor{}
+func NewMockSensor(duration time.Duration, metrics ...model.Metric) *MockSensor {
+	return &MockSensor{
+		duration,
+		metrics,
+	}
 }
 
 func (s *MockSensor) ID() string {
@@ -27,20 +30,15 @@ func (s *MockSensor) Init() error {
 }
 
 func (s *MockSensor) Harvest(ctx *sensor.Context) {
-	time.Sleep(100 * time.Millisecond)
-	temperature, humidity, lux := rand.Float32(), rand.Float32(), rand.Int()
+	time.Sleep(s.duration)
 
-	ctx.For(metrics.Temperature).Write(temperature)
-	ctx.For(metrics.Humidity).Write(humidity)
-	ctx.For(metrics.Luminosity).Write(lux)
+	for _, metric := range s.metrics {
+		ctx.For(metric).Write(rand.Float32())
+	}
 }
 
 func (s *MockSensor) Metrics() []model.Metric {
-	return []model.Metric {
-		metrics.Temperature,
-		metrics.Humidity,
-		metrics.Luminosity,
-	}
+	return s.metrics
 }
 
 func (s *MockSensor) Active() bool {

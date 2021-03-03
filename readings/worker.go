@@ -51,13 +51,13 @@ func (s *SensorsReader) Process() {
 		for {
 			select {
 			case req := <- s.requests:
-				go s.handle(s.context.ForRequest(req.Metrics), req)
+				go s.handleRequest(s.context.ForRequest(req.Metrics), req)
 			}
 		}
 	}()
 }
 
-func (s *SensorsReader) handle(ctx *receiver.Context, req receiver.Request) {
+func (s *SensorsReader) handleRequest(ctx *receiver.Context, req receiver.Request) {
 	ctx.WaitGroup = &sync.WaitGroup{}
 
 	for _, sn := range s.sensors {
@@ -74,9 +74,27 @@ func (s *SensorsReader) handle(ctx *receiver.Context, req receiver.Request) {
 
 				ctx.WaitGroup.Add(1)
 
+				snCtx, cancel := snCtx.SetTimeout(1000 * time.Millisecond) // TODO: configure or base on request period
+
 				go func(snCtx *sensor.Context, sensor sensor.Sensor) {
-					sensor.Harvest(snCtx)
-					ctx.WaitGroup.Done()
+					defer ctx.WaitGroup.Done()
+					defer cancel()
+
+					done := make(chan bool)
+
+					go func() {
+						sensor.Harvest(snCtx)
+						done <- true
+					}()
+
+					select {
+						case <- snCtx.Done():
+							snCtx.Info("context timeout, ran out of time")
+							return
+						case <- done:
+							return
+					}
+
 				}(snCtx, sn)
 				break
 			}
@@ -84,6 +102,7 @@ func (s *SensorsReader) handle(ctx *receiver.Context, req receiver.Request) {
 	}
 
 	ctx.WaitGroup.Wait()
+
 	results := aggregate(ctx)
 	req.Handler(results)
 
@@ -115,8 +134,8 @@ func aggregate(ctx *receiver.Context) model.MetricReadings {
 			}
 		}
 
-		if len(readings) != 0 {
-			results[metric] = readings[len(readings) - 1].Value // TODO: config-based or precision-based aggregation here
+		if len(readings) != 0 { // TODO: config-based or precision-based aggregation here
+			results[metric] = readings[len(readings) - 1].Value
 		}
 	}
 
