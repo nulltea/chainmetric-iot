@@ -1,6 +1,8 @@
 package readings
 
 import (
+	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -10,16 +12,18 @@ import (
 )
 
 type SensorsReader struct {
-	context   *Context
-	sensors   []sensor.Sensor
-	requests  chan receiver.Request
+	context       *Context
+	sensors       []sensor.Sensor
+	requests      chan receiver.Request
+	standbyTimers map[sensor.Sensor]*time.Timer
 }
 
 func NewSensorsReader(ctx *Context) *SensorsReader {
 	return &SensorsReader{
-		context:   ctx,
-		sensors:   make([]sensor.Sensor, 0),
-		requests:  make(chan receiver.Request),
+		context:       ctx,
+		sensors:       make([]sensor.Sensor, 0),
+		requests:      make(chan receiver.Request),
+		standbyTimers: make(map[sensor.Sensor]*time.Timer),
 	}
 }
 
@@ -46,6 +50,13 @@ func (s *SensorsReader) SubscribeReceiver(handler receiver.ReceiverFunc, period 
 	}()
 }
 
+func (s *SensorsReader) SendRequest(handler receiver.ReceiverFunc, metrics ...model.Metric) {
+	s.requests <- receiver.Request{
+		Metrics: metrics,
+		Handler: handler,
+	}
+}
+
 func (s *SensorsReader) Process() {
 	go func() {
 		for {
@@ -63,39 +74,20 @@ func (s *SensorsReader) handleRequest(ctx *receiver.Context, req receiver.Reques
 	for _, sn := range s.sensors {
 		for _, metric := range req.Metrics {
 			if suitable(sn, metric) {
-				snCtx := ctx.ForSensor(sn)
+				c := ctx.ForSensor(sn)
 
-				if !sn.Active() {
-					if err := sn.Init(); err != nil {
-						snCtx.Error(err)
-						continue
-					}
+				if err := s.initSensor(sn); err != nil {
+					c.Error(err)
+					continue
 				}
 
 				ctx.WaitGroup.Add(1)
 
-				snCtx, cancel := snCtx.SetTimeout(1000 * time.Millisecond) // TODO: configure or base on request period
+				c, cancel := c.SetTimeout(1 * time.Second) // TODO: configure or base on request period
+				defer cancel()
 
-				go func(snCtx *sensor.Context, sensor sensor.Sensor) {
-					defer ctx.WaitGroup.Done()
-					defer cancel()
+				go s.readSensor(ctx, c, sn)
 
-					done := make(chan bool)
-
-					go func() {
-						sensor.Harvest(snCtx)
-						done <- true
-					}()
-
-					select {
-						case <- snCtx.Done():
-							snCtx.Info("context timeout, ran out of time")
-							return
-						case <- done:
-							return
-					}
-
-				}(snCtx, sn)
 				break
 			}
 		}
@@ -151,4 +143,52 @@ func (s *SensorsReader) Clean() {
 			}
 		}
 	}
+}
+
+func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
+	if !sn.Active() {
+		if err := sn.Init(); err != nil {
+			return err
+		}
+	}
+
+	if timer, ok := s.standbyTimers[sn]; ok && timer != nil {
+		if !timer.Reset(1 * time.Minute) {
+			go handleStandby(timer, sn)
+		}
+	} else {
+		s.standbyTimers[sn] = time.NewTimer(1 * time.Minute)
+		go handleStandby(s.standbyTimers[sn], sn)
+	}
+
+	return nil
+}
+
+func (s *SensorsReader) readSensor(req *receiver.Context, ctx *sensor.Context, sn sensor.Sensor) {
+	defer req.WaitGroup.Done()
+
+	done := make(chan bool)
+
+	go func() {
+		sn.Harvest(ctx)
+		done <- true
+	}()
+
+	select {
+	case <- ctx.Done():
+		switch ctx.Err() {
+		case context.DeadlineExceeded:
+			ctx.Error(errors.New("sensor reading timeout: time exceeded"))
+		case context.Canceled:
+			ctx.Info("sensor reading canceled by force")
+		}
+		return
+	case <- done:
+		return
+	}
+}
+
+func handleStandby(t *time.Timer, sn sensor.Sensor) {
+	<- t.C
+	sn.Close()
 }
