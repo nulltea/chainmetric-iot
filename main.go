@@ -7,37 +7,44 @@ import (
 	"os/signal"
 	"time"
 
-	log "github.com/d2r2/go-logger"
+	"github.com/d2r2/go-logger"
 	"github.com/op/go-logging"
 
-	"sensorsys/mocks"
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings"
-	"sensorsys/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/mocks"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings"
+	"github.com/timoth-y/iot-blockchain-sensorsys/sensors"
+)
+
+const (
+	format = "%{color}%{time:2006.01.02 15:04:05} %{id:04x} %{level:.4s}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
 )
 
 var (
-	logger = logging.MustGetLogger("sensor")
+	Logger = logging.MustGetLogger("sensorsys")
 	ctx = readings.NewContext(context.Background()).
-		SetLogger(logger).
+		SetLogger(Logger).
 		SetConfig("config.yaml")
 	reader = readings.NewSensorsReader(ctx)
 )
+
+func init() {
+	initLogging()
+}
 
 func main() {
 	done := make(chan struct{}, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
-	log.ChangePackageLogLevel("dht", log.ErrorLevel)
-	log.ChangePackageLogLevel("i2c", log.ErrorLevel)
+
 
 	go run()
 	go shutdown(quit, done)
 
 	<-done
-	logger.Info("Shutdown")
+	Logger.Info("Shutdown")
 }
 
 func run() {
@@ -53,7 +60,7 @@ func run() {
 
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
-		logger.Info(string(s))
+		Logger.Info(string(s))
 	}, 3 * time.Second,
 		metrics.Temperature,
 		metrics.Humidity,
@@ -75,7 +82,7 @@ func mock() {
 
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
-		logger.Info(string(s))
+		Logger.Info(string(s))
 	}, 2 * time.Second,
 		metrics.Temperature,
 		metrics.Humidity,
@@ -85,9 +92,25 @@ func mock() {
 
 func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
-	logger.Info("Shutting down...")
+	Logger.Info("Shutting down...")
 
 	reader.Clean()
 
 	close(done)
+}
+
+func initLogging() {
+	backend := logging.NewBackendFormatter(
+		logging.NewLogBackend(os.Stderr, "", 0),
+		logging.MustStringFormatter(format))
+
+	logging.SetBackend(backend)
+
+	level, err := logging.LogLevel(os.Getenv("LOGGING")); if err != nil {
+		level = logging.INFO
+	}
+	logging.SetLevel(level, "sensorsys")
+
+	logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
+	logger.ChangePackageLogLevel("i2c", logger.ErrorLevel)
 }
