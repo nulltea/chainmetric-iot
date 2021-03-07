@@ -1,12 +1,14 @@
 package model
 
+import "github.com/timoth-y/iot-blockchain-contracts/models"
+
 type MetricReading struct {
 	Source string
 	Value interface{}
 }
 
-type MetricReadings map[Metric] interface{}
+type MetricReadings map[models.Metric] interface{}
 
-type MetricReadingsPipe map[Metric] chan MetricReading
+type MetricReadingsPipe map[models.Metric] chan MetricReading
 
-type MetricReadingsResults map[Metric] interface{}
+type MetricReadingsResults map[models.Metric] interface{}

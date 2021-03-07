@@ -7,8 +7,8 @@ import (
 
 	"github.com/op/go-logging"
 
-	"sensorsys/model"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type Context struct {

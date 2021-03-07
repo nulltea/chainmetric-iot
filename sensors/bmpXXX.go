@@ -3,10 +3,10 @@ package sensors
 import (
 	"github.com/d2r2/go-bsbmp"
 	"github.com/d2r2/go-i2c"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type BMPxx struct {
@@ -43,8 +43,8 @@ func (s *BMPxx) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
 }
 
-func (s *BMPxx) Metrics() []model.Metric {
-	return []model.Metric {
+func (s *BMPxx) Metrics() []models.Metric {
+	return []models.Metric {
 		metrics.Pressure,
 	}
 }

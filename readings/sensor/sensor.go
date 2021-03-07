@@ -1,14 +1,14 @@
 package sensor
 
 import (
-	"sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 )
 
 type Sensor interface {
 	ID() string
 	Init() error
 	Harvest(ctx *Context)
-	Metrics() []model.Metric
+	Metrics() []models.Metric
 	Active() bool
 	Close() error
 }

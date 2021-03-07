@@ -4,16 +4,17 @@ import (
 	"math/rand"
 	"time"
 
-	"sensorsys/model"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type MockSensor struct {
 	duration time.Duration
-	metrics []model.Metric
+	metrics []models.Metric
 }
 
-func NewMockSensor(duration time.Duration, metrics ...model.Metric) *MockSensor {
+func NewMockSensor(duration time.Duration, metrics ...models.Metric) *MockSensor {
 	return &MockSensor{
 		duration,
 		metrics,
@@ -37,7 +38,7 @@ func (s *MockSensor) Harvest(ctx *sensor.Context) {
 	}
 }
 
-func (s *MockSensor) Metrics() []model.Metric {
+func (s *MockSensor) Metrics() []models.Metric {
 	return s.metrics
 }
 

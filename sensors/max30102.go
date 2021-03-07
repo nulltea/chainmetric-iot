@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/cgxeiji/max3010x"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type MAX30102 struct {
@@ -44,8 +44,8 @@ func (s *MAX30102) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.BloodOxidation).WriteWithError(s.ReadSpO2())
 }
 
-func (s *MAX30102) Metrics() []model.Metric {
-	return []model.Metric {
+func (s *MAX30102) Metrics() []models.Metric {
+	return []models.Metric {
 		metrics.HeartRate,
 		metrics.BloodOxidation,
 	}

@@ -1,4 +1,4 @@
-module sensorsys
+module github.com/timoth-y/iot-blockchain-sensorsys
 
 go 1.15
 
@@ -11,6 +11,8 @@ require (
 	github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f // indirect
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/pkg/errors v0.9.1
+	github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210307005325-f518b4f3378d
 	gopkg.in/yaml.v2 v2.4.0
 )
 

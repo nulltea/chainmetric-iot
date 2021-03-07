@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type Context struct {
@@ -16,7 +17,7 @@ type Context struct {
 	Pipe      model.MetricReadingsPipe
 }
 
-func (c *Context) For(metric model.Metric) *metricWriter {
+func (c *Context) For(metric models.Metric) *metricWriter {
 	return &metricWriter {
 		metric,
 		c,

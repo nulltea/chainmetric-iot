@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/d2r2/go-i2c"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 const(
@@ -157,8 +157,8 @@ func (s *CCS811) Harvest(ctx *sensor.Context) {
 	ctx.Error(err)
 }
 
-func (s *CCS811) Metrics() []model.Metric {
-	return []model.Metric {
+func (s *CCS811) Metrics() []models.Metric {
+	return []models.Metric {
 		metrics.AirCO2Concentration,
 		metrics.AirTVOCsConcentration,
 	}

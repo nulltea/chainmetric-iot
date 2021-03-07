@@ -6,9 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"sensorsys/model"
-	"sensorsys/readings/receiver"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/receiver"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type SensorsReader struct {
@@ -37,7 +39,7 @@ func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 	}
 }
 
-func (s *SensorsReader) SubscribeReceiver(handler receiver.ReceiverFunc, period time.Duration, metrics ...model.Metric) {
+func (s *SensorsReader) SubscribeReceiver(handler receiver.ReceiverFunc, period time.Duration, metrics ...models.Metric) {
 	go func() {
 		for {
 			s.requests <- receiver.Request{
@@ -50,7 +52,7 @@ func (s *SensorsReader) SubscribeReceiver(handler receiver.ReceiverFunc, period 
 	}()
 }
 
-func (s *SensorsReader) SendRequest(handler receiver.ReceiverFunc, metrics ...model.Metric) {
+func (s *SensorsReader) SendRequest(handler receiver.ReceiverFunc, metrics ...models.Metric) {
 	s.requests <- receiver.Request{
 		Metrics: metrics,
 		Handler: handler,
@@ -99,7 +101,7 @@ func (s *SensorsReader) handleRequest(ctx *receiver.Context, req receiver.Reques
 	return
 }
 
-func suitable(sensor sensor.Sensor, metric model.Metric) bool {
+func suitable(sensor sensor.Sensor, metric models.Metric) bool {
 	for _, m := range sensor.Metrics() {
 		if metric == m {
 			return true

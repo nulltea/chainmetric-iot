@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/config"
-	"sensorsys/model"
-	"sensorsys/readings/receiver"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/config"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/receiver"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type Context struct {
@@ -35,7 +36,7 @@ func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 	}
 }
 
-func (c *Context) ForRequest(metrics []model.Metric) *receiver.Context {
+func (c *Context) ForRequest(metrics []models.Metric) *receiver.Context {
 	pipe := make(model.MetricReadingsPipe)
 	for _, metric := range metrics {
 		pipe[metric] = make(chan model.MetricReading, 3)

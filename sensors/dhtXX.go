@@ -2,10 +2,10 @@ package sensors
 
 import (
 	"github.com/d2r2/go-dht"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type DHTxx struct {
@@ -50,8 +50,8 @@ func (s *DHTxx) Harvest(ctx *sensor.Context) {
 	ctx.Error(err)
 }
 
-func (s *DHTxx) Metrics() []model.Metric {
-	return []model.Metric {
+func (s *DHTxx) Metrics() []models.Metric {
+	return []models.Metric {
 		metrics.Temperature,
 		metrics.Humidity,
 	}

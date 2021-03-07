@@ -4,10 +4,11 @@ import (
 	"math"
 
 	"github.com/d2r2/go-i2c"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 // Earth Gravity constant in [m/s^2]
@@ -128,8 +129,8 @@ func (s *ADXL345) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.AccelerationInMS2).WriteWithError(s.ReadAxesMS2())
 }
 
-func (s *ADXL345) Metrics() []model.Metric {
-	return []model.Metric{
+func (s *ADXL345) Metrics() []models.Metric {
+	return []models.Metric{
 		metrics.AccelerationInG,
 		metrics.AccelerationInMS2,
 	}

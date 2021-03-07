@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/d2r2/go-i2c"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"sensorsys/model"
-	"sensorsys/model/metrics"
-	"sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 const(
@@ -246,8 +246,8 @@ func (s *SI1145) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Proximity).WriteWithError(s.ReadProximity())
 }
 
-func (s *SI1145) Metrics() []model.Metric {
-	return []model.Metric {
+func (s *SI1145) Metrics() []models.Metric {
+	return []models.Metric {
 		metrics.UVLight,
 		metrics.VisibleLight,
 		metrics.IRLight,

@@ -1,11 +1,13 @@
 package sensor
 
 import (
-	"sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type metricWriter struct {
-	metric model.Metric
+	metric models.Metric
 	ctx *Context
 }
 
