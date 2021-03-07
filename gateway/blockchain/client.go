@@ -1,4 +1,4 @@
-package gateway
+package blockchain
 
 import (
 	"io/ioutil"
@@ -10,10 +10,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"sensorsys/config"
+	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 )
 
-type BlockchainClient struct {
+type Client struct {
 	wallet  *gateway.Wallet
 	gateway *gateway.Gateway
 	network *gateway.Network
@@ -21,13 +21,13 @@ type BlockchainClient struct {
 	client  *channel.Client
 }
 
-func NewBlockchainClient() *BlockchainClient {
-	return &BlockchainClient {
+func NewBlockchainClient() *Client {
+	return &Client{
 
 	}
 }
 
-func (bc *BlockchainClient) Init(config config.BlockchainConfig) (err error) {
+func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 	configProvider := fabconfig.FromFile(config.ConnectionConfig)
 	bc.sdk, err = fabsdk.New(configProvider)
 	if err != nil {
@@ -63,7 +63,7 @@ func (bc *BlockchainClient) Init(config config.BlockchainConfig) (err error) {
 		gateway.WithConfig(configProvider),
 		gateway.WithIdentity(bc.wallet, config.Identity.UserID),
 	); if err != nil {
-		return errors.Wrap(err, "InitConnectionFor: connect to gateway")
+		return errors.Wrap(err, "failed to connect to blockchain gateway")
 	}
 
 	bc.network, err = bc.gateway.GetNetwork(config.ChannelID); if err != nil {
@@ -74,7 +74,7 @@ func (bc *BlockchainClient) Init(config config.BlockchainConfig) (err error) {
 	return
 }
 
-func (bc *BlockchainClient) Close() {
+func (bc *Client) Close() {
 	bc.sdk.Close()
 	bc.gateway.Close()
 }
