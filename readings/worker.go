@@ -11,29 +11,30 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/readings/receiver"
 	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
+	sensors2 "github.com/timoth-y/iot-blockchain-sensorsys/sensors"
 )
 
 type SensorsReader struct {
 	context       *Context
-	sensors       []sensor.Sensor
+	sensors       []sensors2.Sensor
 	requests      chan receiver.Request
-	standbyTimers map[sensor.Sensor]*time.Timer
+	standbyTimers map[sensors2.Sensor]*time.Timer
 }
 
 func NewSensorsReader(ctx *Context) *SensorsReader {
 	return &SensorsReader{
 		context:       ctx,
-		sensors:       make([]sensor.Sensor, 0),
+		sensors:       make([]sensors2.Sensor, 0),
 		requests:      make(chan receiver.Request),
-		standbyTimers: make(map[sensor.Sensor]*time.Timer),
+		standbyTimers: make(map[sensors2.Sensor]*time.Timer),
 	}
 }
 
-func (s *SensorsReader) RegisterSensor(sensor sensor.Sensor) {
+func (s *SensorsReader) RegisterSensor(sensor sensors2.Sensor) {
 	s.sensors = append(s.sensors, sensor)
 }
 
-func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
+func (s *SensorsReader) RegisterSensors(sensors ...sensors2.Sensor) {
 	for _, sensor := range sensors {
 		s.RegisterSensor(sensor)
 	}
@@ -101,7 +102,7 @@ func (s *SensorsReader) handleRequest(ctx *receiver.Context, req receiver.Reques
 	return
 }
 
-func suitable(sensor sensor.Sensor, metric models.Metric) bool {
+func suitable(sensor sensors2.Sensor, metric models.Metric) bool {
 	for _, m := range sensor.Metrics() {
 		if metric == m {
 			return true
@@ -145,7 +146,7 @@ func (s *SensorsReader) Clean() {
 	}
 }
 
-func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
+func (s *SensorsReader) initSensor(sn sensors2.Sensor) error {
 	if !sn.Active() {
 		if err := sn.Init(); err != nil {
 			return err
@@ -164,7 +165,7 @@ func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
 	return nil
 }
 
-func (s *SensorsReader) readSensor(req *receiver.Context, ctx *sensor.Context, sn sensor.Sensor) {
+func (s *SensorsReader) readSensor(req *receiver.Context, ctx *sensor.Context, sn sensors2.Sensor) {
 	defer req.WaitGroup.Done()
 
 	done := make(chan bool)
@@ -188,7 +189,7 @@ func (s *SensorsReader) readSensor(req *receiver.Context, ctx *sensor.Context, s
 	}
 }
 
-func handleStandby(t *time.Timer, sn sensor.Sensor) {
+func handleStandby(t *time.Timer, sn sensors2.Sensor) {
 	<- t.C
 	sn.Close()
 }

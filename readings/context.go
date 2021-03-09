@@ -12,6 +12,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/readings/receiver"
 	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/sensors"
 )
 
 type Context struct {
@@ -27,7 +28,7 @@ func NewContext(parent context.Context) *Context {
 	}
 }
 
-func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
+func (c *Context) ForSensor(s sensors.Sensor) *sensor.Context {
 	return &sensor.Context {
 		Parent: c,
 		Logger: c.Logger,
