@@ -11,7 +11,7 @@ build-remote:
         go build -v  -o $(OUTPUT)
 
 sync:
-	rsync -r . pi@$(REMOTE_IP):$(REMOTE_DIR)
+	rsync -r --delete . pi@$(REMOTE_IP):$(REMOTE_DIR)
 
 run:
 	sudo ./$(OUTPUT)
