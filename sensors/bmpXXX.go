@@ -23,6 +23,12 @@ func NewBMPxxx(deviceID string, addr uint8, bus int) *BMPxx {
 	}
 }
 
+func NewBMP280(addr uint8, bus int) *BMPxx {
+	return &BMPxx{
+		sensorType: bsbmp.BME280,
+	}
+}
+
 func (s *BMPxx) ID() string {
 	return s.sensorType.String()
 }

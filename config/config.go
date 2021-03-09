@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Worker  WorkerConfig  `yaml:"worker"`
 	Sensors SensorsConfig `yaml:"sensors"`
-	Network BlockchainConfig `yaml:"sensors"`
+	Gateway BlockchainConfig `yaml:"gateway"`
 }
 
 func ReadConfig(filename string) (sc Config, err error) {

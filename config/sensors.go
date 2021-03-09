@@ -3,7 +3,7 @@ package config
 type SensorsConfig struct {
 	ADXL345  I2CSensorConfig        `yaml:"ADXL345"`
 	BMP280   I2CSensorConfig        `yaml:"BMP280"`
-	CCS811   I2CSensorConfig        `yaml:"BMP280"`
+	CCS811   I2CSensorConfig        `yaml:"CCS811"`
 	DHT22    DigitalPinSensorConfig `yaml:"DHT22"`
 	MAX30102 I2CSensorConfig        `yaml:"MAX30102"`
 	MAX44009 I2CSensorConfig        `yaml:"MAX44009"`
