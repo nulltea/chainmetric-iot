@@ -9,16 +9,18 @@ import (
 
 	"github.com/d2r2/go-logger"
 	"github.com/op/go-logging"
+	"periph.io/x/periph/host"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/mocks"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/readings"
 	"github.com/timoth-y/iot-blockchain-sensorsys/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/utils"
 )
 
 const (
-	format = "%{color}%{time:2006.01.02 15:04:05} %{id:04x} %{level:.4s}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
+	format = "%{color}%{time:2006.01.02 15:04:05} %{id:04x} %{level}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
 )
 
 var (
@@ -31,6 +33,10 @@ var (
 
 func init() {
 	initLogging()
+
+	if _, err := host.Init(); err != nil {
+		Logger.Fatal(err)
+	}
 }
 
 func main() {
@@ -38,7 +44,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
-
+	utils.GenerateDeviceSignatureInQR()
 
 	go run()
 	go shutdown(quit, done)
@@ -52,7 +58,7 @@ func run() {
 		sensors.NewDHT22(5),
 		sensors.NewMAX44009(0x4A, 1),
 		sensors.NewMAX30102(0x57, 2),
-		sensors.NewCCS811(0x5a, 3),
+		sensors.NewCCS811(0x5A, 3),
 		sensors.NewSI1145(0x60, 4),
 	)
 

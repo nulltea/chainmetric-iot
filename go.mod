@@ -12,8 +12,10 @@ require (
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/pkg/errors v0.9.1
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210307005325-f518b4f3378d
 	gopkg.in/yaml.v2 v2.4.0
+	periph.io/x/periph v3.6.7+incompatible
 )
 
 replace github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea => github.com/timoth-y/max3010x v0.0.0-20210227142301-7a3d7c5be5c7
