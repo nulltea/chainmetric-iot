@@ -5,3 +5,4 @@ type Network struct {
 	MACAddress string `json:"mac"`
 	Hostname   string `json:"hostname"`
 }
+
