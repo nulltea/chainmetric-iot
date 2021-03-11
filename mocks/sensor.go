@@ -6,7 +6,7 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 )
 
 type MockSensor struct {

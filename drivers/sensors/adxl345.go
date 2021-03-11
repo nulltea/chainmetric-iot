@@ -6,9 +6,9 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 // Earth Gravity constant in [m/s^2]
@@ -62,7 +62,7 @@ type ADXL345 struct {
 }
 
 func NewADXL345(addr uint8, bus int) *ADXL345 {
-	return &ADXL345 {
+	return &ADXL345{
 		addr: addr,
 		bus: bus,
 	}
@@ -105,9 +105,9 @@ func (s *ADXL345) ReadAxesG() (model.Vector, error) {
 	z := int16(buf[4]) | (int16(buf[5]) << 8)
 
 	return model.Vector {
-		X: round(float64(x) * scaleMultiplier, 4),
-		Y: round(float64(y) * scaleMultiplier, 4),
-		Z: round(float64(z) * scaleMultiplier, 4),
+		X: round(float64(x) *scaleMultiplier, 4),
+		Y: round(float64(y) *scaleMultiplier, 4),
+		Z: round(float64(z) *scaleMultiplier, 4),
 	}, nil
 }
 

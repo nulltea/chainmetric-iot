@@ -1,4 +1,4 @@
-package readings
+package engine
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	sensors2 "github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/receiver"
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/receiver"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
-	sensors2 "github.com/timoth-y/iot-blockchain-sensorsys/sensors"
 )
 
 type SensorsReader struct {

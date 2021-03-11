@@ -7,8 +7,8 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 const(
@@ -68,7 +68,7 @@ const(
 var (
 	InterruptMode byte = 0
 	InterruptThreshold byte = 0
-	SamplingRate byte =  CCS811_DRIVE_MODE_10SEC
+	SamplingRate byte = CCS811_DRIVE_MODE_10SEC
 )
 
 type CCS811 struct {
@@ -112,11 +112,11 @@ func (s *CCS811) Init() (err error) {
 		return err
 	}
 
-	if status & CCS811_ERROR_BIT != 0 {
+	if status &CCS811_ERROR_BIT != 0 {
 		return fmt.Errorf("CCS811 device has error")
 	}
 
-	if status & CCS811_FW_MODE_BIT == 0 {
+	if status &CCS811_FW_MODE_BIT == 0 {
 		return fmt.Errorf("CCS811 device is in FW mode")
 	}
 

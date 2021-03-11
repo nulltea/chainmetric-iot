@@ -5,14 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8a78e10-0883-4f29-adc9-9ea90919c3d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/config.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/drivers/device/init.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/drivers/device/reset.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/logger.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway/blockchain/devices.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/blockchain/devices.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway/blockchain/readings.go" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/blockchain/readings.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/readings/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mocks/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/mocks/sensor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/network.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/signature.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/specs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/receiver/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/receiver/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/receiver/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/receiver/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/sensor/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/sensor/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/sensor/writer.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/sensor/writer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readings/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/engine/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/adxl345.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/adxl345.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/bmpXXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/bmpXXX.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/ccs811.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/ccs811.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/dhtXX.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/dhtXX.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/locator.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/locator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/max30102.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/max30102.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/max44009.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/max44009.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/sensor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors/si1145.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/sensors/si1145.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/shared/network.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/periph.go" beforeDir="false" afterPath="$PROJECT_DIR$/shared/periphery.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/signature.go" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/device/specs.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +71,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/readings/receiver" />
+    <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -65,11 +87,11 @@
       <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\readings\receiver" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\mocks" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\readings\sensor" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\readings" />
-      <recent name="C:\source\repos\iot-blockchain\sensorsys\worker" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\drivers\device" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\drivers" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\sensors" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\gateway\blockchain" />
+      <recent name="C:\source\repos\iot-blockchain\sensorsys\gateway" />
     </key>
   </component>
   <component name="RemoteSynchronizer">
@@ -157,11 +179,11 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4531" y="338" width="538" height="446" key="#com.intellij.tools.ToolEditorDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666617272" />
-    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1614814599236">
+    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1615233087172">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state x="4534" y="356" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.0.1920.1040@3840.0.1920.1040" timestamp="1614728039802" />
-    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614814599236" />
+    <state x="4534" y="396" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615233087172" />
     <state x="4534" y="403" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614297471328" />
     <state width="631" height="646" key="DebuggerActiveHint" timestamp="1614728800180">
       <screen x="3840" y="0" width="1920" height="1040" />
@@ -176,31 +198,31 @@
       <screen x="3840" y="50" width="1920" height="1030" />
     </state>
     <state x="4578" y="315" key="FileChooserDialogImpl/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613666262989" />
-    <state x="4523" y="474" key="GitCloneDialog" timestamp="1614355381924">
+    <state x="4523" y="474" key="GitCloneDialog" timestamp="1614895216486">
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
-    <state x="4523" y="474" key="GitCloneDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614355381924" />
+    <state x="4523" y="474" key="GitCloneDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614895216486" />
     <state x="4523" y="480" key="GitCloneDialog/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1614295536128" />
-    <state width="1880" height="367" key="GridCell.Tab.0.bottom" timestamp="1614729542507">
-      <screen x="3840" y="0" width="1920" height="1040" />
+    <state width="1880" height="189" key="GridCell.Tab.0.bottom" timestamp="1615408360662">
+      <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state width="1880" height="367" key="GridCell.Tab.0.bottom/0.40.1536.824/0.2200.2194.589/3840.0.1920.1040@3840.0.1920.1040" timestamp="1614729542507" />
-    <state width="1880" height="367" key="GridCell.Tab.0.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614720161137" />
-    <state width="1880" height="367" key="GridCell.Tab.0.center" timestamp="1614729542507">
-      <screen x="3840" y="0" width="1920" height="1040" />
+    <state width="1880" height="189" key="GridCell.Tab.0.bottom/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615408360662" />
+    <state width="1880" height="189" key="GridCell.Tab.0.center" timestamp="1615408360661">
+      <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state width="1880" height="367" key="GridCell.Tab.0.center/0.40.1536.824/0.2200.2194.589/3840.0.1920.1040@3840.0.1920.1040" timestamp="1614729542507" />
-    <state width="1880" height="367" key="GridCell.Tab.0.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614720161137" />
-    <state width="1880" height="367" key="GridCell.Tab.0.left" timestamp="1614729542507">
-      <screen x="3840" y="0" width="1920" height="1040" />
+    <state width="1880" height="189" key="GridCell.Tab.0.center/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615408360661" />
+    <state width="1880" height="189" key="GridCell.Tab.0.left" timestamp="1615408360661">
+      <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state width="1880" height="367" key="GridCell.Tab.0.left/0.40.1536.824/0.2200.2194.589/3840.0.1920.1040@3840.0.1920.1040" timestamp="1614729542507" />
-    <state width="1880" height="367" key="GridCell.Tab.0.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614720161137" />
-    <state width="1880" height="367" key="GridCell.Tab.0.right" timestamp="1614729542507">
-      <screen x="3840" y="0" width="1920" height="1040" />
+    <state width="1880" height="189" key="GridCell.Tab.0.left/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615408360661" />
+    <state width="1880" height="189" key="GridCell.Tab.0.right" timestamp="1615408360661">
+      <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state width="1880" height="367" key="GridCell.Tab.0.right/0.40.1536.824/0.2200.2194.589/3840.0.1920.1040@3840.0.1920.1040" timestamp="1614729542507" />
-    <state width="1880" height="367" key="GridCell.Tab.0.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614720161137" />
+    <state width="1880" height="189" key="GridCell.Tab.0.right/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615408360661" />
     <state width="1880" height="367" key="GridCell.Tab.1.bottom" timestamp="1614729542363">
       <screen x="3840" y="0" width="1920" height="1040" />
     </state>
@@ -229,13 +251,14 @@
       <screen x="3840" y="40" width="1920" height="1040" />
     </state>
     <state x="4548" y="273" key="com.goide.refactor.move.GoMoveDeclarationDialog/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614699081793" />
-    <state x="888" y="182" width="1608" height="1023" maximized="true" key="dock-window-1" timestamp="1614814604328">
+    <state x="-6" y="34" width="1546" height="834" key="dock-window-1" timestamp="1614902244193">
       <screen x="0" y="40" width="1536" height="824" />
     </state>
-    <state x="888" y="182" width="1608" height="1023" maximized="true" key="dock-window-1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614814604328" />
-    <state x="4490" y="283" width="618" height="552" key="find.popup" timestamp="1613667289446">
-      <screen x="3840" y="50" width="1920" height="1030" />
+    <state x="-6" y="34" width="1546" height="834" key="dock-window-1/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1614902244193" />
+    <state x="4490" y="275" width="618" height="632" key="find.popup" timestamp="1615078758207">
+      <screen x="3840" y="40" width="1920" height="1040" />
     </state>
+    <state x="4490" y="275" width="618" height="632" key="find.popup/0.40.1536.824/0.2200.2194.589/3840.40.1920.1040@3840.40.1920.1040" timestamp="1615078758207" />
     <state x="4490" y="283" width="618" height="552" key="find.popup/3840.50.1920.1030/0.40.1536.824/0.2200.2194.589@3840.50.1920.1030" timestamp="1613667289446" />
     <state x="4466" y="269" width="672" height="678" key="search.everywhere.popup" timestamp="1614208705991">
       <screen x="3840" y="50" width="1920" height="1030" />

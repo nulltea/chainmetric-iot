@@ -7,36 +7,24 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/d2r2/go-logger"
-	"github.com/op/go-logging"
-	"periph.io/x/periph/host"
-
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/mocks"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings"
-	"github.com/timoth-y/iot-blockchain-sensorsys/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/utils"
-)
-
-const (
-	format = "%{color}%{time:2006.01.02 15:04:05} %{id:04x} %{level}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 var (
-	Logger = logging.MustGetLogger("sensorsys")
-	ctx = readings.NewContext(context.Background()).
-		SetLogger(Logger).
+	ctx = engine.NewContext(context.Background()).
+		SetLogger(shared.Logger).
 		SetConfig("config.yaml")
-	reader = readings.NewSensorsReader(ctx)
+	reader = engine.NewSensorsReader(ctx)
 )
 
 func init() {
-	initLogging()
-
-	if _, err := host.Init(); err != nil {
-		Logger.Fatal(err)
-	}
+	shared.InitLogger()
+	shared.InitPeriphery()
 }
 
 func main() {
@@ -44,13 +32,11 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
-	utils.GenerateDeviceSignatureInQR()
-
 	go run()
 	go shutdown(quit, done)
 
 	<-done
-	Logger.Info("Shutdown")
+	shared.Logger.Info("Shutdown")
 }
 
 func run() {
@@ -66,7 +52,7 @@ func run() {
 
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
-		Logger.Info(string(s))
+		shared.Logger.Info(string(s))
 	}, 3 * time.Second,
 		metrics.Temperature,
 		metrics.Humidity,
@@ -88,7 +74,7 @@ func mock() {
 
 	reader.SubscribeReceiver(func(readings model.MetricReadings) {
 		s, _ := json.MarshalIndent(readings, "", "\t")
-		Logger.Info(string(s))
+		shared.Logger.Info(string(s))
 	}, 2 * time.Second,
 		metrics.Temperature,
 		metrics.Humidity,
@@ -98,25 +84,10 @@ func mock() {
 
 func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
-	Logger.Info("Shutting down...")
+	shared.Logger.Info("Shutting down...")
 
 	reader.Clean()
 
 	close(done)
 }
 
-func initLogging() {
-	backend := logging.NewBackendFormatter(
-		logging.NewLogBackend(os.Stderr, "", 0),
-		logging.MustStringFormatter(format))
-
-	logging.SetBackend(backend)
-
-	level, err := logging.LogLevel(os.Getenv("LOGGING")); if err != nil {
-		level = logging.INFO
-	}
-	logging.SetLevel(level, "sensorsys")
-
-	logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
-	logger.ChangePackageLogLevel("i2c", logger.ErrorLevel)
-}

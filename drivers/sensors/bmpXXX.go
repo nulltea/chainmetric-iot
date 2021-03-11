@@ -5,8 +5,8 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type BMPxx struct {

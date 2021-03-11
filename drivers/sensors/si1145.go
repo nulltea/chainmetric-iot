@@ -6,8 +6,8 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 const(
@@ -165,7 +165,7 @@ func (s *SI1145) Init() (err error) {
 
 	// Enable UV sensorType
 	s.writeParam(SI1145_PARAM_CHLIST,
-		SI1145_PARAM_CHLIST_ENUV | SI1145_PARAM_CHLIST_ENALSIR | SI1145_PARAM_CHLIST_ENALSVIS | SI1145_PARAM_CHLIST_ENPS1)
+		SI1145_PARAM_CHLIST_ENUV|SI1145_PARAM_CHLIST_ENALSIR|SI1145_PARAM_CHLIST_ENALSVIS|SI1145_PARAM_CHLIST_ENPS1)
 
 	// Enable interrupt on every sample
 	s.i2c.WriteRegU8(SI1145_REG_INTCFG, SI1145_REG_INTCFG_INTOE)
@@ -185,7 +185,7 @@ func (s *SI1145) Init() (err error) {
 	s.writeParam(SI1145_PARAM_PSADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
 
 	// in proximity mode, high range
-	s.writeParam(SI1145_PARAM_PSADCMISC, SI1145_PARAM_PSADCMISC_RANGE | SI1145_PARAM_PSADCMISC_PSMODE)
+	s.writeParam(SI1145_PARAM_PSADCMISC, SI1145_PARAM_PSADCMISC_RANGE|SI1145_PARAM_PSADCMISC_PSMODE)
 	s.writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR)
 
 	// Fastest clocks, clock div 1
@@ -270,7 +270,7 @@ func (s *SI1145) Close() error {
 
 func (s *SI1145) writeParam(p, v uint8) (uint8, error) {
 	s.i2c.WriteRegU8(SI1145_REG_PARAMWR, v)
-	s.i2c.WriteRegU8(SI1145_REG_COMMAND, p | SI1145_PARAM_SET)
+	s.i2c.WriteRegU8(SI1145_REG_COMMAND, p |SI1145_PARAM_SET)
 
 	return s.i2c.ReadRegU8(SI1145_REG_PARAMRD)
 }

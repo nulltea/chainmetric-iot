@@ -18,7 +18,7 @@ type ReadingsContract struct {
 func NewSensorReadingsContract(client *Client) *ReadingsContract {
 	return &ReadingsContract{
 		client: client,
-		contract: client.network.GetContract("readings"),
+		contract: client.network.GetContract("engine"),
 	}
 }
 

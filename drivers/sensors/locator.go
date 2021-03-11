@@ -9,7 +9,7 @@ const (
 )
 
 var (
-	I2CSensorsMap = map[uint8]func(bus int) Sensor {
+	I2CSensorsMap = map[uint8]func(bus int) Sensor{
 		BMP280_ADDRESS: func(bus int) Sensor {
 			return NewBMP280(BMP280_ADDRESS, bus)
 		},

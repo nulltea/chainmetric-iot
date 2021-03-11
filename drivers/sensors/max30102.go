@@ -6,8 +6,8 @@ import (
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
-	"github.com/timoth-y/iot-blockchain-sensorsys/readings/sensor"
 )
 
 type MAX30102 struct {
@@ -28,7 +28,8 @@ func (s *MAX30102) ID() string {
 }
 
 func (s *MAX30102) Init() (err error) {
-	s.dev, err = max3010x.NewOnBus(fmt.Sprintf("/dev/i2c-%d", s.bus)); if err != nil {
+	s.dev, err = max3010x.New(
+		max3010x.WithSpecificBus(fmt.Sprintf("/dev/i2c-%d", s.bus))); if err != nil {
 		return
 	}
 
