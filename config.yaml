@@ -22,6 +22,10 @@ sensors:
     bus: 4
     timeout: 500
 
+display:
+  width: 240
+  height: 135
+
 gateway:
   connectionConfig: connection.yaml
   identity:
