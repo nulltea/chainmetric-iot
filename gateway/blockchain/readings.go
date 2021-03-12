@@ -15,7 +15,7 @@ type ReadingsContract struct {
 	contract *gateway.Contract
 }
 
-func NewSensorReadingsContract(client *Client) *ReadingsContract {
+func NewReadingsContract(client *Client) *ReadingsContract {
 	return &ReadingsContract{
 		client: client,
 		contract: client.network.GetContract("engine"),

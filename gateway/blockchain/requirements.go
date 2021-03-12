@@ -11,8 +11,8 @@ type RequirementsContract struct {
 	contract *gateway.Contract
 }
 
-func NewRequirementsContract(client *Client) *ReadingsContract {
-	return &ReadingsContract{
+func NewRequirementsContract(client *Client) *RequirementsContract {
+	return &RequirementsContract{
 		client: client,
 		contract: client.network.GetContract("requirements"),
 	}

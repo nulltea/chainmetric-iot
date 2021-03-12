@@ -39,7 +39,7 @@ func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 		return err
 	}
 
-	if  _, err = cc.contract.EvaluateTransaction("Update", string(data)); err != nil {
+	if  _, err = cc.contract.EvaluateTransaction("Update", id, string(data)); err != nil {
 		return err
 	}
 

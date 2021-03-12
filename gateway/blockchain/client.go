@@ -3,9 +3,7 @@ package blockchain
 import (
 	"io/ioutil"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	fabconfig "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 
 	"github.com/pkg/errors"
@@ -17,31 +15,38 @@ type Client struct {
 	wallet  *gateway.Wallet
 	gateway *gateway.Gateway
 	network *gateway.Network
-	sdk     *fabsdk.FabricSDK
-	client  *channel.Client
+	// sdk     *fabsdk.FabricSDK
+	// client  *channel.Client
+
+	Contracts contracts
+}
+
+type contracts struct {
+	Devices      *DevicesContract
+	Assets       *AssetsContract
+	Requirements *RequirementsContract
+	Readings     *ReadingsContract
 }
 
 func NewBlockchainClient() *Client {
-	return &Client{
-
-	}
+	return &Client{}
 }
 
 func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 	configProvider := fabconfig.FromFile(config.ConnectionConfig)
-	bc.sdk, err = fabsdk.New(configProvider)
-	if err != nil {
-		err = errors.Wrap(err, "failed to create new SDK")
-		return
-	}
-
-	bc.client, err = channel.New(bc.sdk.ChannelContext(config.ChannelID,
-		fabsdk.WithUser(config.Identity.UserID),
-		fabsdk.WithOrg(config.Identity.OrgID),
-	)); if err != nil {
-		err = errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
-		return
-	}
+	// bc.sdk, err = fabsdk.New(configProvider)
+	// if err != nil {
+	// 	err = errors.Wrap(err, "failed to create new SDK")
+	// 	return
+	// }
+	//
+	// bc.client, err = channel.New(bc.sdk.ChannelContext(config.ChannelID,
+	// 	fabsdk.WithUser(config.Identity.UserID),
+	// 	fabsdk.WithOrg(config.Identity.OrgID),
+	// )); if err != nil {
+	// 	err = errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
+	// 	return
+	// }
 
 	bc.wallet, err = gateway.NewFileSystemWallet(config.WalletPath)
 	if err != nil {
@@ -71,11 +76,18 @@ func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 		return
 	}
 
+	bc.Contracts = contracts{
+		Devices:      NewDevicesContract(bc),
+		Assets:       NewAssetsContract(bc),
+		Requirements: NewRequirementsContract(bc),
+		Readings:     NewReadingsContract(bc),
+	}
+
 	return
 }
 
 func (bc *Client) Close() {
-	bc.sdk.Close()
+	//bc.sdk.Close()
 	bc.gateway.Close()
 }
 
