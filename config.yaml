@@ -21,3 +21,14 @@ sensors:
     address: 0x60
     bus: 4
     timeout: 500
+
+gateway:
+  connectionConfig: connection.yaml
+  identity:
+    certificate: ../identity.pem
+    privateKey: ../identity.key
+    userID: device
+    orgID: supplier
+    mspID: supplierMSP
+  channelID: supply-channel
+  walletPath: ../keystore
