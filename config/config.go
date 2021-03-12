@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	Worker  WorkerConfig  `yaml:"worker"`
-	Sensors SensorsConfig `yaml:"sensors"`
+	Worker  WorkerConfig     `yaml:"worker"`
+	Sensors SensorsConfig    `yaml:"sensors"`
+	Display DisplayConfig    `yaml:"display"`
 	Gateway BlockchainConfig `yaml:"gateway"`
 }
 

@@ -7,8 +7,11 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
+	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/mocks"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
@@ -16,6 +19,7 @@ import (
 )
 
 var (
+	Device *device.Device
 	ctx = engine.NewContext(context.Background()).
 		SetLogger(shared.Logger).
 		SetConfig("config.yaml")
@@ -40,6 +44,28 @@ func main() {
 }
 
 func run() {
+	Device = device.NewDevice()
+
+	client := blockchain.NewBlockchainClient()
+	if err := client.Init(ctx.Config.Gateway); err != nil {
+		shared.Logger.Fatal(err)
+	}
+	shared.Logger.Debug("init blockchain client ended")
+
+	Device.SetClient(client)
+
+	dp := display.NewST7789("SPI0.0", "GPIO25")
+
+	if err := dp.Init(ctx.Config.Display); err != nil {
+		shared.Logger.Fatal(err)
+	}
+
+	Device.SetDisplay(dp)
+
+	if err := Device.Init(); err != nil {
+		shared.Logger.Fatal(err)
+	}
+
 	reader.RegisterSensors(
 		sensors.NewDHT22(5),
 		sensors.NewMAX44009(0x4A, 1),
@@ -87,6 +113,8 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	shared.Logger.Info("Shutting down...")
 
 	reader.Clean()
+
+	Device.Close()
 
 	close(done)
 }

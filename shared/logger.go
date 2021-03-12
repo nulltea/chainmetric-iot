@@ -23,7 +23,7 @@ func InitLogger() {
 	logging.SetBackend(backend)
 
 	level, err := logging.LogLevel(os.Getenv("LOGGING")); if err != nil {
-		level = logging.INFO
+		level = logging.DEBUG
 	}
 	logging.SetLevel(level, "sensorsys")
 

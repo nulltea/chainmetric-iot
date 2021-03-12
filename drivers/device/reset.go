@@ -5,16 +5,15 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-func Reset(dc *blockchain.DevicesContract) error {
+func (d *Device) Reset() error {
 	id, is := isRegistered(); if !is {
 		return nil
 	}
 
-	if err := dc.Remove(id); err != nil {
+	if err := d.client.Contracts.Devices.Remove(id); err != nil {
 		return err
 	}
 

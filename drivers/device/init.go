@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"image/color"
 	"io/ioutil"
 	"os"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
@@ -23,15 +23,11 @@ var (
 	Specs *model.DeviceSpecs
 )
 
-func Init(dc *blockchain.DevicesContract) error {
+func (d *Device) Init() error {
 	var err error
 
-	Specs, err = DiscoverSpecs(); if err != nil {
-		return err
-	}
-
 	if id, is := isRegistered(); is {
-		if err := dc.UpdateSpecs(id, Specs); err != nil {
+		if err := d.client.Contracts.Devices.UpdateSpecs(id, Specs); err != nil {
 			return err
 		}
 
@@ -40,13 +36,26 @@ func Init(dc *blockchain.DevicesContract) error {
 		return nil
 	}
 
-	// TODO: display QR code
-	qrcode.Encode(Specs.Encode(), qrcode.Medium, 135)
-	qrcode.WriteFile(Specs.EncodeJson(), qrcode.Medium, 135, "../qr.png")
+
+	Specs, err = DiscoverSpecs(); if err != nil {
+		return err
+	}
+	shared.Logger.Debug("Showing QR code")
+
+	qr, err := qrcode.New(Specs.Encode(), qrcode.Medium); if err != nil {
+		return err
+	}
+	//_, size := d.display.Size()
+	d.display.PowerOn()
+	d.display.FillScreen(color.RGBA{G: 255})
+	time.Sleep(2 * time.Second)
+	d.display.DrawImage(qr.Image(135))
+
+	shared.Logger.Debug("Subscribing to blockchain...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 
-	if err := dc.Subscribe(ctx, "inserted", func(device models.Device) error {
+	if err := d.client.Contracts.Devices.Subscribe(ctx, "inserted", func(device models.Device) error {
 		if device.Hostname == Specs.Hostname {
 			defer cancel()
 
@@ -56,7 +65,7 @@ func Init(dc *blockchain.DevicesContract) error {
 
 			shared.Logger.Infof("Device is been registered with id: %s", device.ID)
 
-			return dc.UpdateSpecs(device.ID, Specs)
+			return d.client.Contracts.Devices.UpdateSpecs(device.ID, Specs)
 		}
 
 		return nil
