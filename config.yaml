@@ -24,7 +24,12 @@ sensors:
 
 display:
   width: 240
-  height: 135
+  height: 240
+  imageSize: 135
+  bus: SPI0.0
+  dcPin: 25
+  backlightPin: 18
+  resetPin: 15
 
 gateway:
   connectionConfig: connection.yaml

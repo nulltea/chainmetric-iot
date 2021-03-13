@@ -1,16 +1,15 @@
 package display
 
 import (
-	"errors"
 	"image"
 	"image/color"
 	"image/draw"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
 	"time"
 
+	"github.com/pkg/errors"
 	"periph.io/x/periph/conn"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
@@ -24,49 +23,47 @@ import (
 
 // ST7789 is an open handle to the display controller.
 type ST7789 struct {
-	bus    string
-	pin    string
-	port   spi.PortCloser
-	conn   conn.Conn
-	dc     gpio.PinOut
-	rect   image.Rectangle
+	port         spi.PortCloser
+	spi          conn.Conn
+	backlightPin gpio.PinOut
+	resetPin     gpio.PinOut
+	dcPin        gpio.PinOut
 
-	rotation                      Rotation
-	frameRate                     FrameRate
-	width                         int16
-	height                        int16
-	rowOffsetCfg, rowOffset       int16
-	columnOffset, columnOffsetCfg int16
-	isBGR                         bool
-	batchLength                   int32
-	backlightPin                  gpio.PinIO
-	resetPin                      gpio.PinIO
+	rotation         Rotation
+	frameRate        FrameRate
+	width            int16
+	height           int16
+	batchLength      int32
+	isBGR            bool
 }
 
-func NewST7789(bus string, pin string) *ST7789 {
-	return &ST7789{
-		bus:          bus,
-		pin:          pin,
-		backlightPin: gpioreg.ByName("GPIO18"),
-		resetPin:     gpioreg.ByName("GPIO15"),
-	}
+func NewST7789() *ST7789 {
+	return &ST7789{}
 }
 
 func (d *ST7789) Init(cnf config.DisplayConfig) (err error) {
-	if d.port, err = spireg.Open(d.bus); err != nil {
+	d.dcPin = gpioreg.ByName(shared.NtoPinName(cnf.DCPin)); if d.dcPin == gpio.INVALID {
+		return errors.New("st7789: invalid GPIO pin")
+	}
+
+	d.backlightPin = gpioreg.ByName(shared.NtoPinName(cnf.BacklightPin)); if d.dcPin == gpio.INVALID {
+		return errors.New("st7789: invalid GPIO pin")
+	}
+
+	d.resetPin = gpioreg.ByName(shared.NtoPinName(cnf.ResetPin)); if d.dcPin == gpio.INVALID {
+		return errors.New("st7789: invalid GPIO pin")
+	}
+
+	if err = d.dcPin.Out(gpio.Low); err != nil {
 		return err
 	}
 
-	d.dc = gpioreg.ByName(d.pin); if d.dc == gpio.INVALID {
-		return errors.New("ssd1306: use nil for dc to use 3-wire mode, do not use gpio.INVALID")
+	if d.port, err = spireg.Open(cnf.Bus); err != nil {
+		return errors.Wrap(err, "st7789: failed to open to SPI bus")
 	}
 
-	if err = d.dc.Out(gpio.Low); err != nil {
-		return err
-	}
-
-	if d.conn, err = d.port.Connect(80*physic.MegaHertz, spi.Mode0, 8); err != nil {
-		return err
+	if d.spi, err = d.port.Connect(80 * physic.MegaHertz, spi.Mode0, 8); err != nil {
+		return errors.Wrap(err, "st7789: failed to connect vis SPI bus")
 	}
 
 	if cnf.Width != 0 {
@@ -102,8 +99,6 @@ func (d *ST7789) Init(cnf config.DisplayConfig) (err error) {
 	d.reset()
 	d.setup()
 
-	//d.SetRotation(d.rotation)
-
 	return nil
 }
 
@@ -117,27 +112,27 @@ func (d *ST7789) PowerOff() error {
 	return d.backlightPin.Out(gpio.Low)
 }
 
-func (d *ST7789) setWindow(x, y, w, h int16) {
-	x += d.columnOffset
-	y += d.rowOffset
-
-	d.Command(CASET)
-	d.SendData([]uint8{uint8(x >> 8), uint8(x), uint8((x + w - 1) >> 8), uint8(x + w - 1)})
-
-	d.Command(RASET)
-	d.SendData([]uint8{uint8(y >> 8), uint8(y), uint8((y + h - 1) >> 8), uint8(y + h - 1)})
-
-	d.Command(RAMWR)
+// SetPixel sets a pixel in the screen
+func (d *ST7789) SetPixel(x int16, y int16, c color.RGBA) {
+	if x < 0 || y < 0 ||
+		(((d.rotation == NO_ROTATION || d.rotation == ROTATION_180) && (x >= d.width || y >= d.height)) ||
+			((d.rotation == ROTATION_90 || d.rotation == ROTATION_270) && (x >= d.height || y >= d.width))) {
+		return
+	}
+	d.FillRectangle(x, y, 1, 1, c)
 }
 
 // FillRectangle fills a rectangle at a given coordinates with a color
 func (d *ST7789) FillRectangle(x, y, width, height int16, c color.RGBA) error {
 	k, i := d.Size()
+
 	if x < 0 || y < 0 || width <= 0 || height <= 0 ||
 		x >= k || (x+width) > k || y >= i || (y+height) > i {
-		return errors.New("rectangle coordinates outside display area")
+		return errors.New("st7789: rectangle coordinates outside display area")
 	}
+
 	d.setWindow(x, y, width, height)
+
 	c565 := RGBATo565(c)
 	c1 := uint8(c565 >> 8)
 	c2 := uint8(c565)
@@ -147,7 +142,9 @@ func (d *ST7789) FillRectangle(x, y, width, height int16, c color.RGBA) error {
 		data[i*2] = c1
 		data[i*2+1] = c2
 	}
+
 	j := int32(width) * int32(height)
+
 	for j > 0 {
 		if j >= d.batchLength {
 			d.SendData(data)
@@ -156,19 +153,23 @@ func (d *ST7789) FillRectangle(x, y, width, height int16, c color.RGBA) error {
 		}
 		j -= d.batchLength
 	}
+
 	return nil
 }
 
 // FillRectangleWithBuffer fills buffer with a rectangle at a given coordinates.
 func (d *ST7789) FillRectangleWithBuffer(x, y, width, height int16, buffer []color.RGBA) error {
 	i, j := d.Size()
+
 	if x < 0 || y < 0 || width <= 0 || height <= 0 ||
 		x >= i || (x+width) > i || y >= j || (y+height) > j {
-		return errors.New("rectangle coordinates outside display area")
+		return errors.New("st7789: rectangle coordinates outside display area")
 	}
-	if int32(width)*int32(height) != int32(len(buffer)) {
-		return errors.New("buffer length does not match with rectangle size")
+
+	if int32(width) * int32(height) != int32(len(buffer)) {
+		return errors.New("st7789: buffer length does not match with rectangle size")
 	}
+
 	d.setWindow(x, y, width, height)
 
 	k := int32(width) * int32(height)
@@ -184,58 +185,44 @@ func (d *ST7789) FillRectangleWithBuffer(x, y, width, height int16, buffer []col
 				data[i*2+1] = c2
 			}
 		}
+
 		if k >= d.batchLength {
 			d.SendData(data)
 		} else {
 			d.SendData(data[:k*2])
 		}
+
 		k -= d.batchLength
 		offset += d.batchLength
 	}
 	return nil
 }
 
-// SetPixel sets a pixel in the screen
-func (d *ST7789) SetPixel(x int16, y int16, c color.RGBA) {
-	if x < 0 || y < 0 ||
-		(((d.rotation == NO_ROTATION || d.rotation == ROTATION_180) && (x >= d.width || y >= d.height)) ||
-			((d.rotation == ROTATION_90 || d.rotation == ROTATION_270) && (x >= d.height || y >= d.width))) {
-		return
-	}
-	d.FillRectangle(x, y, 1, 1, c)
-}
-
 // FillScreen fills the screen with a given color
 func (d *ST7789) FillScreen(c color.RGBA) {
 	if d.rotation == NO_ROTATION || d.rotation == ROTATION_180 {
+		shared.Logger.Debug("Filling screen with w: %d, h: %d, and bL: %d", d.width, d.height, d.batchLength)
 		d.FillRectangle(0, 0, d.width, d.height, c)
 	} else {
 		d.FillRectangle(0, 0, d.height, d.width, c)
 	}
 }
 
-func (d *ST7789) DrawRAW(reader io.Reader) {
-	d.setWindow(0, 0, d.width, d.height)
-	img, _, err := image.Decode(reader)
-	if err != nil {
-		shared.Logger.Error(err)
-		return
-	}
-
-	d.DrawImage(img)
-}
-
 func (d *ST7789) DrawImage(img image.Image) {
 	d.setWindow(0, 0, d.width, d.height)
-	rect := img.Bounds()
+	rect := d.Bounds()
+	imgRect := img.Bounds()
 	rgbaImg := image.NewRGBA(rect)
-	draw.Draw(rgbaImg, rect, img, rect.Min, draw.Src)
-
+	centered := image.Point{
+		X: (imgRect.Dx() - rect.Dx())/2,
+		Y: (imgRect.Dy() - rect.Dx())/2,
+	}
+	draw.Draw(rgbaImg, rect, img, centered, draw.Src)
 
 	buffer := make([]color.RGBA, 0)
 	for i := 0; i < int(d.batchLength); i++ {
 		for j := 0; j < int(d.batchLength); j++ {
-			rgba := rgbaImg.RGBAAt(int(d.width)-i, j)
+			rgba := rgbaImg.RGBAAt(int(d.batchLength)-i, j)
 			buffer = append(buffer, rgba)
 		}
 	}
@@ -265,22 +252,14 @@ func (d *ST7789) SetRotation(rotation Rotation) {
 	switch rotation % 4 {
 	case 0:
 		madctl = MADCTL_MX | MADCTL_MY
-		d.rowOffset = d.rowOffsetCfg
-		d.columnOffset = d.columnOffsetCfg
 		break
 	case 1:
 		madctl = MADCTL_MY | MADCTL_MV
-		d.rowOffset = d.columnOffsetCfg
-		d.columnOffset = d.rowOffsetCfg
 		break
 	case 2:
-		d.rowOffset = 0
-		d.columnOffset = 0
 		break
 	case 3:
 		madctl = MADCTL_MX | MADCTL_MV
-		d.rowOffset = 0
-		d.columnOffset = 0
 		break
 	}
 	if d.isBGR {
@@ -290,11 +269,10 @@ func (d *ST7789) SetRotation(rotation Rotation) {
 	d.Data(madctl)
 }
 
-// IsBGR changes the color mode (RGB/BGR)
-func (d *ST7789) IsBGR(bgr bool) {
+// SetBGR changes the color mode (RGB/BGR)
+func (d *ST7789) SetBGR(bgr bool) {
 	d.isBGR = bgr
 }
-
 
 // Size returns the current size of the display.
 func (d *ST7789) Size() (w, h int16) {
@@ -306,41 +284,22 @@ func (d *ST7789) Size() (w, h int16) {
 
 // Bounds implements display.Drawer. Min is guaranteed to be {0, 0}.
 func (d *ST7789) Bounds() image.Rectangle {
-	return d.rect
+	return image.Rect(0, 0, int(d.width), int(d.height))
 }
-
-// Invert the display (black on white vs white on black).
-func (d *ST7789) Invert(blackOnWhite bool) {
-	b := byte(0xA6)
-	if blackOnWhite {
-		b = 0xA7
-	}
-	d.Command(b)
-}
-
-// RGBATo565 converts a color.RGBA to uint16 used in the display
-func RGBATo565(c color.RGBA) uint16 {
-	r, g, b, _ := c.RGBA()
-	return uint16((r & 0xF800) +
-		((g & 0xFC00) >> 5) +
-		((b & 0xF800) >> 11))
-}
-
 
 func (d *ST7789) SendData(c []byte) error {
-	if err := d.dc.Out(gpio.High); err != nil {
+	if err := d.dcPin.Out(gpio.High); err != nil {
 		return err
 	}
-	return d.conn.Tx(c, nil)
+	return d.spi.Tx(c, nil)
 }
 
 func (d *ST7789) SendCommand(c []byte) error {
-	if err := d.dc.Out(gpio.Low); err != nil {
+	if err := d.dcPin.Out(gpio.Low); err != nil {
 		return err
 	}
-	return d.conn.Tx(c, nil)
+	return d.spi.Tx(c, nil)
 }
-
 
 // Command sends a command to the device
 func (d *ST7789) Command(cmd uint8) {
@@ -355,6 +314,24 @@ func (d *ST7789) Data(data uint8) {
 func (d *ST7789) Close() error {
 	d.PowerOff()
 	return d.port.Close()
+}
+
+// RGBATo565 converts a color.RGBA to uint16 used in the display
+func RGBATo565(c color.RGBA) uint16 {
+	r, g, b, _ := c.RGBA()
+	return uint16((r & 0xF800) +
+		((g & 0xFC00) >> 5) +
+		((b & 0xF800) >> 11))
+}
+
+func (d *ST7789) setWindow(x, y, w, h int16) {
+	d.Command(CASET)
+	d.SendData([]uint8{uint8(x >> 8), uint8(x), uint8((x + w - 1) >> 8), uint8(x + w - 1)})
+
+	d.Command(RASET)
+	d.SendData([]uint8{uint8(y >> 8), uint8(y), uint8((y + h - 1) >> 8), uint8(y + h - 1)})
+
+	d.Command(RAMWR)
 }
 
 func (d *ST7789) setup() {

@@ -46,6 +46,8 @@ func main() {
 func run() {
 	Device = device.NewDevice()
 
+	Device.SetConfig(ctx.Config)
+
 	client := blockchain.NewBlockchainClient()
 	if err := client.Init(ctx.Config.Gateway); err != nil {
 		shared.Logger.Fatal(err)
@@ -54,7 +56,7 @@ func run() {
 
 	Device.SetClient(client)
 
-	dp := display.NewST7789("SPI0.0", "GPIO25")
+	dp := display.NewST7789()
 
 	if err := dp.Init(ctx.Config.Display); err != nil {
 		shared.Logger.Fatal(err)
