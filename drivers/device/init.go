@@ -2,7 +2,6 @@ package device
 
 import (
 	"context"
-	"image/color"
 	"io/ioutil"
 	"os"
 	"time"
@@ -45,11 +44,10 @@ func (d *Device) Init() error {
 	qr, err := qrcode.New(Specs.Encode(), qrcode.Medium); if err != nil {
 		return err
 	}
-	//_, size := d.display.Size()
+
 	d.display.PowerOn()
-	d.display.FillScreen(color.RGBA{G: 255})
-	time.Sleep(2 * time.Second)
-	d.display.DrawImage(qr.Image(135))
+
+	d.display.DrawImage(qr.Image(d.config.Display.ImageSize))
 
 	shared.Logger.Debug("Subscribing to blockchain...")
 
