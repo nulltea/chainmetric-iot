@@ -10,7 +10,6 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -18,30 +17,28 @@ const (
 	deviceIdentityFile = "device.id"
 )
 
-var (
-	Specs *model.DeviceSpecs
-)
-
 func (d *Device) Init() error {
 	var err error
 
-	if id, is := isRegistered(); is {
-		if err := d.client.Contracts.Devices.UpdateSpecs(id, Specs); err != nil {
-			return err
-		}
-
-		shared.Logger.Infof("Device specs been updated in blockchain with id: %s", id)
-
-		return nil
-	}
-
-
-	Specs, err = DiscoverSpecs(); if err != nil {
+	d.Specs, err = d.DiscoverSpecs(); if err != nil {
 		return err
 	}
-	shared.Logger.Debug("Showing QR code")
 
-	qr, err := qrcode.New(Specs.Encode(), qrcode.Medium); if err != nil {
+	if id, is := isRegistered(); is {
+		if exists, _ := d.client.Contracts.Devices.Exists(id); exists {
+			if err := d.client.Contracts.Devices.UpdateSpecs(id, d.Specs); err != nil {
+				return err
+			}
+
+			shared.Logger.Infof("Device specs been updated in blockchain with id: %s", id)
+
+			return nil
+		}
+
+		shared.Logger.Warning("device was removed from network, must re-initialize now")
+	}
+
+	qr, err := qrcode.New(d.Specs.Encode(), qrcode.Medium); if err != nil {
 		return err
 	}
 
@@ -54,7 +51,7 @@ func (d *Device) Init() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 
 	if err := d.client.Contracts.Devices.Subscribe(ctx, "inserted", func(device models.Device) error {
-		if device.Hostname == Specs.Hostname {
+		if device.Hostname == d.Specs.Hostname {
 			defer cancel()
 
 			if err := storeIdentity(device.ID); err != nil {
@@ -63,7 +60,7 @@ func (d *Device) Init() error {
 
 			shared.Logger.Infof("Device is been registered with id: %s", device.ID)
 
-			return d.client.Contracts.Devices.UpdateSpecs(device.ID, Specs)
+			return d.client.Contracts.Devices.UpdateSpecs(device.ID, d.Specs)
 		}
 
 		return nil

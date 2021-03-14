@@ -12,7 +12,7 @@ type DeviceSpecs struct {
 }
 
 func (ds *DeviceSpecs) Encode() string {
-	return fmt.Sprintf("%s;%s;%s", ds.Hostname, ds.IPAddress, strings.Join(ds.Supports, ","))
+	return fmt.Sprintf("${%s;%s;%s}", ds.Hostname, ds.IPAddress, strings.Join(ds.Supports, ","))
 }
 
 func (ds *DeviceSpecs) EncodeJson() string {
