@@ -1,6 +1,10 @@
 package device
 
 import (
+	"context"
+
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
@@ -10,6 +14,8 @@ import (
 
 type Device struct {
 	Specs *model.DeviceSpecs
+	model *models.Device
+	assets map[string]bool
 
 	display display.Display
 	client  *blockchain.Client
@@ -17,10 +23,13 @@ type Device struct {
 
 	i2cScan       map[int][]uint8
 	staticSensors []sensors.Sensor
+
+	cancelEvents context.CancelFunc
 }
 
 func NewDevice() *Device {
 	return &Device{
+		assets: make(map[string]bool),
 		staticSensors: make([]sensors.Sensor, 0),
 	}
 }
@@ -46,6 +55,8 @@ func (d *Device) Close() error {
 	}
 
 	d.client.Close()
+
+	d.cancelEvents()
 
 	return nil
 }

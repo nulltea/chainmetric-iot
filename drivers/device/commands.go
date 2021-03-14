@@ -18,15 +18,18 @@ const (
 )
 
 func (d *Device) Init() error {
-	var err error
+	var (
+		err error
+		contract = d.client.Contracts.Devices
+	)
 
 	d.Specs, err = d.DiscoverSpecs(); if err != nil {
 		return err
 	}
 
 	if id, is := isRegistered(); is {
-		if exists, _ := d.client.Contracts.Devices.Exists(id); exists {
-			if err := d.client.Contracts.Devices.UpdateSpecs(id, d.Specs); err != nil {
+		if d.model, _ = contract.Retrieve(id); d.model == nil {
+			if err := contract.UpdateSpecs(id, d.Specs); err != nil {
 				return err
 			}
 
@@ -43,14 +46,13 @@ func (d *Device) Init() error {
 	}
 
 	d.display.PowerOn()
+	defer d.display.PowerOff()
 
 	d.display.DrawImage(qr.Image(d.config.Display.ImageSize))
 
-	shared.Logger.Debug("Subscribing to blockchain...")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 
-	if err := d.client.Contracts.Devices.Subscribe(ctx, "inserted", func(device models.Device) error {
+	if err := contract.Subscribe(ctx, "inserted", func(device *models.Device, _ string) error {
 		if device.Hostname == d.Specs.Hostname {
 			defer cancel()
 
@@ -59,8 +61,8 @@ func (d *Device) Init() error {
 			}
 
 			shared.Logger.Infof("Device is been registered with id: %s", device.ID)
-
-			return d.client.Contracts.Devices.UpdateSpecs(device.ID, d.Specs)
+			d.model = device
+			return contract.UpdateSpecs(device.ID, d.Specs)
 		}
 
 		return nil
@@ -70,6 +72,25 @@ func (d *Device) Init() error {
 
 	return nil
 }
+
+func (d *Device) Reset() error {
+	id, is := isRegistered(); if !is {
+		return nil
+	}
+
+	if err := d.client.Contracts.Devices.Remove(id); err != nil {
+		return err
+	}
+
+	if err := os.Remove(deviceIdentityFile); err != nil {
+		return errors.Wrap(err, "failed to remove device's identity file")
+	}
+
+	shared.Logger.Info("Device is been reset.")
+
+	return nil
+}
+
 
 func isRegistered() (string, bool) {
 	id, err := ioutil.ReadFile(deviceIdentityFile); if err != nil {
