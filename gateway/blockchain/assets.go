@@ -1,9 +1,14 @@
 package blockchain
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 type AssetsContract struct {
@@ -22,14 +27,34 @@ func (cc *AssetsContract) Receive() {
 
 }
 
-func (cc *AssetsContract) Subscribe(handler func()) error {
-	reg, notifier, err := cc.contract.RegisterEvent("requirements.inserted")
+func (cc *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
+	reg, notifier, err := cc.contract.RegisterEvent(eventFilter("assets", event)); if err != nil {
+		return err
+	}
+
 	defer cc.contract.Unregister(reg)
 
-
-	select {
-	case event := <-notifier:
-		fmt.Printf("Received CC event: %#v\n", string(event.Payload))
+	for {
+		select {
+		case event := <-notifier:
+			asset, err := models.Asset{}.Decode(event.Payload); if err != nil {
+				shared.Logger.Errorf("failed parse asset from event payload: %v", err)
+				continue
+			}
+			go func(a *models.Asset, e string) {
+				if err := action(a, e); err != nil {
+					shared.Logger.Error(err)
+				}
+			}(asset, strings.Replace(event.EventName, "assets.", "", 1))
+		case <- ctx.Done():
+			switch ctx.Err() {
+			case context.DeadlineExceeded:
+				return fmt.Errorf("timeout waiting for event assets.%s", event)
+			default:
+				return nil
+			}
+		}
 	}
-	return err
+
+	return nil
 }

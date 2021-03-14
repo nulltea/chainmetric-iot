@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
@@ -24,11 +25,16 @@ func NewDevicesContract(client *Client) *DevicesContract {
 		contract: client.network.GetContract("devices"),
 	}
 }
+func (cc *DevicesContract) Retrieve(id string) (*models.Device, error) {
+	resp, err := cc.contract.EvaluateTransaction("Retrieve", id); if err != nil {
+		return nil, err
+	}
+
+	return models.Device{}.Decode(resp)
+}
 
 func (cc *DevicesContract) Exists(id string) (bool, error) {
-	resp, err := cc.contract.EvaluateTransaction("Exists", id)
-
-	if err != nil {
+	resp, err := cc.contract.EvaluateTransaction("Exists", id); if err != nil {
 		return false, err
 	}
 
@@ -40,7 +46,7 @@ func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 		return err
 	}
 
-	if  _, err = cc.contract.EvaluateTransaction("Update", id, string(data)); err != nil {
+	if  _, err = cc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
 		return err
 	}
 
@@ -48,15 +54,15 @@ func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 }
 
 func (cc *DevicesContract) Remove(id string) error {
-	if  _, err := cc.contract.EvaluateTransaction("Remove", id); err != nil {
+	if  _, err := cc.contract.SubmitTransaction("Remove", id); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (cc *DevicesContract) Subscribe(ctx context.Context, event string, action func(device models.Device) error) error {
-	reg, notifier, err := cc.contract.RegisterEvent(fmt.Sprintf("devices.%s", event)); if err != nil {
+func (cc *DevicesContract) Subscribe(ctx context.Context, event string, action func(*models.Device, string) error) error {
+	reg, notifier, err := cc.contract.RegisterEvent(eventFilter("devices", event)); if err != nil {
 		return err
 	}
 
@@ -65,18 +71,16 @@ func (cc *DevicesContract) Subscribe(ctx context.Context, event string, action f
 	for {
 		select {
 		case event := <-notifier:
-			dev := models.Device{}
-
-			if err := json.Unmarshal(event.Payload, &dev); err != nil {
-				shared.Logger.Errorf("failed decentralise device from event payload: %v", err)
+			dev, err := models.Device{}.Decode(event.Payload); if err != nil {
+				shared.Logger.Errorf("failed parse device from event payload: %v", err)
 				continue
 			}
 
-			go func(d models.Device) {
-				if err := action(d); err != nil {
+			go func(d *models.Device, e string) {
+				if err := action(d, e); err != nil {
 					shared.Logger.Error(err)
 				}
-			}(dev)
+			}(dev, strings.Replace(event.EventName, "devices.", "", 1))
 		case <- ctx.Done():
 			switch ctx.Err() {
 			case context.DeadlineExceeded:

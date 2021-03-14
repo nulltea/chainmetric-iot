@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	fabconfig "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
@@ -102,3 +103,16 @@ func newX509Identity(identity config.BlockchainIdentityConfig) (*gateway.X509Ide
 
 	return gateway.NewX509Identity(identity.MspID, string(cert), string(key)), nil
 }
+
+func eventFilter(prefix, action string) string {
+	if len(prefix) == 0 {
+		return action
+	}
+
+	if action == "*" {
+		action = "[a-zA-Z]+"
+	}
+
+	return fmt.Sprintf(`%s\.%s`, prefix, action)
+}
+
