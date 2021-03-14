@@ -6,7 +6,7 @@ var (
 	Temperature           models.Metric = "temp"
 	Humidity              models.Metric = "hdt"
 	Luminosity            models.Metric = "lux"
-	Magnetism             models.Metric = "hall"
+	Magnetism             models.Metric = "mgn"
 	Pressure              models.Metric = "bar"
 	Altitude              models.Metric = "alt"
 	UVLight               models.Metric = "uv"
@@ -19,4 +19,5 @@ var (
 	AccelerationInMS2     models.Metric = "axms"
 	HeartRate             models.Metric = "hrt"
 	BloodOxidation        models.Metric = "blo"
+	NoiseLevel            models.Metric = "nse"
 )
