@@ -68,13 +68,8 @@ func run() {
 		shared.Logger.Fatal(err)
 	}
 
-	reader.RegisterSensors(
-		sensors.NewDHT22(5),
-		sensors.NewMAX44009(0x4A, 1),
-		sensors.NewMAX30102(0x57, 2),
-		sensors.NewCCS811(0x5A, 3),
-		sensors.NewSI1145(0x60, 4),
-	)
+	Device.RegisterStaticSensors(sensors.NewDHT22(ctx.Config.Sensors.DHT22.Pin))
+	reader.RegisterSensors(Device.SupportedSensors()...)
 
 	go reader.Process()
 

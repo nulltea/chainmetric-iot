@@ -3,18 +3,25 @@ package device
 import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type Device struct {
+	Specs *model.DeviceSpecs
+
 	display display.Display
 	client  *blockchain.Client
 	config  config.Config
+
+	i2cScan       map[int][]uint8
+	staticSensors []sensors.Sensor
 }
 
 func NewDevice() *Device {
 	return &Device{
-
+		staticSensors: make([]sensors.Sensor, 0),
 	}
 }
 
@@ -42,3 +49,4 @@ func (d *Device) Close() error {
 
 	return nil
 }
+
