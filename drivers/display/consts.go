@@ -50,15 +50,11 @@ const (
 	VMCTR1     = 0xC5
 	FRCTRL2    = 0xC6
 	PWCTR6     = 0xFC
-	GCTRL      = 0xB7
 	GMCTRP1    = 0xE0
 	GMCTRN1    = 0xE1
 	GSCAN      = 0x45
-	VCOMS      = 0xBB
-	LCMCTRL    = 0xC0
-	VDVVRHEN   = 0xC2
-	VRHS       = 0xC3
-	VDVS       = 0xC4
+	VSCRDEF    = 0x33
+	VSCRSADD   = 0x37
 
 	NO_ROTATION  Rotation = 0
 	ROTATION_90  Rotation = 1 // 90 degrees clock-wise rotation
@@ -99,9 +95,4 @@ const (
 	FRAMERATE_39  FrameRate = 0x1F
 
 	MAX_VSYNC_SCANLINES = 254
-
-	BG_SPI_CS_BACK  = 0
-	BG_SPI_CS_FRONT = 1
-
-	SPI_CLOCK_HZ = 16000000
 )
