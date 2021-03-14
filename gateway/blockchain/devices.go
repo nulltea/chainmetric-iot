@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
@@ -24,14 +25,14 @@ func NewDevicesContract(client *Client) *DevicesContract {
 	}
 }
 
-func (cc *DevicesContract) Exists(hostname string) (string, error) {
-	resp, err := cc.contract.EvaluateTransaction("Retrieve", hostname)
+func (cc *DevicesContract) Exists(id string) (bool, error) {
+	resp, err := cc.contract.EvaluateTransaction("Exists", id)
 
 	if err != nil {
-		return "", err
+		return false, err
 	}
 
-	return string(resp), nil
+	return strconv.ParseBool(string(resp))
 }
 
 func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) error {
