@@ -8,17 +8,20 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type Device struct {
-	Specs *model.DeviceSpecs
+	specs *model.DeviceSpecs
 	model *models.Device
 	assets map[string]bool
 
-	display display.Display
+	reader *engine.SensorsReader
+
 	client  *blockchain.Client
+	display display.Display
 	config  config.Config
 
 	i2cScan       map[int][]uint8
@@ -29,7 +32,7 @@ type Device struct {
 
 func NewDevice() *Device {
 	return &Device{
-		assets: make(map[string]bool),
+		assets:        make(map[string]bool),
 		staticSensors: make([]sensors.Sensor, 0),
 	}
 }
@@ -46,6 +49,11 @@ func (d *Device) SetDisplay(dp display.Display) *Device {
 
 func (d *Device) SetClient(client *blockchain.Client) *Device {
 	d.client = client
+	return d
+}
+
+func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
+	d.reader = reader
 	return d
 }
 

@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -23,8 +24,18 @@ func NewAssetsContract(client *Client) *AssetsContract {
 	}
 }
 
-func (cc *AssetsContract) Receive() {
+func (cc *AssetsContract) Receive() ([]*models.Asset, error) {
+	data, err := cc.contract.EvaluateTransaction("List"); if err != {
+		return nil, err
+	}
 
+	assets := []*models.Asset{}
+
+	if err = json.Unmarshal(data, assets); err != nil {
+		return nil, err
+	}
+
+	return assets, nil
 }
 
 func (cc *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
