@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 var (
@@ -58,6 +60,9 @@ func (d *Device) watchDevice(ctx context.Context) {
 		case "updated":
 			d.model = dev
 		case "removed":
+			shared.Logger.Notice("Device has been removed from blockchain, must reset it now")
+			d.Reset()
+			d.Close()
 		}
 
 		return nil
