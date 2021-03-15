@@ -8,6 +8,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/iot-blockchain-contracts/models/request"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
@@ -24,12 +25,12 @@ func NewAssetsContract(client *Client) *AssetsContract {
 	}
 }
 
-func (cc *AssetsContract) Receive() ([]*models.Asset, error) {
-	data, err := cc.contract.EvaluateTransaction("List"); if err != nil {
+func (ac *AssetsContract) Receive(query request.AssetsQuery) ([]*models.Asset, error) {
+	data, err := ac.contract.EvaluateTransaction("Query", string(query.Encode())); if err != nil {
 		return nil, err
 	}
 
-	assets := []*models.Asset{}
+	var assets []*models.Asset
 
 	if err = json.Unmarshal(data, assets); err != nil {
 		return nil, err
@@ -38,12 +39,12 @@ func (cc *AssetsContract) Receive() ([]*models.Asset, error) {
 	return assets, nil
 }
 
-func (cc *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
-	reg, notifier, err := cc.contract.RegisterEvent(eventFilter("assets", event)); if err != nil {
+func (ac *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
+	reg, notifier, err := ac.contract.RegisterEvent(eventFilter("assets", event)); if err != nil {
 		return err
 	}
 
-	defer cc.contract.Unregister(reg)
+	defer ac.contract.Unregister(reg)
 
 	for {
 		select {

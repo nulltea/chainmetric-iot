@@ -32,17 +32,20 @@ func (d *Device) watchAssets(ctx context.Context) {
 	)
 
 	contract.Subscribe(ctx, "*", func(asset *models.Asset, e string) error {
+		d.assets.mutex.Lock()
+		defer d.assets.mutex.Unlock()
+
 		switch e {
 		case "inserted":
 			fallthrough
 		case "updated":
 			if asset.Location == d.model.Location {
-				d.assets[asset.ID] = true
+				d.assets.data[asset.ID] = true
 				break
 			}
 			fallthrough
 		case "removed":
-			delete(d.assets, asset.ID)
+			delete(d.assets.data, asset.ID)
 		}
 
 		return nil

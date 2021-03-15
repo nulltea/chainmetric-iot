@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -23,13 +24,26 @@ func NewRequirementsContract(client *Client) *RequirementsContract {
 	}
 }
 
+func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requirements, error) {
+	request, _ := json.Marshal(assets)
 
-func (cc *RequirementsContract) Subscribe(ctx context.Context, event string, action func(*models.Requirements, string) error) error {
-	reg, notifier, err := cc.contract.RegisterEvent(eventFilter("requirements", event)); if err != nil {
+	data, err := rc.contract.EvaluateTransaction("ForAssets", string(request)); if err != nil {
+		return nil, err
+	}
+
+	var requirements []*models.Requirements; if err = json.Unmarshal(data, requirements); err != nil {
+		return nil, err
+	}
+
+	return requirements, nil
+}
+
+func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, action func(*models.Requirements, string) error) error {
+	reg, notifier, err := rc.contract.RegisterEvent(eventFilter("requirements", event)); if err != nil {
 		return err
 	}
 
-	defer cc.contract.Unregister(reg)
+	defer rc.contract.Unregister(reg)
 
 	for {
 		select {

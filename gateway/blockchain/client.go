@@ -16,8 +16,6 @@ type Client struct {
 	wallet  *gateway.Wallet
 	gateway *gateway.Gateway
 	network *gateway.Network
-	// sdk     *fabsdk.FabricSDK
-	// client  *channel.Client
 
 	Contracts contracts
 }
@@ -35,19 +33,6 @@ func NewBlockchainClient() *Client {
 
 func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 	configProvider := fabconfig.FromFile(config.ConnectionConfig)
-	// bc.sdk, err = fabsdk.New(configProvider)
-	// if err != nil {
-	// 	err = errors.Wrap(err, "failed to create new SDK")
-	// 	return
-	// }
-	//
-	// bc.client, err = channel.New(bc.sdk.ChannelContext(config.ChannelID,
-	// 	fabsdk.WithUser(config.Identity.UserID),
-	// 	fabsdk.WithOrg(config.Identity.OrgID),
-	// )); if err != nil {
-	// 	err = errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
-	// 	return
-	// }
 
 	bc.wallet, err = gateway.NewFileSystemWallet(config.WalletPath)
 	if err != nil {
@@ -88,7 +73,6 @@ func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 }
 
 func (bc *Client) Close() {
-	//bc.sdk.Close()
 	bc.gateway.Close()
 }
 

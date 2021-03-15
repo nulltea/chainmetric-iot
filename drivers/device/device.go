@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"sync"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -14,9 +15,10 @@ import (
 )
 
 type Device struct {
-	specs *model.DeviceSpecs
-	model *models.Device
-	assets map[string]bool
+	specs    *model.DeviceSpecs
+	model    *models.Device
+	assets   *assetsCache
+	requests *requirementsCache
 
 	reader *engine.SensorsReader
 
@@ -30,9 +32,26 @@ type Device struct {
 	cancelEvents context.CancelFunc
 }
 
+type assetsCache struct {
+	mutex sync.Mutex
+	data  map[string]bool
+}
+
+type requirementsCache struct {
+	mutex sync.Mutex
+	data  map[string]models.Metrics
+}
+
 func NewDevice() *Device {
 	return &Device{
-		assets:        make(map[string]bool),
+		assets: &assetsCache{
+			mutex: sync.Mutex{},
+			data:  make(map[string]bool),
+		},
+		requests: &requirementsCache{
+			mutex: sync.Mutex{},
+			data:  make(map[string]models.Metrics),
+		},
 		staticSensors: make([]sensors.Sensor, 0),
 	}
 }
@@ -69,3 +88,18 @@ func (d *Device) Close() error {
 	return nil
 }
 
+func (ac *assetsCache) Get() []string {
+	ac.mutex.Lock()
+	defer ac.mutex.Unlock()
+
+	var (
+		ids = make([]string, len(ac.data))
+		i = 0
+	)
+
+	for id := range ac.data {
+		ids[i] = id
+		i++
+	}
+	return ids
+}
