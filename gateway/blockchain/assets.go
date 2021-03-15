@@ -25,7 +25,7 @@ func NewAssetsContract(client *Client) *AssetsContract {
 }
 
 func (cc *AssetsContract) Receive() ([]*models.Asset, error) {
-	data, err := cc.contract.EvaluateTransaction("List"); if err != {
+	data, err := cc.contract.EvaluateTransaction("List"); if err != nil {
 		return nil, err
 	}
 

@@ -5,8 +5,6 @@ import (
 	"sync"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
-
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 var (
@@ -74,11 +72,9 @@ func (d *Device) watchRequirements(ctx context.Context) {
 	contract.Subscribe(ctx, "*", func(req *models.Requirements, e string) error {
 		switch e {
 		case "inserted":
-			d.model = dev
+		case "updated":
 		case "removed":
-			shared.Logger.Notice("Device has been removed from blockchain, must reset it now")
-			d.Reset()
-			d.Close()
+			// TODO: act on requirements changes
 		}
 
 		return nil
