@@ -1,4 +1,4 @@
-package sensor
+package sensors
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type Context struct {
 }
 
 func (c *Context) For(metric models.Metric) *metricWriter {
-	return &metricWriter {
+	return &metricWriter{
 		metric,
 		c,
 	}

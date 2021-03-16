@@ -6,12 +6,9 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/receiver"
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
@@ -28,24 +25,12 @@ func NewContext(parent context.Context) *Context {
 	}
 }
 
-func (c *Context) ForSensor(s sensors.Sensor) *sensor.Context {
-	return &sensor.Context {
+func (c *Context) ForSensor(s sensors.Sensor) *sensors.Context {
+	return &sensors.Context{
 		Parent: c,
 		Logger: c.Logger,
 		SensorID: s.ID(),
 		Pipe: make(model.MetricReadingsPipe),
-	}
-}
-
-func (c *Context) ForRequest(metrics []models.Metric) *receiver.Context {
-	pipe := make(model.MetricReadingsPipe)
-	for _, metric := range metrics {
-		pipe[metric] = make(chan model.MetricReading, 3)
-	}
-	return &receiver.Context {
-		Parent: c,
-		Logger: c.Logger,
-		Pipe: pipe,
 	}
 }
 

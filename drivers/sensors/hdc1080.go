@@ -6,7 +6,6 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -77,7 +76,7 @@ func (s *HDC1080) ReadHumidity() (float32, error) {
 	return (raw / 65536.0) * 100.0, nil
 }
 
-func (s *HDC1080) Harvest(ctx *sensor.Context) {
+func (s *HDC1080) Harvest(ctx *Context) {
 	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
 	ctx.For(metrics.Humidity).WriteWithError(s.ReadHumidity())
 }

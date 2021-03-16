@@ -6,7 +6,6 @@ import (
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -40,7 +39,7 @@ func (s *MAX30102) Init() (err error) {
 	return
 }
 
-func (s *MAX30102) Harvest(ctx *sensor.Context) {
+func (s *MAX30102) Harvest(ctx *Context) {
 	ctx.For(metrics.HeartRate).WriteWithError(s.ReadHeartRate())
 	ctx.For(metrics.BloodOxidation).WriteWithError(s.ReadSpO2())
 }

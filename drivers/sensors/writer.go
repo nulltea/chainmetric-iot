@@ -1,4 +1,4 @@
-package sensor
+package sensors
 
 import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"

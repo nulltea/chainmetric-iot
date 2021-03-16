@@ -5,7 +5,6 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -45,7 +44,7 @@ func (s *BMPxx) Init() (err error) {
 	return
 }
 
-func (s *BMPxx) Harvest(ctx *sensor.Context) {
+func (s *BMPxx) Harvest(ctx *Context) {
 	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
 }
 

@@ -7,7 +7,6 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -149,7 +148,7 @@ func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
 	return
 }
 
-func (s *CCS811) Harvest(ctx *sensor.Context) {
+func (s *CCS811) Harvest(ctx *Context) {
 	eCO2, eTVOC, err := s.Read()
 
 	ctx.For(metrics.AirCO2Concentration).Write(eCO2)

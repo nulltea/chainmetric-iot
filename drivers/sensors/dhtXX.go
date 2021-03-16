@@ -4,7 +4,6 @@ import (
 	"github.com/d2r2/go-dht"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -42,7 +41,7 @@ func (s *DHTxx) Init() error {
 	return nil
 }
 
-func (s *DHTxx) Harvest(ctx *sensor.Context) {
+func (s *DHTxx) Harvest(ctx *Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
 	ctx.For(metrics.Temperature).Write(temperature)

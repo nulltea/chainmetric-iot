@@ -6,7 +6,6 @@ import (
 	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
@@ -124,7 +123,7 @@ func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
 	}, nil
 }
 
-func (s *ADXL345) Harvest(ctx *sensor.Context) {
+func (s *ADXL345) Harvest(ctx *Context) {
 	ctx.For(metrics.AccelerationInG).WriteWithError(s.ReadAxesG())
 	ctx.For(metrics.AccelerationInMS2).WriteWithError(s.ReadAxesMS2())
 }
