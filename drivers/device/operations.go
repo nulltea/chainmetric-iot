@@ -1,7 +1,13 @@
 package device
 
 import (
+	"time"
+
+	"github.com/pkg/errors"
+	"github.com/timoth-y/iot-blockchain-contracts/models"
+
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 func (d *Device) Operate() {
@@ -30,5 +36,16 @@ func (d *Device) actOnRequest(request *readingsRequest) {
 }
 
 func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
-	// TODO: posting to blockchain
+	var (
+		contract = d.client.Contracts.Readings
+	)
+
+	if err := contract.Post(models.MetricReadings{
+		AssetID: assetID,
+		DeviceID: d.model.ID,
+		Timestamp: time.Now(),
+		Values: readings,
+	}); err != nil {
+		shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
+	}
 }

@@ -41,14 +41,16 @@ func (d *Device) Init() error {
 		shared.Logger.Warning("device was removed from network, must re-initialize now")
 	}
 
-	qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
-		return err
+	if d.display != nil {
+		qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
+			return err
+		}
+
+		d.display.PowerOn()
+		defer d.display.PowerOff()
+
+		d.display.DrawImage(qr.Image(d.config.Display.ImageSize))
 	}
-
-	d.display.PowerOn()
-	defer d.display.PowerOff()
-
-	d.display.DrawImage(qr.Image(d.config.Display.ImageSize))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 

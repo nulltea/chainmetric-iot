@@ -118,8 +118,8 @@ func (d *Device) actOnDeviceUpdates(updated *models.Device) {
 
 	if d.model.Location != updated.Location {
 		d.reader.Close() // TODO: main routine must stay locked from ending
-		d.LocateAssets()
-		d.ReceiveRequirements()
+		d.locateAssets()
+		d.receiveRequirements()
 		go d.Operate()
 	}
 }

@@ -26,7 +26,19 @@ type readingsRequest struct {
 	cancel context.CancelFunc
 }
 
-func (d *Device) LocateAssets() error {
+func (d *Device) CacheBlockchainState() error {
+	if err := d.locateAssets(); err != nil {
+		return err
+	}
+
+	if err := d.receiveRequirements(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *Device) locateAssets() error {
 	var (
 		contract = d.client.Contracts.Assets
 	)
@@ -48,7 +60,7 @@ func (d *Device) LocateAssets() error {
 	return nil
 }
 
-func (d *Device) ReceiveRequirements() error {
+func (d *Device) receiveRequirements() error {
 	var (
 		contract = d.client.Contracts.Requirements
 	)
