@@ -24,6 +24,7 @@ func (d *Device) WatchForBlockchainEvents() {
 	once.Do(func() {
 		go d.watchAssets(ctx)
 		go d.watchDevice(ctx)
+		go d.watchRequirements(ctx)
 	})
 }
 
@@ -60,8 +61,10 @@ func (d *Device) watchDevice(ctx context.Context) {
 
 	contract.Subscribe(ctx, "*", func(dev *models.Device, e string) error {
 		switch e {
-		case "inserted":
 		case "updated":
+			d.actOnDeviceUpdates(dev)
+			fallthrough
+		case "inserted":
 			d.model = dev
 		case "removed":
 			shared.Logger.Notice("Device has been removed from blockchain, must reset it now")
@@ -106,4 +109,17 @@ func (d *Device) watchRequirements(ctx context.Context) {
 
 		return nil
 	})
+}
+
+func (d *Device) actOnDeviceUpdates(updated *models.Device) {
+	if d.model.State != updated.State {
+		// TODO: handle state changes
+	}
+
+	if d.model.Location != updated.Location {
+		d.reader.Close() // TODO: main routine must stay locked from ending
+		d.LocateAssets()
+		d.ReceiveRequirements()
+		go d.Operate()
+	}
 }

@@ -20,8 +20,7 @@ type Device struct {
 	assets   *assetsCache
 	requests *requirementsCache
 
-	reader *engine.SensorsReader
-
+	reader  *engine.SensorsReader
 	client  *blockchain.Client
 	display display.Display
 	config  config.Config
