@@ -3,6 +3,7 @@ package device
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -78,11 +79,29 @@ func (d *Device) watchRequirements(ctx context.Context) {
 	)
 
 	contract.Subscribe(ctx, "*", func(req *models.Requirements, e string) error {
+		d.requests.mutex.Lock()
+		defer d.requests.mutex.Unlock()
+
 		switch e {
-		case "inserted":
 		case "updated":
+			if request, ok := d.requests.data[req.ID]; ok {
+				request.cancel()
+				delete(d.requests.data, req.ID)
+			}
+			fallthrough
+		case "inserted":
+			request := &readingsRequest{
+				assetID: req.AssetID,
+				metrics: req.Metrics.Metrics(),
+				period: time.Second * time.Duration(req.Period),
+			}
+			d.requests.data[req.ID] = request
+			d.actOnRequest(request)
 		case "removed":
-			// TODO: act on requirements changes
+			if request, ok := d.requests.data[req.ID]; ok {
+				request.cancel()
+				delete(d.requests.data, req.ID)
+			}
 		}
 
 		return nil
