@@ -1,13 +1,9 @@
 package blockchain
 
 import (
-	"encoding/json"
-
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
-
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type ReadingsContract struct {
@@ -22,17 +18,8 @@ func NewReadingsContract(client *Client) *ReadingsContract {
 	}
 }
 
-func (cc *ReadingsContract) Post(assetID string, values model.MetricReadingsResults) error {
-	readings := models.MetricReadings{
-		AssetID: assetID,
-		Values: values,
-	}
-
-	data, err := json.Marshal(readings); if err != nil {
-		return err
-	}
-
-	_, err = cc.contract.SubmitTransaction("Insert", string(data))
+func (cc *ReadingsContract) Post(readings models.MetricReadings) error {
+	_, err := cc.contract.SubmitTransaction("Post", string(readings.Encode()))
 
 	return err
 }
