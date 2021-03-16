@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pkg/errors"
+
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
@@ -43,7 +45,15 @@ func main() {
 }
 
 func run() {
-	Device.Init()
+	if err := Device.Init(); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed to initialize device"))
+	}
+
+	if err := Device.CacheBlockchainState(); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed to cache the state of blockchain"))
+	}
+
+	Device.Operate()
 }
 
 func shutdown(quit chan os.Signal, done chan struct{}) {
