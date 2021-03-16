@@ -26,20 +26,10 @@ type Device struct {
 	display display.Display
 	config  config.Config
 
-	i2cScan       map[int][]uint8
+	i2cScan i2cScan
 	staticSensors []sensors.Sensor
 
 	cancelEvents context.CancelFunc
-}
-
-type assetsCache struct {
-	mutex sync.Mutex
-	data  map[string]bool
-}
-
-type requirementsCache struct {
-	mutex sync.Mutex
-	data  map[string]models.Metrics
 }
 
 func NewDevice() *Device {
@@ -50,7 +40,7 @@ func NewDevice() *Device {
 		},
 		requests: &requirementsCache{
 			mutex: sync.Mutex{},
-			data:  make(map[string]models.Metrics),
+			data:  make(map[string]*readingsRequest),
 		},
 		staticSensors: make([]sensors.Sensor, 0),
 	}
@@ -60,6 +50,12 @@ func (d *Device) SetConfig(cfn config.Config) *Device {
 	d.config = cfn
 	return d
 }
+
+func (d *Device) RegisterStaticSensors(sensors ...sensors.Sensor) *Device {
+	d.staticSensors = append(d.staticSensors, sensors...)
+	return d
+}
+
 
 func (d *Device) SetDisplay(dp display.Display) *Device {
 	d.display = dp
@@ -81,25 +77,11 @@ func (d *Device) Close() error {
 		return err
 	}
 
-	d.client.Close()
-
 	d.cancelEvents()
 
+	d.reader.Close()
+
+	d.client.Close()
+
 	return nil
-}
-
-func (ac *assetsCache) Get() []string {
-	ac.mutex.Lock()
-	defer ac.mutex.Unlock()
-
-	var (
-		ids = make([]string, len(ac.data))
-		i = 0
-	)
-
-	for id := range ac.data {
-		ids[i] = id
-		i++
-	}
-	return ids
 }
