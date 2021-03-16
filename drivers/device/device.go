@@ -26,7 +26,7 @@ type Device struct {
 	display display.Display
 	config  config.Config
 
-	i2cScan i2cScan
+	i2cScan       i2cScanResults
 	staticSensors []sensors.Sensor
 
 	cancelEvents context.CancelFunc

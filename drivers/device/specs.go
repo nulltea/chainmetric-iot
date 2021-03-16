@@ -8,6 +8,8 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
+type i2cScanResults map[int][]uint8
+
 func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 	var (
 		availableMetrics = make(map[models.Metric]bool)
@@ -39,12 +41,12 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		i++
 	}
 
-	d.Specs = &model.DeviceSpecs{
+	d.specs = &model.DeviceSpecs{
 		Network: *network,
 		Supports: supports,
 	}
 
-	return d.Specs, nil
+	return d.specs, nil
 }
 
 func (d *Device) SupportedSensors() []sensors.Sensor {
@@ -65,8 +67,4 @@ func (d *Device) SupportedSensors() []sensors.Sensor {
 	supports = append(supports, d.staticSensors...)
 
 	return supports
-}
-
-func (d *Device) RegisterStaticSensors(sensors ...sensors.Sensor) {
-	d.staticSensors = append(d.staticSensors, sensors...)
 }
