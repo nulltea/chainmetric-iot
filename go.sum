@@ -233,6 +233,8 @@ github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210315163436-f776a9ed3078 h1:dGBmLM4UALYMo20//oXEoAz36jW6jwH1Q05SC4AopiA=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210315163436-f776a9ed3078/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
+github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea h1:293019pzJ8U0KaBKxDQiejdSkt3BVJtoantSSwH5kZA=
+github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3/go.mod h1:t553ts7ptTIMASPHACY/f8Rb2991hpAEnUiI2y0bWSk=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
