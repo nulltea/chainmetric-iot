@@ -23,13 +23,13 @@ func (d *Device) Init() error {
 		contract = d.client.Contracts.Devices
 	)
 
-	d.Specs, err = d.DiscoverSpecs(); if err != nil {
+	d.specs, err = d.DiscoverSpecs(); if err != nil {
 		return err
 	}
 
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model == nil {
-			if err := contract.UpdateSpecs(id, d.Specs); err != nil {
+			if err := contract.UpdateSpecs(id, d.specs); err != nil {
 				return err
 			}
 
@@ -41,7 +41,7 @@ func (d *Device) Init() error {
 		shared.Logger.Warning("device was removed from network, must re-initialize now")
 	}
 
-	qr, err := qrcode.New(d.Specs.Encode(), qrcode.Medium); if err != nil {
+	qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
 		return err
 	}
 
@@ -53,7 +53,7 @@ func (d *Device) Init() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 
 	if err := contract.Subscribe(ctx, "inserted", func(device *models.Device, _ string) error {
-		if device.Hostname == d.Specs.Hostname {
+		if device.Hostname == d.specs.Hostname {
 			defer cancel()
 
 			if err := storeIdentity(device.ID); err != nil {
@@ -62,7 +62,7 @@ func (d *Device) Init() error {
 
 			shared.Logger.Infof("Device is been registered with id: %s", device.ID)
 			d.model = device
-			return contract.UpdateSpecs(device.ID, d.Specs)
+			return contract.UpdateSpecs(device.ID, d.specs)
 		}
 
 		return nil
