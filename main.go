@@ -53,6 +53,8 @@ func run() {
 		shared.Logger.Fatal(errors.Wrap(err, "failed to cache the state of blockchain"))
 	}
 
+	Device.WatchForBlockchainEvents()
+
 	Device.Operate()
 }
 
