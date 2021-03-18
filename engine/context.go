@@ -39,11 +39,8 @@ func (c *Context) SetLogger(logger *logging.Logger) *Context {
 	return c
 }
 
-func (c *Context) SetConfig(configPath string) *Context {
-	cnf, err := config.ReadConfig(configPath); if err != nil {
-		c.Fatal(err)
-	}
-	c.Config = cnf
+func (c *Context) SetConfig(config config.Config) *Context {
+	c.Config = config
 	return c
 }
 

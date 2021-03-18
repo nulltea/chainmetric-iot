@@ -17,7 +17,7 @@ type SensorsReader struct {
 	sensors       []sensors.Sensor
 	requests      chan Request
 	standbyTimers map[sensors.Sensor]*time.Timer
-	done chan struct{}
+	done          chan struct{}
 }
 
 func NewSensorsReader() *SensorsReader {
@@ -25,11 +25,13 @@ func NewSensorsReader() *SensorsReader {
 		sensors:       make([]sensors.Sensor, 0),
 		requests:      make(chan Request),
 		standbyTimers: make(map[sensors.Sensor]*time.Timer),
+		done:          make(chan struct{}),
 	}
 }
 
-func (s *SensorsReader) Init(ctx *Context) {
+func (s *SensorsReader) Init(ctx *Context) error {
 	s.context = ctx
+	return nil
 }
 
 func (s *SensorsReader) RegisterSensors(sensors ...sensors.Sensor) {
@@ -72,6 +74,7 @@ func (s *SensorsReader) Process() {
 		case <- s.context.Done():
 			return
 		case <- s.done:
+			s.context.Info("Reader process ended")
 			return
 		}
 	}
