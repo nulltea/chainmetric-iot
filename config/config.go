@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 type Config struct {
@@ -24,4 +26,12 @@ func ReadConfig(filename string) (sc Config, err error) {
 		return
 	}
 	return
+}
+
+func MustReadConfig(filename string) Config {
+	cnf, err := ReadConfig(filename); if err != nil {
+		shared.Logger.Fatal(cnf)
+	}
+
+	return cnf
 }
