@@ -32,7 +32,7 @@ func (ac *AssetsContract) Receive(query request.AssetsQuery) ([]*models.Asset, e
 
 	var assets []*models.Asset
 
-	if err = json.Unmarshal(data, assets); err != nil {
+	if err = json.Unmarshal(data, &assets); err != nil {
 		return nil, err
 	}
 

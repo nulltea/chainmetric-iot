@@ -31,7 +31,7 @@ func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requireme
 		return nil, err
 	}
 
-	var requirements []*models.Requirements; if err = json.Unmarshal(data, requirements); err != nil {
+	var requirements []*models.Requirements; if err = json.Unmarshal(data, &requirements); err != nil {
 		return nil, err
 	}
 
