@@ -7,6 +7,8 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 	"github.com/timoth-y/iot-blockchain-contracts/models/request"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 type assetsCache struct {
@@ -57,6 +59,8 @@ func (d *Device) locateAssets() error {
 		d.assets.data[asset.ID] = true
 	}
 
+	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location)
+
 	return nil
 }
 
@@ -80,6 +84,8 @@ func (d *Device) receiveRequirements() error {
 			period: time.Second * time.Duration(req.Period),
 		}
 	}
+
+	shared.Logger.Debugf("Received %d requirements", len(reqs))
 
 	return nil
 }

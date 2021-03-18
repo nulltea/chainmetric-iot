@@ -23,7 +23,7 @@ type Device struct {
 	reader  *engine.SensorsReader
 	client  *blockchain.Client
 	display display.Display
-	config  config.Config
+	Config  config.Config
 
 	i2cScan       i2cScanResults
 	staticSensors []sensors.Sensor
@@ -45,8 +45,8 @@ func NewDevice() *Device {
 	}
 }
 
-func (d *Device) SetConfig(cfn config.Config) *Device {
-	d.config = cfn
+func (d *Device) SetConfig(config config.Config) *Device {
+	d.Config = config
 	return d
 }
 

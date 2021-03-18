@@ -3,9 +3,12 @@ package display
 import (
 	"image"
 	"image/color"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 )
 
 type Display interface {
+	Init(cnf config.DisplayConfig) error
 	PowerOn() error
 	PowerOff() error
 	DrawImage(img image.Image)

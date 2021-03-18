@@ -201,7 +201,6 @@ func (d *ST7789) FillRectangleWithBuffer(x, y, width, height int16, buffer []col
 // FillScreen fills the screen with a given color
 func (d *ST7789) FillScreen(c color.RGBA) {
 	if d.rotation == NO_ROTATION || d.rotation == ROTATION_180 {
-		shared.Logger.Debug("Filling screen with w: %d, h: %d, and bL: %d", d.width, d.height, d.batchLength)
 		d.FillRectangle(0, 0, d.width, d.height, c)
 	} else {
 		d.FillRectangle(0, 0, d.height, d.width, c)

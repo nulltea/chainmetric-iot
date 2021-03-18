@@ -50,6 +50,8 @@ func (d *Device) watchAssets(ctx context.Context) {
 			delete(d.assets.data, asset.ID)
 		}
 
+		shared.Logger.Debugf("Asset %q was %s", asset.ID, e)
+
 		return nil
 	})
 }
@@ -71,6 +73,8 @@ func (d *Device) watchDevice(ctx context.Context) {
 			d.Reset()
 			d.Close()
 		}
+
+		shared.Logger.Debugf("Device was %s", e)
 
 		return nil
 	})
@@ -106,6 +110,8 @@ func (d *Device) watchRequirements(ctx context.Context) {
 				delete(d.requests.data, req.ID)
 			}
 		}
+
+		shared.Logger.Debugf("Requirement with %d metrics was %s", len(req.Metrics), e)
 
 		return nil
 	})

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	deviceIdentityFile = "device.id"
+	deviceIdentityFile = "../device.id"
 )
 
 func (d *Device) Init() error {
@@ -49,7 +49,7 @@ func (d *Device) Init() error {
 		d.display.PowerOn()
 		defer d.display.PowerOff()
 
-		d.display.DrawImage(qr.Image(d.config.Display.ImageSize))
+		d.display.DrawImage(qr.Image(d.Config.Display.ImageSize))
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)

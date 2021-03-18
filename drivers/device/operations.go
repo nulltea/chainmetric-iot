@@ -1,6 +1,8 @@
 package device
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -48,4 +50,7 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 	}); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
 	}
+
+	s, _ := json.MarshalIndent(readings, "", "\t")
+	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted", assetID), string(s))
 }
