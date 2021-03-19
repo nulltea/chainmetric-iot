@@ -104,7 +104,7 @@ func (s *SensorsReader) handleRequest(req Request) {
 
 				waitGroup.Add(1)
 
-				ctx, cancel := ctx.SetTimeout(1 * time.Second) // TODO: configure or base on request period
+				ctx, cancel := ctx.SetTimeout(2 * time.Second) // TODO: configure or base on request period
 				defer cancel()
 
 				go s.readSensor(ctx, sn, waitGroup)

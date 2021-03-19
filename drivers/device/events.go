@@ -104,14 +104,15 @@ func (d *Device) watchRequirements(ctx context.Context) {
 			}
 			d.requests.data[req.ID] = request
 			d.actOnRequest(request)
+			shared.Logger.Debugf("Requirements (id: %s) with %d metrics was %s", req.ID, len(req.Metrics), e)
 		case "removed":
 			if request, ok := d.requests.data[req.ID]; ok {
 				request.cancel()
 				delete(d.requests.data, req.ID)
 			}
+			shared.Logger.Debugf("Requirements (id: %s) was removed and unsubscribed from reading sensors",
+				req.ID, len(req.Metrics), e)
 		}
-
-		shared.Logger.Debugf("Requirement with %d metrics was %s", len(req.Metrics), e)
 
 		return nil
 	})

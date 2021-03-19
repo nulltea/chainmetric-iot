@@ -1,7 +1,6 @@
 package device
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -42,6 +41,11 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 		contract = d.client.Contracts.Readings
 	)
 
+	if len(readings) == 0 {
+		shared.Logger.Warningf("No metrics was read for asset %s, posting is skipped", assetID)
+		return
+	}
+
 	if err := contract.Post(models.MetricReadings{
 		AssetID: assetID,
 		DeviceID: d.model.ID,
@@ -51,6 +55,5 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 		shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
 	}
 
-	s, _ := json.MarshalIndent(readings, "", "\t")
-	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted", assetID), string(s))
+	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted with =>", assetID), shared.PrettyPrint(readings))
 }

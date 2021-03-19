@@ -28,7 +28,7 @@ func (d *Device) Init() error {
 	}
 
 	if id, is := isRegistered(); is {
-		if d.model, _ = contract.Retrieve(id); d.model == nil {
+		if d.model, _ = contract.Retrieve(id); d.model != nil {
 			if err := contract.UpdateSpecs(id, d.specs); err != nil {
 				return err
 			}
@@ -92,7 +92,6 @@ func (d *Device) Reset() error {
 
 	return nil
 }
-
 
 func isRegistered() (string, bool) {
 	id, err := ioutil.ReadFile(deviceIdentityFile); if err != nil {
