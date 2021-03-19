@@ -18,12 +18,16 @@ type BMPxx struct {
 
 func NewBMPxxx(deviceID string, addr uint8, bus int) *BMPxx {
 	return &BMPxx{
+		bus: bus,
+		addr: addr,
 		sensorType: sensorTypeBMP(deviceID),
 	}
 }
 
 func NewBMP280(addr uint8, bus int) *BMPxx {
 	return &BMPxx{
+		bus: bus,
+		addr: addr,
 		sensorType: bsbmp.BME280,
 	}
 }
@@ -46,11 +50,13 @@ func (s *BMPxx) Init() (err error) {
 
 func (s *BMPxx) Harvest(ctx *Context) {
 	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Altitude).WriteWithError(s.bmp.ReadAltitude(bsbmp.ACCURACY_STANDARD))
 }
 
 func (s *BMPxx) Metrics() []models.Metric {
 	return []models.Metric {
 		metrics.Pressure,
+		metrics.Altitude,
 	}
 }
 
@@ -66,7 +72,7 @@ func (s *BMPxx) Close() error {
 func sensorTypeBMP(deviceID string) bsbmp.SensorType {
 	switch deviceID {
 	case "BMP180":
-		return bsbmp.BMP280
+		return bsbmp.BMP180
 	case "BMP280":
 		return bsbmp.BMP280
 	case "BME280":
