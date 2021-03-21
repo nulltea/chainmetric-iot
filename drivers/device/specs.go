@@ -5,6 +5,7 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -44,6 +45,7 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 	d.specs = &model.DeviceSpecs{
 		Network: *network,
 		Supports: supports,
+		State: state.Online,
 	}
 
 	return d.specs, nil

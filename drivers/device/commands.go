@@ -10,6 +10,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -80,7 +81,7 @@ func (d *Device) Reset() error {
 		return nil
 	}
 
-	if err := d.client.Contracts.Devices.Remove(id); err != nil {
+	if err := d.client.Contracts.Devices.Unbind(id); err != nil {
 		return err
 	}
 
@@ -91,6 +92,10 @@ func (d *Device) Reset() error {
 	shared.Logger.Info("Device is been reset.")
 
 	return nil
+}
+
+func (d *Device) Off() error {
+	return d.client.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }
 
 func isRegistered() (string, bool) {

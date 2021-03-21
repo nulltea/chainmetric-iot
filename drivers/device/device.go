@@ -80,7 +80,5 @@ func (d *Device) Close() error {
 
 	d.reader.Close()
 
-	d.client.Close()
-
 	return nil
 }

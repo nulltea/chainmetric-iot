@@ -9,6 +9,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/iot-blockchain-contracts/models/request"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
@@ -53,8 +54,20 @@ func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 	return nil
 }
 
-func (cc *DevicesContract) Remove(id string) error {
-	if  _, err := cc.contract.SubmitTransaction("Remove", id); err != nil {
+func (cc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
+	data, err := json.Marshal(request.DeviceUpdateRequest{State: &state}); if err != nil {
+		return err
+	}
+
+	if  _, err = cc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cc *DevicesContract) Unbind(id string) error {
+	if  _, err := cc.contract.SubmitTransaction("Unbind", id); err != nil {
 		return err
 	}
 

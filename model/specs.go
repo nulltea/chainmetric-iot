@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/timoth-y/iot-blockchain-contracts/models"
 )
 
 type DeviceSpecs struct {
 	Network
 	Supports []string `json:"supports"`
+	State models.DeviceState `json:"state"`
 }
 
 func (ds *DeviceSpecs) Encode() string {
