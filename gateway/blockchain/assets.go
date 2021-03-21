@@ -26,7 +26,7 @@ func NewAssetsContract(client *Client) *AssetsContract {
 }
 
 func (ac *AssetsContract) Receive(query request.AssetsQuery) ([]*models.Asset, error) {
-	data, err := ac.contract.EvaluateTransaction("Query", string(query.Encode())); if err != nil {
+	data, err := ac.contract.EvaluateTransaction("QueryRaw", string(query.Encode())); if err != nil {
 		return nil, err
 	}
 
