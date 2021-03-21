@@ -3,6 +3,7 @@ package sensors
 const (
 	BMP280_ADDRESS = 0x76
 	CCS811_ADDRESS = 0x5A
+	HDC1080_ADDRESS = 0x40
 	MAX30102_ADDRESS = 0x57
 	MAX44009_ADDRESS = 0x4A
 	SI1145_ADDRESS = 0x60
@@ -15,6 +16,9 @@ var (
 		},
 		CCS811_ADDRESS: func(bus int) Sensor {
 			return NewCCS811(CCS811_ADDRESS, bus)
+		},
+		HDC1080_ADDRESS:  func(bus int) Sensor {
+			return NewHDC1080(HDC1080_ADDRESS, bus)
 		},
 		MAX30102_ADDRESS: func(bus int) Sensor {
 			return NewMAX30102(MAX44009_ADDRESS, bus)

@@ -10,7 +10,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
@@ -28,8 +27,7 @@ var (
 		SetConfig(Config).
 		SetClient(Client).
 		SetDisplay(Display).
-		SetReader(Reader).
-		RegisterStaticSensors(sensors.NewDHT22(Config.Sensors.DHT22.Pin))
+		SetReader(Reader)
 )
 
 func init() {
@@ -82,6 +80,12 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	if err := Device.Close(); err != nil {
 		shared.Logger.Error(err)
 	}
+
+	if err := Device.Off(); err != nil {
+		shared.Logger.Error(err)
+	}
+
+	Client.Close()
 
 	close(done)
 }

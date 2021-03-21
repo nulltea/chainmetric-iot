@@ -10,8 +10,6 @@ import (
 )
 
 const (
-	// I2C
-	HDC1080_ADDRESS =                       0x40
 	// Registers
 	HDC1080_TEMPERATURE_REGISTER =          0x00
 	HDC1080_HUMIDITY_REGISTER =             0x01
