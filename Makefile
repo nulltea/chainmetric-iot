@@ -1,5 +1,5 @@
 OUTPUT=bin/sensor
-REMOTE_IP=192.168.31.180
+REMOTE_IP=192.168.31.181
 REMOTE_DIR=/home/pi/sensorsys
 CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
 
