@@ -2,9 +2,12 @@ package sensors
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/d2r2/go-i2c"
+	"github.com/pkg/errors"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"periph.io/x/periph/conn/i2c"
+	"periph.io/x/periph/conn/i2c/i2creg"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
@@ -27,14 +30,15 @@ const (
 
 type HDC1080 struct {
 	addr uint8
-	bus int
-	i2c *i2c.I2C
+	busN int
+	bus i2c.BusCloser
+	i2c  *i2c.Dev
 }
 
 func NewHDC1080(addr uint8, bus int) *HDC1080 {
 	return &HDC1080{
 		addr: addr,
-		bus: bus,
+		busN: bus,
 	}
 }
 
@@ -43,33 +47,57 @@ func (s *HDC1080) ID() string {
 }
 
 func (s *HDC1080) Init() (err error) {
-	s. i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
+	s.bus, err = i2creg.Open(fmt.Sprintf("/dev/i2c-%d", s.busN)); if err != nil {
 		return
+	}
+
+	s.i2c = &i2c.Dev{
+		Addr: 0x40,
+		Bus:  s.bus,
 	}
 
 	if !s.Verify() {
 		return fmt.Errorf("not HDC1080 sensor")
 	}
 
+	s.i2c.Write([]byte{HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00})
+	time.Sleep(15 * time.Millisecond)
+
 	return
 }
 
 func (s *HDC1080) ReadTemperature() (float32, error) {
-	data, _, err := s.i2c.ReadRegBytes(HDC1080_TEMPERATURE_REGISTER, 2); if err != nil {
-		return 0, err
+	_, err := s.i2c.Write([]byte{HDC1080_TEMPERATURE_REGISTER}); if err != nil {
+		return 0, errors.Wrap(err, "failed write reg")
 	}
 
-	raw := float32(data[0] << 8 | data[1])
+	data := make([]byte, 2)
+
+	time.Sleep(65 * time.Millisecond)
+
+	err = s.i2c.Tx([]byte{}, data); if err != nil {
+		return 0, errors.Wrap(err, "failed read reg")
+	}
+
+	raw := float32(int(data[0]) << 8 + int(data[1]))
 
 	return (raw / 65536.0) * 165.0 - 40.0, nil
 }
 
 func (s *HDC1080) ReadHumidity() (float32, error) {
-	data, _, err := s.i2c.ReadRegBytes(HDC1080_HUMIDITY_REGISTER, 2); if err != nil {
-		return 0, err
+	_, err := s.i2c.Write([]byte{HDC1080_HUMIDITY_REGISTER}); if err != nil {
+		return 0, errors.Wrap(err, "failed write reg")
 	}
 
-	raw := float32(data[0] << 8 | data[1])
+	data := make([]byte, 2)
+
+	time.Sleep(65 * time.Millisecond)
+
+	err = s.i2c.Tx([]byte{}, data); if err != nil {
+		return 0, errors.Wrap(err, "failed read reg")
+	}
+
+	raw := float32(int(data[0]) << 8 + int(data[1]))
 
 	return (raw / 65536.0) * 100.0, nil
 }
@@ -96,7 +124,7 @@ func (s *HDC1080) Active() bool {
 
 func (s *HDC1080) Close() error {
 	defer s.clean()
-	return s.i2c.Close()
+	return s.bus.Close()
 }
 
 func (s *HDC1080) clean() {
