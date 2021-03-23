@@ -57,7 +57,7 @@ func run() {
 	}
 
 	if err := Reader.Init(Context); err != nil {
-		shared.Logger.Fatal(err)
+		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
 	}
 
 	if err := Device.Init(); err != nil {

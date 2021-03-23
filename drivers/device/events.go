@@ -111,7 +111,7 @@ func (d *Device) watchRequirements(ctx context.Context) {
 				delete(d.requests.data, req.ID)
 			}
 			shared.Logger.Debugf("Requirements (id: %s) was removed and unsubscribed from reading sensors",
-				req.ID, len(req.Metrics), e)
+				req.ID)
 		}
 
 		return nil
