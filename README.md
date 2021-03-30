@@ -66,7 +66,7 @@ $ make crypto-sync
 
 ## Roadmap
 
-- Hot-Swap support
+- Sensor modules Hot-Swap support
 - Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via [MSP3008][msp3008]
 - [E-Ink display][e-ink display] support
 - Device as a blockchain node
