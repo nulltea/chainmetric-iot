@@ -14,7 +14,8 @@ By leveraging highly concurrent engine driver such implementation is ideal for h
 
 The device itself is intended for deployment in the areas where assets requiring monitoring are stored or being delivered on. Thus, providing a general-purpose supply-chain monitoring solution.
 
-[![device photo]][this repo]
+![device photo]
+*Chainmetric device: development stage beta*
 
 ## Supports
 
