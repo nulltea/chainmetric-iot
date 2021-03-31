@@ -14,6 +14,8 @@ By leveraging highly concurrent engine driver such implementation is ideal for h
 
 The device itself is intended for deployment in the areas where assets requiring monitoring are stored or being delivered on. Thus, providing a general-purpose supply-chain monitoring solution.
 
+[![device photo]][this repo]
+
 ## Supports
 
 [![max44009 badge]][max44009]
@@ -88,6 +90,8 @@ Licensed under the [Apache 2.0][license file].
 [commit activity badge]: https://img.shields.io/github/commit-activity/m/timoth-y/chainmetric-sensorsys?label=Commit%20activity&color=teal
 [hardware badge]: https://img.shields.io/badge/Hardware-Raspberry%20Pi-informational?style=flat&logo=Raspberry%20Pi&color=953347
 [license badge]: https://img.shields.io/badge/License-Apache%202.0-informational?style=flat&color=blue
+
+[device photo]: https://github.com/timoth-y/chainmetric-sensorsys/blob/main/docs/device.png?raw=true
 
 [this repo]: https://github.com/timoth-y/chainmetric-sensorsys
 [golang]: https://golang.org
