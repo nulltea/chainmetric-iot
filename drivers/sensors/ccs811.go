@@ -151,8 +151,14 @@ func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
 func (s *CCS811) Harvest(ctx *Context) {
 	eCO2, eTVOC, err := s.Read()
 
-	ctx.For(metrics.AirCO2Concentration).Write(eCO2)
-	ctx.For(metrics.AirTVOCsConcentration).Write(eTVOC)
+	if eCO2 != 0 {
+		ctx.For(metrics.AirCO2Concentration).Write(eCO2)
+	}
+
+	if eTVOC != 0 {
+		ctx.For(metrics.AirTVOCsConcentration).Write(eTVOC)
+	}
+
 	ctx.Error(err)
 }
 

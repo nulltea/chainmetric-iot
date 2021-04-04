@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -33,12 +34,14 @@ type HDC1080 struct {
 	busN int
 	bus i2c.BusCloser
 	i2c  *i2c.Dev
+	attempts int
 }
 
 func NewHDC1080(addr uint8, bus int) *HDC1080 {
 	return &HDC1080{
 		addr: addr,
 		busN: bus,
+		attempts: 10,
 	}
 }
 
@@ -67,44 +70,74 @@ func (s *HDC1080) Init() (err error) {
 }
 
 func (s *HDC1080) ReadTemperature() (float32, error) {
-	_, err := s.i2c.Write([]byte{HDC1080_TEMPERATURE_REGISTER}); if err != nil {
-		return 0, errors.Wrap(err, "failed write reg")
+	if _, err := s.i2c.Write([]byte{HDC1080_TEMPERATURE_REGISTER}); err != nil {
+		return 0, errors.Wrap(err, "failed write to temperature register")
 	}
 
-	data := make([]byte, 2)
+	var (
+		data = make([]byte, 2)
+		left = s.attempts
+		err error
+	)
 
-	time.Sleep(65 * time.Millisecond)
+	for left >= 0 {
+		left--
+		time.Sleep(65 * time.Millisecond)
 
-	err = s.i2c.Tx([]byte{}, data); if err != nil {
-		return 0, errors.Wrap(err, "failed read reg")
+		if err = s.i2c.Tx([]byte{}, data); err != nil {
+			continue
+		}
+
+		raw := float32(int(data[0]) << 8 + int(data[1]))
+
+		return (raw / 65536.0) * 165.0 - 40.0, nil
 	}
 
-	raw := float32(int(data[0]) << 8 + int(data[1]))
-
-	return (raw / 65536.0) * 165.0 - 40.0, nil
+	return 0, errors.Wrap(err, "failed read from temperature register")
 }
 
 func (s *HDC1080) ReadHumidity() (float32, error) {
-	_, err := s.i2c.Write([]byte{HDC1080_HUMIDITY_REGISTER}); if err != nil {
-		return 0, errors.Wrap(err, "failed write reg")
+	if _, err := s.i2c.Write([]byte{HDC1080_HUMIDITY_REGISTER}); err != nil {
+		return 0, errors.Wrap(err, "failed write to humidity register")
 	}
 
-	data := make([]byte, 2)
+	var (
+		data = make([]byte, 2)
+		left = s.attempts
+		err error
+	)
 
-	time.Sleep(65 * time.Millisecond)
+	for left >= 0 {
+		left--
+		time.Sleep(65 * time.Millisecond)
 
-	err = s.i2c.Tx([]byte{}, data); if err != nil {
-		return 0, errors.Wrap(err, "failed read reg")
+		if err = s.i2c.Tx([]byte{}, data); err != nil {
+			continue
+		}
+
+		raw := float32(int(data[0]) << 8 + int(data[1]))
+
+		return (raw / 65536.0) * 100.0, nil
 	}
 
-	raw := float32(int(data[0]) << 8 + int(data[1]))
-
-	return (raw / 65536.0) * 100.0, nil
+	return 0, errors.Wrap(err, "failed read from humidity register")
 }
 
 func (s *HDC1080) Harvest(ctx *Context) {
-	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
-	ctx.For(metrics.Humidity).WriteWithError(s.ReadHumidity())
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
+		wg.Done()
+	}()
+
+	go func() {
+		ctx.For(metrics.Humidity).WriteWithError(s.ReadHumidity())
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
 
 func (s *HDC1080) Metrics() []models.Metric {
