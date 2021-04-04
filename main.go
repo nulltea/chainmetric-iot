@@ -77,13 +77,16 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
 	shared.Logger.Info("Shutting down...")
 
-	if err := Device.Close(); err != nil {
-		shared.Logger.Error(err)
+	if Device != nil {
+		if err := Device.Off(); err != nil {
+			shared.Logger.Error(err)
+		}
+
+		if err := Device.Close(); err != nil {
+			shared.Logger.Error(err)
+		}
 	}
 
-	if err := Device.Off(); err != nil {
-		shared.Logger.Error(err)
-	}
 
 	Client.Close()
 
