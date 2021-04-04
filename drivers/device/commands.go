@@ -95,6 +95,9 @@ func (d *Device) Reset() error {
 }
 
 func (d *Device) Off() error {
+	if d.client == nil || d.model == nil {
+		return nil
+	}
 	return d.client.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }
 

@@ -201,9 +201,9 @@ func (d *ST7789) FillRectangleWithBuffer(x, y, width, height int16, buffer []col
 // FillScreen fills the screen with a given color
 func (d *ST7789) FillScreen(c color.RGBA) {
 	if d.rotation == NO_ROTATION || d.rotation == ROTATION_180 {
-		d.FillRectangle(0, 0, d.width, d.height, c)
+		d.FillRectangle(0, 0, d.width * 2, d.height * 2, c)
 	} else {
-		d.FillRectangle(0, 0, d.height, d.width, c)
+		d.FillRectangle(0, 0, d.width * 2, d.height * 2, c)
 	}
 }
 
@@ -327,6 +327,7 @@ func (d *ST7789) setWindow(x, y, w, h int16) {
 	d.Command(CASET)
 	d.SendData([]uint8{uint8(x >> 8), uint8(x), uint8((x + w - 1) >> 8), uint8(x + w - 1)})
 
+
 	d.Command(RASET)
 	d.SendData([]uint8{uint8(y >> 8), uint8(y), uint8((y + h - 1) >> 8), uint8(y + h - 1)})
 
@@ -351,7 +352,7 @@ func (d *ST7789) setup() {
 	d.SetRotation(d.rotation)
 
 	// Clear screen
-	d.setWindow(0, 0, d.width, d.height)
+	d.setWindow(0, 0, d.width * 2, d.height * 2)
 	d.FillScreen(color.RGBA{A: 255})
 
 	// Frame rate for normal mode: 60Hz
