@@ -30,6 +30,10 @@ func (c *Context) Error(err error) {
 	}
 }
 
+func (c *Context) Warning(msg string) {
+	c.Logger.Errorf("%v: %v", c.SensorID, msg)
+}
+
 func (c *Context) Info(info string) {
 	c.Logger.Infof("%v: %v", c.SensorID, info)
 }

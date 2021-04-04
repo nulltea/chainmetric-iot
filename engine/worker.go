@@ -189,6 +189,12 @@ func (s *SensorsReader) initSensor(sn sensors.Sensor) error {
 func (s *SensorsReader) readSensor(ctx *sensors.Context, sn sensors.Sensor, wg *sync.WaitGroup) {
 	defer wg.Done()
 
+	if !sn.Active() {
+		ctx.Warning("attempt of reading from non-active sensor")
+
+		return
+	}
+
 	done := make(chan bool)
 
 	go func() {
