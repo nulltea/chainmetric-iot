@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -137,18 +139,18 @@ func aggregate(pipe model.MetricReadingsPipe) model.MetricReadings {
 	for metric, ch := range pipe {
 		readings := make([]model.MetricReading, 0)
 
-		L:
+	LOOP:
 		for {
 			select {
 			case reading := <- ch:
 				readings = append(readings, reading)
 			default:
-				break L
+				break LOOP
 			}
 		}
 
-		if len(readings) != 0 { // TODO: config-based or precision-based aggregation here
-			results[metric] = readings[len(readings) - 1].Value
+		if len(readings) != 0 {
+			results[metric] = selectResult(readings)
 		}
 	}
 
@@ -219,4 +221,31 @@ func (s *SensorsReader) readSensor(ctx *sensors.Context, sn sensors.Sensor, wg *
 func handleStandby(t *time.Timer, sn sensors.Sensor) {
 	<- t.C
 	sn.Close()
+}
+
+func selectResult(results []model.MetricReading) (result float64) {
+	var (
+		getPrecision = func(v float64) int {
+			s := strconv.FormatFloat(v, 'f', -1, 64)
+			i := strings.IndexByte(s, '.')
+			if i > -1 {
+				return len(s) - i - 1
+			}
+			return 0
+		}
+	)
+	result = results[0].Value
+	lastPrecision := 0
+
+	for i := range results {
+		precision := getPrecision(results[i].Value)
+
+		if precision > lastPrecision {
+			result = results[i].Value
+		}
+
+		lastPrecision = precision
+	}
+
+	return
 }
