@@ -4,7 +4,7 @@ import "github.com/timoth-y/iot-blockchain-contracts/models"
 
 type MetricReading struct {
 	Source string
-	Value interface{}
+	Value float64
 }
 
 type MetricReadings map[models.Metric] interface{}

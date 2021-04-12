@@ -10,10 +10,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
-const(
-	MAX44009_APP_START = 0x03
-)
-
 type MAX44009 struct {
 	addr uint8
 	bus int

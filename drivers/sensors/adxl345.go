@@ -124,8 +124,8 @@ func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
 }
 
 func (s *ADXL345) Harvest(ctx *Context) {
-	ctx.For(metrics.AccelerationInG).WriteWithError(s.ReadAxesG())
-	ctx.For(metrics.AccelerationInMS2).WriteWithError(s.ReadAxesMS2())
+	ctx.For(metrics.AccelerationInG).WriteWithError(toMagnitude(s.ReadAxesG()))
+	ctx.For(metrics.AccelerationInMS2).WriteWithError(toMagnitude(s.ReadAxesMS2()))
 }
 
 func (s *ADXL345) Metrics() []models.Metric {
@@ -170,4 +170,12 @@ func round(f float64, places int) float64 {
 
 func (s *ADXL345) clean() {
 	s.i2c = nil
+}
+
+func toMagnitude(vector model.Vector, err error) (float64, error) {
+	r := math.Pow(vector.X, 2) +
+		math.Pow(vector.Y, 2) +
+		math.Pow(vector.Z, 2)
+
+	return math.Sqrt(r), err
 }

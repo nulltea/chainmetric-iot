@@ -13,22 +13,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
-const (
-	// Registers
-	HDC1080_TEMPERATURE_REGISTER =          0x00
-	HDC1080_HUMIDITY_REGISTER =             0x01
-	HDC1080_CONFIGURATION_REGISTER =        0x02
-
-	// Configuration Register Bits
-	HDC1080_CONFIG_RESET_BIT =             0x8000
-	HDC1080_CONFIG_HEATER_ENABLE =          0x2000
-	HDC1080_CONFIG_ACQUISITION_MODE =       0x1000
-	HDC1080_CONFIG_BATTERY_STATUS =         0x0800
-	HDC1080_CONFIG_TEMPERATURE_RESOLUTION = 0x0400
-	HDC1080_CONFIG_HUMIDITY_RESOLUTION_HBIT =    0x0200
-	HDC1080_CONFIG_HUMIDITY_RESOLUTION_LBIT =    0x0100
-)
-
 type HDC1080 struct {
 	addr uint8
 	busN int
@@ -69,7 +53,7 @@ func (s *HDC1080) Init() (err error) {
 	return
 }
 
-func (s *HDC1080) ReadTemperature() (float32, error) {
+func (s *HDC1080) ReadTemperature() (float64, error) {
 	if _, err := s.i2c.Write([]byte{HDC1080_TEMPERATURE_REGISTER}); err != nil {
 		return 0, errors.Wrap(err, "failed write to temperature register")
 	}
@@ -88,7 +72,7 @@ func (s *HDC1080) ReadTemperature() (float32, error) {
 			continue
 		}
 
-		raw := float32(int(data[0]) << 8 + int(data[1]))
+		raw := float64(int(data[0]) << 8 + int(data[1]))
 
 		return (raw / 65536.0) * 165.0 - 40.0, nil
 	}
@@ -96,7 +80,7 @@ func (s *HDC1080) ReadTemperature() (float32, error) {
 	return 0, errors.Wrap(err, "failed read from temperature register")
 }
 
-func (s *HDC1080) ReadHumidity() (float32, error) {
+func (s *HDC1080) ReadHumidity() (float64, error) {
 	if _, err := s.i2c.Write([]byte{HDC1080_HUMIDITY_REGISTER}); err != nil {
 		return 0, errors.Wrap(err, "failed write to humidity register")
 	}
@@ -115,7 +99,7 @@ func (s *HDC1080) ReadHumidity() (float32, error) {
 			continue
 		}
 
-		raw := float32(int(data[0]) << 8 + int(data[1]))
+		raw := float64(int(data[0]) << 8 + int(data[1]))
 
 		return (raw / 65536.0) * 100.0, nil
 	}

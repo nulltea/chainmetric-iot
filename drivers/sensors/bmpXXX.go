@@ -16,7 +16,7 @@ type BMPxx struct {
 	bmp *bsbmp.BMP
 }
 
-func NewBMPxxx(deviceID string, addr uint8, bus int) *BMPxx {
+func NewBMPxx(deviceID string, addr uint8, bus int) *BMPxx {
 	return &BMPxx{
 		bus: bus,
 		addr: addr,
@@ -49,14 +49,20 @@ func (s *BMPxx) Init() (err error) {
 }
 
 func (s *BMPxx) Harvest(ctx *Context) {
-	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
-	ctx.For(metrics.Altitude).WriteWithError(s.bmp.ReadAltitude(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Pressure).Write32WithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Altitude).Write32WithError(s.bmp.ReadAltitude(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Temperature).Write32WithError(s.bmp.ReadTemperatureC(bsbmp.ACCURACY_STANDARD))
+	if supported, humidity, err := s.bmp.ReadHumidityRH(bsbmp.ACCURACY_STANDARD); supported {
+		ctx.For(metrics.Altitude).Write32WithError(humidity, err)
+	}
 }
 
 func (s *BMPxx) Metrics() []models.Metric {
 	return []models.Metric {
 		metrics.Pressure,
 		metrics.Altitude,
+		metrics.Temperature,
+		metrics.Humidity,
 	}
 }
 
@@ -86,3 +92,5 @@ func (s *BMPxx) clean() {
 	s.i2c = nil
 	s.bmp = nil
 }
+
+

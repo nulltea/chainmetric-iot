@@ -10,60 +10,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
-const(
-	// Registers
-	CCS811_STATUS          = 0x00
-	CCS811_MEAS_MODE       = 0x01
-	CCS811_ALG_RESULT_DATA = 0x02
-	CCS811_RAW_DATA        = 0x03
-	CCS811_ENV_DATA        = 0x05
-	CCS811_NTC             = 0x06
-	CCS811_THRESHOLDS      = 0x10
-	CCS811_BASELINE        = 0x11
-	CCS811_HW_ID           = 0x20
-	CCS811_HW_VERSION      = 0x21
-	CCS811_FW_BOOT_VERSION = 0x23
-	CCS811_FW_APP_VERSION  = 0x24
-	CCS811_ERROR_ID        = 0xE0
-	CCS811_SW_RESET        = 0xFF
-
-	// Bootloader Registers
-	CCS811_BOOTLOADER_APP_ERASE  = 0xF1
-	CCS811_BOOTLOADER_APP_DATA   = 0xF2
-	CCS811_BOOTLOADER_APP_VERIFY = 0xF3
-	CCS811_BOOTLOADER_APP_START  = 0xF4
-
-	// Drive mode
-	CCS811_DRIVE_MODE_IDLE  = 0x00
-	CCS811_DRIVE_MODE_1SEC  = 0x01
-	CCS811_DRIVE_MODE_10SEC = 0x02
-	CCS811_DRIVE_MODE_60SEC = 0x03
-	CCS811_DRIVE_MODE_250MS = 0x04
-
-	// Constants
-	CCS811_HW_ID_CODE   = 0x81
-	CCS811_REF_RESISTOR = 100000
-
-	// STATUS - Bitwise
-	CCS811_ERROR_BIT      = 0x01
-	CCS811_DATA_READY_BIT = 0x08
-	CCS811_APP_VALID_BIT  = 0x10
-	CCS811_FW_MODE_BIT    = 0x80
-
-	// ERROR - Bitwise
-	CCS811_WRITE_REG_INVALID = 0x01
-	CCS811_READ_REG_INVALID  = 0x02
-	CCS811_MEASMODE_INVALID  = 0x04
-	CCS811_MAX_RESISTANCE    = 0x08
-	CCS811_HEATER_FAULT      = 0x10
-	CCS811_HEATER_SUPPLY     = 0x20
-
-	// Time
-	CCS811_APP_START_TIME    = 100
-	CCS811_RESET_TIME    = 100
-	CCS811_RETRY_TIME = 250
-)
-
 var (
 	InterruptMode byte = 0
 	InterruptThreshold byte = 0
@@ -126,7 +72,7 @@ func (s *CCS811) Init() (err error) {
 	return
 }
 
-func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
+func (s *CCS811) Read() (eCO2 float64, eTVOC float64, err error) {
 	retry := 10
 	for retry > 0 {
 		retry--
@@ -138,8 +84,8 @@ func (s *CCS811) Read() (eCO2 float32, eTVOC float32, err error) {
 			if err != nil {
 				return 0, 0, err
 			}
-			eCO2 = float32((uint16(buffer[0]) << 8) | uint16(buffer[1]))
-			eTVOC = float32((uint16(buffer[2]) << 8) | uint16(buffer[3]))
+			eCO2 = float64((uint16(buffer[0]) << 8) | uint16(buffer[1]))
+			eTVOC = float64((uint16(buffer[2]) << 8) | uint16(buffer[3]))
 			break
 		}
 		time.Sleep(CCS811_RETRY_TIME * time.Millisecond)
@@ -200,8 +146,6 @@ func (s *CCS811) getStatus() (byte, error) {
 	data, _, err := s.i2c.ReadRegBytes(CCS811_STATUS, 1); if err != nil {
 		return 0, err
 	}
-
-	// fmt.Printf("status: %#x\n", data[0])
 
 	return data[0], nil
 }

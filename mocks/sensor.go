@@ -34,7 +34,7 @@ func (s *MockSensor) Harvest(ctx *sensors.Context) {
 	time.Sleep(s.duration)
 
 	for _, metric := range s.metrics {
-		ctx.For(metric).Write(rand.Float32())
+		ctx.For(metric).Write(rand.Float64())
 	}
 }
 

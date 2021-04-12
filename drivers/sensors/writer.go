@@ -11,7 +11,7 @@ type metricWriter struct {
 	ctx *Context
 }
 
-func (w *metricWriter) Write(value interface{}) {
+func (w *metricWriter) Write(value float64) {
 	if ch, ok := w.ctx.Pipe[w.metric]; ok {
 		ch <- model.MetricReading {
 			Source: w.ctx.SensorID,
@@ -20,7 +20,11 @@ func (w *metricWriter) Write(value interface{}) {
 	}
 }
 
-func (w *metricWriter) WriteWithError(value interface{}, err error) {
+func (w *metricWriter) Write32(value float32) {
+	w.Write(float64(value))
+}
+
+func (w *metricWriter) WriteWithError(value float64, err error) {
 	if err != nil {
 		w.ctx.Error(err)
 		return
@@ -28,3 +32,6 @@ func (w *metricWriter) WriteWithError(value interface{}, err error) {
 	w.Write(value)
 }
 
+func (w *metricWriter) Write32WithError(value float32, err error) {
+	w.WriteWithError(float64(value), err)
+}
