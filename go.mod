@@ -3,6 +3,7 @@ module github.com/timoth-y/iot-blockchain-sensorsys
 go 1.15
 
 require (
+	github.com/bskari/go-lsm303 v0.0.0-20200927082938-3432d22cb4f1
 	github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea
 	github.com/d2r2/go-bsbmp v0.0.0-20190515110334-3b4b3aea8375
 	github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218
