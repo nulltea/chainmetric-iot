@@ -64,7 +64,7 @@ func (s *MAX44009) Metrics() []models.Metric {
 }
 
 func (s *MAX44009) Verify() bool {
-	return true // TODO verify by device ID
+	return true
 }
 
 func (s *MAX44009) Active() bool {

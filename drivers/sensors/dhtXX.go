@@ -44,8 +44,8 @@ func (s *DHTxx) Init() error {
 func (s *DHTxx) Harvest(ctx *Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
-	ctx.For(metrics.Temperature).Write32(temperature)
-	ctx.For(metrics.Humidity).Write32(humidity)
+	ctx.For(metrics.Temperature).Write(temperature)
+	ctx.For(metrics.Humidity).Write(humidity)
 	ctx.Error(err)
 }
 

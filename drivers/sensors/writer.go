@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"fmt"
+
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
@@ -11,27 +13,39 @@ type metricWriter struct {
 	ctx *Context
 }
 
-func (w *metricWriter) Write(value float64) {
+func (w *metricWriter) Write(v interface{}) {
+	var value float64
+
+	switch t := v.(type) {
+	case float64:
+		value = t
+	case float32:
+		value = float64(t)
+	case int:
+		value = float64(t)
+	case int32:
+		value = float64(t)
+	case int64:
+		value = float64(t)
+	default:
+		w.ctx.Error(fmt.Errorf("value type is not supported: %T", t))
+		return
+	}
+
+
 	if ch, ok := w.ctx.Pipe[w.metric]; ok {
 		ch <- model.MetricReading {
 			Source: w.ctx.SensorID,
-			Value: value,
+			Value:  value,
 		}
 	}
 }
 
-func (w *metricWriter) Write32(value float32) {
-	w.Write(float64(value))
-}
-
-func (w *metricWriter) WriteWithError(value float64, err error) {
+func (w *metricWriter) WriteWithError(value interface{}, err error) {
 	if err != nil {
 		w.ctx.Error(err)
+
 		return
 	}
 	w.Write(value)
-}
-
-func (w *metricWriter) Write32WithError(value float32, err error) {
-	w.WriteWithError(float64(value), err)
 }

@@ -49,11 +49,11 @@ func (s *BMPxx) Init() (err error) {
 }
 
 func (s *BMPxx) Harvest(ctx *Context) {
-	ctx.For(metrics.Pressure).Write32WithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
-	ctx.For(metrics.Altitude).Write32WithError(s.bmp.ReadAltitude(bsbmp.ACCURACY_STANDARD))
-	ctx.For(metrics.Temperature).Write32WithError(s.bmp.ReadTemperatureC(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Pressure).WriteWithError(s.bmp.ReadPressurePa(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Altitude).WriteWithError(s.bmp.ReadAltitude(bsbmp.ACCURACY_STANDARD))
+	ctx.For(metrics.Temperature).WriteWithError(s.bmp.ReadTemperatureC(bsbmp.ACCURACY_STANDARD))
 	if supported, humidity, err := s.bmp.ReadHumidityRH(bsbmp.ACCURACY_STANDARD); supported {
-		ctx.For(metrics.Altitude).Write32WithError(humidity, err)
+		ctx.For(metrics.Altitude).WriteWithError(humidity, err)
 	}
 }
 

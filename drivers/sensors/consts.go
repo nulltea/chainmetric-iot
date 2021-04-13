@@ -1,5 +1,37 @@
 package sensors
 
+// ADXL345 accelerometer sensor constants
+const (
+	// Registers
+	ADXL345_DATA_FORMAT = 0x31
+	ADXL345_BW_RATE     = 0x2C
+	ADXL345_POWER_CTL   = 0x2D
+	ADXL345_MEASURE     = 0x08
+
+	// Device bandwidth and output data rates
+	ADXL345_Rate1600HZ = 0x0F
+	ADXL345_Rate800HZ  = 0x0E
+	ADXL345_Rate400HZ  = 0x0D
+	ADXL345_Rate200HZ  = 0x0C
+	ADXL345_Rate100HZ  = 0x0B
+	ADXL345_Rate50HZ   = 0x0A
+	ADXL345_Rate25HZ   = 0x09
+
+	// Measurement Range
+	ADXL345_RANGE2G  = 0x00
+	ADXL345_RANGE4G  = 0x01
+	ADXL345_RANGE8G  = 0x02
+	ADXL345_RANGE16G = 0x03
+
+	// Axes Data
+	ADXL345_DATAX0 = 0x32
+	ADXL345_DATAX1 = 0x33
+	ADXL345_DATAY0 = 0x34
+	ADXL345_DATAY1 = 0x35
+	ADXL345_DATAZ0 = 0x36
+	ADXL345_DATAZ1 = 0x37
+)
+
 // CCS811 air quality sensor constants
 const(
 	// Registers

@@ -36,59 +36,60 @@ func (s *SI1145) Init() (err error) {
 	}
 
 	// Enable UV index measurement coefficients
-	s.i2c.WriteRegU8(SI1145_REG_UCOEFF0, 0x29)
-	s.i2c.WriteRegU8(SI1145_REG_UCOEFF1, 0x89)
-	s.i2c.WriteRegU8(SI1145_REG_UCOEFF2, 0x02)
-	s.i2c.WriteRegU8(SI1145_REG_UCOEFF3, 0x00)
+	err = s.i2c.WriteRegU8(SI1145_REG_UCOEFF0, 0x7B)
+	err = s.i2c.WriteRegU8(SI1145_REG_UCOEFF1, 0x6B)
+	err = s.i2c.WriteRegU8(SI1145_REG_UCOEFF2, 0x01)
+	err = s.i2c.WriteRegU8(SI1145_REG_UCOEFF3, 0x00)
 
 	// Enable UV sensorType
-	s.writeParam(SI1145_PARAM_CHLIST,
-		SI1145_PARAM_CHLIST_ENUV|SI1145_PARAM_CHLIST_ENALSIR|SI1145_PARAM_CHLIST_ENALSVIS|SI1145_PARAM_CHLIST_ENPS1)
+	_, err = s.writeParam(SI1145_PARAM_CHLIST,
+		SI1145_PARAM_CHLIST_ENUV    | SI1145_PARAM_CHLIST_ENAUX |
+		SI1145_PARAM_CHLIST_ENALSIR | SI1145_PARAM_CHLIST_ENALSVIS | SI1145_PARAM_CHLIST_ENPS1)
 
 	// Enable interrupt on every sample
-	s.i2c.WriteRegU8(SI1145_REG_INTCFG, SI1145_REG_INTCFG_INTOE)
-	s.i2c.WriteRegU8(SI1145_REG_IRQEN, SI1145_REG_IRQEN_ALSEVERYSAMPLE)
+	err = s.i2c.WriteRegU8(SI1145_REG_INTCFG, SI1145_REG_INTCFG_INTOE)
+	err = s.i2c.WriteRegU8(SI1145_REG_IRQEN, SI1145_REG_IRQEN_ALSEVERYSAMPLE)
 
 	// Program LED current
-	s.i2c.WriteRegU8(SI1145_REG_PSLED21, 0x03) // 20mA for LED 1 only
-	s.writeParam(SI1145_PARAM_PS1ADCMUX, SI1145_PARAM_ADCMUX_LARGEIR)
+	err = s.i2c.WriteRegU8(SI1145_REG_PSLED21, 0x03) // 20mA for LED 1 only
+	_, err = s.writeParam(SI1145_PARAM_PS1ADCMUX, SI1145_PARAM_ADCMUX_LARGEIR)
 
 	// Proximity sensorType //1 uses LED //1
-	s.writeParam(SI1145_PARAM_PSLED12SEL, SI1145_PARAM_PSLED12SEL_PS1LED1)
+	_, err = s.writeParam(SI1145_PARAM_PSLED12SEL, SI1145_PARAM_PSLED12SEL_PS1LED1)
 
 	// Fastest clocks, clock div 1
-	s.writeParam(SI1145_PARAM_PSADCGAIN, 0)
+	_, err = s.writeParam(SI1145_PARAM_PSADCGAIN, 0)
 
 	// Take 511 clocks to measure
-	s.writeParam(SI1145_PARAM_PSADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
+	_, err = s.writeParam(SI1145_PARAM_PSADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
 
 	// in proximity mode, high range
-	s.writeParam(SI1145_PARAM_PSADCMISC, SI1145_PARAM_PSADCMISC_RANGE|SI1145_PARAM_PSADCMISC_PSMODE)
-	s.writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR)
+	_, err = s.writeParam(SI1145_PARAM_PSADCMISC, SI1145_PARAM_PSADCMISC_RANGE|SI1145_PARAM_PSADCMISC_PSMODE)
+	_, err = s.writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR)
 
 	// Fastest clocks, clock div 1
-	s.writeParam(SI1145_PARAM_ALSIRADCGAIN, 0)
+	_, err = s.writeParam(SI1145_PARAM_ALSIRADCGAIN, 0)
 
 	// Take 511 clocks to measure
-	s.writeParam(SI1145_PARAM_ALSIRADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
+	_, err = s.writeParam(SI1145_PARAM_ALSIRADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
 
 	// in high range mode
-	s.writeParam(SI1145_PARAM_ALSIRADCMISC, SI1145_PARAM_ALSIRADCMISC_RANGE)
+	_, err = s.writeParam(SI1145_PARAM_ALSIRADCMISC, SI1145_PARAM_ALSIRADCMISC_RANGE)
 
 	// fastest clocks, clock div 1
-	s.writeParam(SI1145_PARAM_ALSVISADCGAIN, 0)
+	_, err = s.writeParam(SI1145_PARAM_ALSVISADCGAIN, 0)
 
 	// Take 511 clocks to measure
-	s.writeParam(SI1145_PARAM_ALSVISADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
+	_, err = s.writeParam(SI1145_PARAM_ALSVISADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK)
 
 	// in high range mode (not normal signal)
-	s.writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE)
+	_, err = s.writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE)
 
 	// measurement rate for auto
-	s.i2c.WriteRegU8(SI1145_REG_MEASRATE0, 0xFF) // 255 * 31.25uS = 8ms
+	err = s.i2c.WriteRegU8(SI1145_REG_MEASRATE0, 0xFF) // 255 * 31.25uS = 8ms
 
 	// auto run
-	s.i2c.WriteRegU8(SI1145_REG_COMMAND, SI1145_PSALS_AUTO)
+	err = s.i2c.WriteRegU8(SI1145_REG_COMMAND, SI1145_PSALS_AUTO)
 
 	return nil
 }
@@ -147,8 +148,13 @@ func (s *SI1145) Close() error {
 }
 
 func (s *SI1145) writeParam(p, v uint8) (uint8, error) {
-	s.i2c.WriteRegU8(SI1145_REG_PARAMWR, v)
-	s.i2c.WriteRegU8(SI1145_REG_COMMAND, p |SI1145_PARAM_SET)
+	if err := s.i2c.WriteRegU8(SI1145_REG_PARAMWR, v); err != nil {
+		return 0, err
+	}
+
+	if err := s.i2c.WriteRegU8(SI1145_REG_COMMAND, p |SI1145_PARAM_SET); err != nil {
+		return 0, err
+	}
 
 	return s.i2c.ReadRegU8(SI1145_REG_PARAMRD)
 }

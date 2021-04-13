@@ -42,10 +42,10 @@ func (s *CCS811) Init() (err error) {
 		return fmt.Errorf("not that sensorType")
 	}
 
-	s.setReset()
+	err = s.setReset()
 	time.Sleep(CCS811_RESET_TIME * time.Millisecond)
 
-	s.getStatus()
+	_, err = s.getStatus()
 
 	_, err = s.i2c.WriteBytes([]byte{CCS811_BOOTLOADER_APP_START}); if err != nil {
 		return err
@@ -57,17 +57,15 @@ func (s *CCS811) Init() (err error) {
 		return err
 	}
 
-	if status &CCS811_ERROR_BIT != 0 {
+	if status & CCS811_ERROR_BIT != 0 {
 		return fmt.Errorf("CCS811 device has error")
 	}
 
-	if status &CCS811_FW_MODE_BIT == 0 {
+	if status & CCS811_FW_MODE_BIT == 0 {
 		return fmt.Errorf("CCS811 device is in FW mode")
 	}
 
-	s.setConfig(); if err != nil {
-		return err
-	}
+	err = s.setConfig()
 
 	return
 }

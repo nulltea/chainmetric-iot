@@ -5,26 +5,24 @@ import (
 	"sync"
 	"time"
 
+	"github.com/d2r2/go-i2c"
 	"github.com/pkg/errors"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
-	"periph.io/x/periph/conn/i2c"
-	"periph.io/x/periph/conn/i2c/i2creg"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
 type HDC1080 struct {
-	addr uint8
-	busN int
-	bus i2c.BusCloser
-	i2c  *i2c.Dev
+	addr     uint8
+	bus      int
+	i2c      *i2c.I2C
 	attempts int
 }
 
 func NewHDC1080(addr uint8, bus int) *HDC1080 {
 	return &HDC1080{
-		addr: addr,
-		busN: bus,
+		addr:     addr,
+		bus:      bus,
 		attempts: 10,
 	}
 }
@@ -34,27 +32,22 @@ func (s *HDC1080) ID() string {
 }
 
 func (s *HDC1080) Init() (err error) {
-	s.bus, err = i2creg.Open(fmt.Sprintf("/dev/i2c-%d", s.busN)); if err != nil {
+	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
 		return
-	}
-
-	s.i2c = &i2c.Dev{
-		Addr: 0x40,
-		Bus:  s.bus,
 	}
 
 	if !s.Verify() {
 		return fmt.Errorf("not HDC1080 sensor")
 	}
 
-	s.i2c.Write([]byte{HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00})
+	_, err = s.i2c.WriteBytes([]byte{HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00})
 	time.Sleep(15 * time.Millisecond)
 
 	return
 }
 
 func (s *HDC1080) ReadTemperature() (float64, error) {
-	if _, err := s.i2c.Write([]byte{HDC1080_TEMPERATURE_REGISTER}); err != nil {
+	if _, err := s.i2c.WriteBytes([]byte{HDC1080_TEMPERATURE_REGISTER}); err != nil {
 		return 0, errors.Wrap(err, "failed write to temperature register")
 	}
 
@@ -68,7 +61,7 @@ func (s *HDC1080) ReadTemperature() (float64, error) {
 		left--
 		time.Sleep(65 * time.Millisecond)
 
-		if err = s.i2c.Tx([]byte{}, data); err != nil {
+		if _, err = s.i2c.ReadBytes(data); err != nil {
 			continue
 		}
 
@@ -81,7 +74,7 @@ func (s *HDC1080) ReadTemperature() (float64, error) {
 }
 
 func (s *HDC1080) ReadHumidity() (float64, error) {
-	if _, err := s.i2c.Write([]byte{HDC1080_HUMIDITY_REGISTER}); err != nil {
+	if _, err := s.i2c.WriteBytes([]byte{HDC1080_HUMIDITY_REGISTER}); err != nil {
 		return 0, errors.Wrap(err, "failed write to humidity register")
 	}
 
@@ -95,7 +88,7 @@ func (s *HDC1080) ReadHumidity() (float64, error) {
 		left--
 		time.Sleep(65 * time.Millisecond)
 
-		if err = s.i2c.Tx([]byte{}, data); err != nil {
+		if _, err = s.i2c.ReadBytes(data); err != nil {
 			continue
 		}
 
@@ -141,7 +134,7 @@ func (s *HDC1080) Active() bool {
 
 func (s *HDC1080) Close() error {
 	defer s.clean()
-	return s.bus.Close()
+	return s.i2c.Close()
 }
 
 func (s *HDC1080) clean() {

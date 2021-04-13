@@ -10,47 +10,12 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
-// Earth Gravity constant in [m/s^2]
-const earthGravityMS2 = 9.80665
-
-// The typical scale factor in g/LSB
-const scaleMultiplier = 0.0039
-
-// Registers
 const (
-	dataFormat = 0x31
-	bwRate     = 0x2C
-	powerCTL   = 0x2D
-	measure    = 0x08
-)
+	// Earth Gravity constant in [m/s^2]
+	earthGravityMS2 = 9.80665
 
-// Device bandwidth and output data rates
-const (
-	Rate1600HZ = 0x0F
-	Rate800HZ  = 0x0E
-	Rate400HZ  = 0x0D
-	Rate200HZ  = 0x0C
-	Rate100HZ  = 0x0B
-	Rate50HZ   = 0x0A
-	Rate25HZ   = 0x09
-)
-
-// Measurement Range
-const (
-	Range2G  = 0x00
-	Range4G  = 0x01
-	Range8G  = 0x02
-	Range16G = 0x03
-)
-
-// Axes Data
-const (
-	dataX0 = 0x32
-	dataX1 = 0x33
-	dataY0 = 0x34
-	dataY1 = 0x35
-	dataZ0 = 0x36
-	dataZ1 = 0x37
+	// The typical scale factor in g/LSB
+	scaleMultiplier = 0.0039
 )
 
 // Represents ADXL345 sensor device
@@ -77,16 +42,16 @@ func (s *ADXL345) Init() (err error) {
 	}
 
 	// changes the device bandwidth and output data rate
-	if err = s.i2c.WriteRegU8(bwRate, Rate100HZ); err != nil {
+	if err = s.i2c.WriteRegU8(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
 		return
 	}
 
-	if err = s.setRange(Range2G); err != nil {
+	if err = s.setRange(ADXL345_RANGE2G); err != nil {
 		return
 	}
 
 	// enables measurement on sensor
-	if err = s.i2c.WriteRegU8(powerCTL, measure); err != nil {
+	if err = s.i2c.WriteRegU8(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
 		return
 	}
 
@@ -95,7 +60,7 @@ func (s *ADXL345) Init() (err error) {
 
 // ReadAxesG retrieves axes acceleration data as multiplications of G
 func (s *ADXL345) ReadAxesG() (model.Vector, error) {
-	buf, _, err := s.i2c.ReadRegBytes(dataX0, 6); if err != nil {
+	buf, _, err := s.i2c.ReadRegBytes(ADXL345_DATAX0, 6); if err != nil {
 		return model.Vector{}, err
 	}
 
@@ -117,9 +82,9 @@ func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
 	}
 
 	return model.Vector {
-		X: round(gAxes.X*earthGravityMS2, 4),
-		Y: round(gAxes.Y*earthGravityMS2, 4),
-		Z: round(gAxes.Z*earthGravityMS2, 4),
+		X: round(gAxes.X * earthGravityMS2, 4),
+		Y: round(gAxes.Y * earthGravityMS2, 4),
+		Z: round(gAxes.Z * earthGravityMS2, 4),
 	}, nil
 }
 
@@ -136,7 +101,7 @@ func (s *ADXL345) Metrics() []models.Metric {
 }
 
 func (s *ADXL345) Verify() bool {
-	return true // TODO verify by device ID
+	return true
 }
 
 func (s *ADXL345) Active() bool {
@@ -151,7 +116,7 @@ func (s *ADXL345) Close() error {
 
 // setRange changes the range of sensor. Available ranges are 2G, 4G, 8G and 16G.
 func (s *ADXL345) setRange(newRange byte) error {
-	format, err := s.i2c.ReadRegU8(dataFormat); if err != nil {
+	format, err := s.i2c.ReadRegU8(ADXL345_DATA_FORMAT); if err != nil {
 		return err
 	}
 
@@ -160,7 +125,7 @@ func (s *ADXL345) setRange(newRange byte) error {
 	value |= int32(newRange)
 	value |= 0x08
 
-	return s.i2c.WriteRegU8(dataFormat, byte(value))
+	return s.i2c.WriteRegU8(ADXL345_DATA_FORMAT, byte(value))
 }
 
 func round(f float64, places int) float64 {
