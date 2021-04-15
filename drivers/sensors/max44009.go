@@ -4,22 +4,19 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
 type MAX44009 struct {
-	addr uint8
-	bus int
-	i2c *i2c.I2C
+	dev *peripherals.I2C
 }
 
-func NewMAX44009(addr uint8, bus int) *MAX44009 {
+func NewMAX44009(addr uint16, bus int) *MAX44009 {
 	return &MAX44009{
-		addr: addr,
-		bus: bus,
+		dev: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -27,30 +24,28 @@ func (s *MAX44009) ID() string {
 	return "MAX44009"
 }
 
-func (s *MAX44009) Init() (err error) {
-	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
-		return
+func (s *MAX44009) Init() error {
+	if err := s.dev.Init(); err != nil {
+		return err
 	}
 
 	if !s.Verify() {
-		return fmt.Errorf("not MAX44009 sensorType")
+		return fmt.Errorf("driver is not compatiple with specified sensor")
 	}
 
-	_, err = s.i2c.WriteBytes([]byte{MAX44009_APP_START}); if err != nil {
-		return
+	if err := s.dev.WriteBytes(MAX44009_APP_START); err != nil {
+		return err
 	}
 
-	return
+	return nil
 }
 
-func (s *MAX44009) Read() (lux float64, err error) {
-	var buffer = make([]byte, 2)
-	_, err = s.i2c.ReadBytes(buffer); if err != nil {
+func (s *MAX44009) Read() (float64, error) {
+	buffer, err := s.dev.ReadBytes(2); if err != nil {
 		return math.NaN(), err
 	}
 
-	lux = dataToLuminance(buffer)
-	return
+	return dataToLuminance(buffer), nil
 }
 
 func (s *MAX44009) Harvest(ctx *Context) {
@@ -68,20 +63,16 @@ func (s *MAX44009) Verify() bool {
 }
 
 func (s *MAX44009) Active() bool {
-	return s.i2c != nil
+	return s.dev.Active()
 }
 
+// Close disconnects from the device
 func (s *MAX44009) Close() error {
-	defer s.clean()
-	return s.i2c.Close()
+	return s.dev.Close()
 }
 
 func dataToLuminance(d []byte) float64 {
 	exponent := int((d[0] & 0xF0) >> 4)
 	mantissa := int(((d[0] & 0x0F) << 4) | (d[1] & 0x0F))
 	return math.Pow(float64(2), float64(exponent)) * float64(mantissa) * 0.045
-}
-
-func (s *MAX44009) clean() {
-	s.i2c = nil
 }

@@ -60,6 +60,7 @@ func (s *DHTxx) Active() bool {
 	return true
 }
 
+// Close disconnects from the device
 func (s *DHTxx) Close() error {
 	return nil
 }

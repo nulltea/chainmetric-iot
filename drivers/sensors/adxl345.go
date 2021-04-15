@@ -3,9 +3,9 @@ package sensors
 import (
 	"math"
 
-	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
@@ -21,14 +21,13 @@ const (
 // Represents ADXL345 sensor device
 type ADXL345 struct {
 	addr uint8
-	bus int
-	i2c *i2c.I2C
+	bus  int
+	dev  *peripherals.I2C
 }
 
-func NewADXL345(addr uint8, bus int) *ADXL345 {
+func NewADXL345(addr uint16, bus int) *ADXL345 {
 	return &ADXL345{
-		addr: addr,
-		bus: bus,
+		dev: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -37,12 +36,12 @@ func (s *ADXL345) ID() string {
 }
 
 func (s *ADXL345) Init() (err error) {
-	s.i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
+	if err = s.dev.Init(); err != nil {
 		return
 	}
 
 	// changes the device bandwidth and output data rate
-	if err = s.i2c.WriteRegU8(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
+	if err = s.dev.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
 		return
 	}
 
@@ -51,7 +50,7 @@ func (s *ADXL345) Init() (err error) {
 	}
 
 	// enables measurement on sensor
-	if err = s.i2c.WriteRegU8(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
+	if err = s.dev.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
 		return
 	}
 
@@ -60,7 +59,7 @@ func (s *ADXL345) Init() (err error) {
 
 // ReadAxesG retrieves axes acceleration data as multiplications of G
 func (s *ADXL345) ReadAxesG() (model.Vector, error) {
-	buf, _, err := s.i2c.ReadRegBytes(ADXL345_DATAX0, 6); if err != nil {
+	buf, err := s.dev.ReadRegBytes(ADXL345_DATAX0, 6); if err != nil {
 		return model.Vector{}, err
 	}
 
@@ -105,18 +104,17 @@ func (s *ADXL345) Verify() bool {
 }
 
 func (s *ADXL345) Active() bool {
-	return s.i2c != nil
+	return s.dev.Active()
 }
 
 // Close disconnects from the device
 func (s *ADXL345) Close() error {
-	defer s.clean()
-	return s.i2c.Close()
+	return s.dev.Close()
 }
 
 // setRange changes the range of sensor. Available ranges are 2G, 4G, 8G and 16G.
 func (s *ADXL345) setRange(newRange byte) error {
-	format, err := s.i2c.ReadRegU8(ADXL345_DATA_FORMAT); if err != nil {
+	format, err := s.dev.ReadReg(ADXL345_DATA_FORMAT); if err != nil {
 		return err
 	}
 
@@ -125,7 +123,7 @@ func (s *ADXL345) setRange(newRange byte) error {
 	value |= int32(newRange)
 	value |= 0x08
 
-	return s.i2c.WriteRegU8(ADXL345_DATA_FORMAT, byte(value))
+	return s.dev.WriteRegBytes(ADXL345_DATA_FORMAT, byte(value))
 }
 
 func round(f float64, places int) float64 {
@@ -133,14 +131,8 @@ func round(f float64, places int) float64 {
 	return math.Floor(f*shift+.5) / shift
 }
 
-func (s *ADXL345) clean() {
-	s.i2c = nil
-}
-
 func toMagnitude(vector model.Vector, err error) (float64, error) {
-	r := math.Pow(vector.X, 2) +
-		math.Pow(vector.Y, 2) +
-		math.Pow(vector.Z, 2)
+	r := math.Pow(vector.X, 2) + math.Pow(vector.Y, 2) + math.Pow(vector.Z, 2)
 
 	return math.Sqrt(r), err
 }

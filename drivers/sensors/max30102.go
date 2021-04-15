@@ -1,12 +1,11 @@
 package sensors
 
 import (
-	"fmt"
-
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 type MAX30102 struct {
@@ -28,7 +27,8 @@ func (s *MAX30102) ID() string {
 
 func (s *MAX30102) Init() (err error) {
 	s.dev, err = max3010x.New(
-		max3010x.WithSpecificBus(fmt.Sprintf("/dev/i2c-%d", s.bus))); if err != nil {
+		max3010x.WithSpecificBus(shared.NtoI2cBusName(s.bus)),
+	); if err != nil {
 		return
 	}
 
@@ -63,6 +63,7 @@ func (s *MAX30102) Active() bool {
 	return s.dev != nil
 }
 
+// Close disconnects from the device
 func (s *MAX30102) Close() error {
 	s.dev.Close()
 	s.dev = nil

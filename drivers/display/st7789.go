@@ -10,24 +10,17 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"periph.io/x/periph/conn"
-	"periph.io/x/periph/conn/gpio"
-	"periph.io/x/periph/conn/gpio/gpioreg"
-	"periph.io/x/periph/conn/physic"
-	"periph.io/x/periph/conn/spi"
-	"periph.io/x/periph/conn/spi/spireg"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 )
 
 // ST7789 is an open handle to the display controller.
 type ST7789 struct {
-	port         spi.PortCloser
-	spi          conn.Conn
-	backlightPin gpio.PinOut
-	resetPin     gpio.PinOut
-	dcPin        gpio.PinOut
+	spi          *peripherals.SPI
+	backlightPin *peripherals.GPIO
+	resetPin     *peripherals.GPIO
+	dcPin        *peripherals.GPIO
 
 	rotation         Rotation
 	frameRate        FrameRate
@@ -41,51 +34,52 @@ func NewST7789() *ST7789 {
 	return &ST7789{}
 }
 
-func (d *ST7789) Init(cnf config.DisplayConfig) (err error) {
-	d.dcPin = gpioreg.ByName(shared.NtoPinName(cnf.DCPin)); if d.dcPin == gpio.INVALID {
-		return errors.New("st7789: invalid GPIO pin")
+func (d *ST7789) Init(config config.DisplayConfig) (err error) {
+	d.dcPin = peripherals.NewGPIO(config.DCPin)
+	if err := d.dcPin.Init(); err != nil {
+		return errors.Wrap(err, "failed to connect DC pin")
 	}
 
-	d.backlightPin = gpioreg.ByName(shared.NtoPinName(cnf.BacklightPin)); if d.dcPin == gpio.INVALID {
-		return errors.New("st7789: invalid GPIO pin")
+	d.backlightPin = peripherals.NewGPIO(config.BacklightPin)
+	if err := d.backlightPin.Init(); err != nil {
+		return errors.Wrap(err, "failed to connect backlight pin")
 	}
 
-	d.resetPin = gpioreg.ByName(shared.NtoPinName(cnf.ResetPin)); if d.dcPin == gpio.INVALID {
-		return errors.New("st7789: invalid GPIO pin")
+	d.resetPin = peripherals.NewGPIO(config.ResetPin)
+	if err := d.resetPin.Init(); err != nil {
+		return errors.Wrap(err, "failed to connect reset pin")
 	}
 
-	if err = d.dcPin.Out(gpio.Low); err != nil {
+	if err = d.dcPin.Low(); err != nil {
 		return err
 	}
 
-	if d.port, err = spireg.Open(cnf.Bus); err != nil {
-		return errors.Wrap(err, "st7789: failed to open to SPI bus")
+	d.spi = peripherals.NewSPI(config.Bus)
+
+	if err = d.spi.Init(); err != nil {
+		return errors.Wrap(err, "failed to connect via SPI bus")
 	}
 
-	if d.spi, err = d.port.Connect(80 * physic.MegaHertz, spi.Mode0, 8); err != nil {
-		return errors.Wrap(err, "st7789: failed to connect vis SPI bus")
-	}
-
-	if cnf.Width != 0 {
-		d.width = int16(cnf.Width)
+	if config.Width != 0 {
+		d.width = int16(config.Width)
 	} else {
 		d.width = 240
 	}
 
-	if cnf.Height != 0 {
-		d.height = int16(cnf.Height)
+	if config.Height != 0 {
+		d.height = int16(config.Height)
 	} else {
 		d.height = 240
 	}
 
-	if cnf.FrameRate != 0 {
-		d.frameRate = FrameRate(cnf.FrameRate)
+	if config.FrameRate != 0 {
+		d.frameRate = FrameRate(config.FrameRate)
 	} else {
 		d.frameRate = FRAMERATE_60
 	}
 
-	if cnf.Rotation != 0 {
-		d.rotation = Rotation(cnf.Rotation)
+	if config.Rotation != 0 {
+		d.rotation = Rotation(config.Rotation)
 	} else {
 		d.rotation = NO_ROTATION
 	}
@@ -104,12 +98,12 @@ func (d *ST7789) Init(cnf config.DisplayConfig) (err error) {
 
 // PowerOn the display
 func (d *ST7789) PowerOn() error {
-	return d.backlightPin.Out(gpio.High)
+	return d.backlightPin.High()
 }
 
 // PowerOff the display
 func (d *ST7789) PowerOff() error {
-	return d.backlightPin.Out(gpio.Low)
+	return d.backlightPin.Low()
 }
 
 // SetPixel sets a pixel in the screen
@@ -287,14 +281,14 @@ func (d *ST7789) Bounds() image.Rectangle {
 }
 
 func (d *ST7789) SendData(c []byte) error {
-	if err := d.dcPin.Out(gpio.High); err != nil {
+	if err := d.dcPin.High(); err != nil {
 		return err
 	}
 	return d.spi.Tx(c, nil)
 }
 
 func (d *ST7789) SendCommand(c []byte) error {
-	if err := d.dcPin.Out(gpio.Low); err != nil {
+	if err := d.dcPin.Low(); err != nil {
 		return err
 	}
 	return d.spi.Tx(c, nil)
@@ -312,7 +306,7 @@ func (d *ST7789) Data(data uint8) {
 
 func (d *ST7789) Close() error {
 	d.PowerOff()
-	return d.port.Close()
+	return d.spi.Close()
 }
 
 // RGBATo565 converts a color.RGBA to uint16 used in the display
@@ -371,10 +365,10 @@ func (d *ST7789) setup() {
 }
 
 func (d *ST7789) reset() {
-	d.resetPin.Out(gpio.High)
+	d.resetPin.High()
 	time.Sleep(50 * time.Millisecond)
-	d.resetPin.Out(gpio.Low)
+	d.resetPin.Low()
 	time.Sleep(50 * time.Millisecond)
-	d.resetPin.Out(gpio.High)
+	d.resetPin.High()
 	time.Sleep(50 * time.Millisecond)
 }

@@ -4,28 +4,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/d2r2/go-i2c"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
 var (
-	InterruptMode byte = 0
+	InterruptMode      byte = 0
 	InterruptThreshold byte = 0
-	SamplingRate byte = CCS811_DRIVE_MODE_10SEC
+	SamplingRate       byte = CCS811_DRIVE_MODE_1SEC
 )
 
 type CCS811 struct {
-	addr uint8
-	bus int
-	i2c *i2c.I2C
+	dev *peripherals.I2C
 }
 
-func NewCCS811(addr uint8, bus int) *CCS811 {
+func NewCCS811(addr uint16, bus int) *CCS811 {
 	return &CCS811{
-		addr: addr,
-		bus: bus,
+		dev: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -34,7 +31,7 @@ func (s *CCS811) ID() string {
 }
 
 func (s *CCS811) Init() (err error) {
-	s. i2c, err = i2c.NewI2C(s.addr, s.bus); if err != nil {
+	if err = s.dev.Init(); err != nil {
 		return
 	}
 
@@ -47,7 +44,7 @@ func (s *CCS811) Init() (err error) {
 
 	_, err = s.getStatus()
 
-	_, err = s.i2c.WriteBytes([]byte{CCS811_BOOTLOADER_APP_START}); if err != nil {
+	err = s.dev.WriteBytes(CCS811_BOOTLOADER_APP_START); if err != nil {
 		return err
 	}
 
@@ -78,7 +75,7 @@ func (s *CCS811) Read() (eCO2 float64, eTVOC float64, err error) {
 			return 0, 0, err
 		}
 		if ready {
-			buffer, _, err := s.i2c.ReadRegBytes(CCS811_ALG_RESULT_DATA, 4)
+			buffer, err := s.dev.ReadRegBytes(CCS811_ALG_RESULT_DATA, 4)
 			if err != nil {
 				return 0, 0, err
 			}
@@ -114,8 +111,8 @@ func (s *CCS811) Metrics() []models.Metric {
 }
 
 func (s *CCS811) Verify() bool {
-	buffer, _, err := s.i2c.ReadRegBytes(CCS811_HW_ID, 1)
-	if err == nil && buffer[0] == CCS811_HW_ID_CODE {
+	buffer, err := s.dev.ReadReg(CCS811_HW_ID)
+	if err == nil && buffer == CCS811_HW_ID_CODE {
 		return true
 	}
 
@@ -123,12 +120,12 @@ func (s *CCS811) Verify() bool {
 }
 
 func (s *CCS811) Active() bool {
-	return s.i2c != nil
+	return s.dev.Active()
 }
 
+// Close disconnects from the device
 func (s *CCS811) Close() error {
-	defer s.clean()
-	return s.i2c.Close()
+	return s.dev.Close()
 }
 
 func (s *CCS811) isDataReady() (bool, error) {
@@ -141,11 +138,11 @@ func (s *CCS811) isDataReady() (bool, error) {
 }
 
 func (s *CCS811) getStatus() (byte, error) {
-	data, _, err := s.i2c.ReadRegBytes(CCS811_STATUS, 1); if err != nil {
+	data, err := s.dev.ReadReg(CCS811_STATUS); if err != nil {
 		return 0, err
 	}
 
-	return data[0], nil
+	return data, nil
 }
 
 func (s *CCS811) setConfig() error {
@@ -155,17 +152,9 @@ func (s *CCS811) setConfig() error {
 	bin3 := 0x03 & SamplingRate
 	buffer[0] = bin1 << 2 | bin2 << 3 | bin3 << 4
 
-	_, err := s.i2c.WriteBytes(append([]byte{CCS811_MEAS_MODE}, buffer...))
-
-	return err
+	return s.dev.WriteRegBytes(CCS811_MEAS_MODE, buffer...)
 }
 
 func (s *CCS811) setReset() error {
-	_, err := s.i2c.WriteBytes([]byte {CCS811_SW_RESET, 0x11, 0xE5, 0x72, 0x8A})
-
-	return err
-}
-
-func (s *CCS811) clean() {
-	s.i2c = nil
+	return s.dev.WriteRegBytes(CCS811_SW_RESET, 0x11, 0xE5, 0x72, 0x8A)
 }

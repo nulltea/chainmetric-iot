@@ -166,10 +166,9 @@ func (s *LSM303Magnetometer) Active() bool {
 
 // Close disconnects from the device
 func (s *LSM303Magnetometer) Close() error {
-	defer s.clean()
-	return s.bus.Close()
-}
+	defer func() {
+		s.dev = nil
+	}()
 
-func (s *LSM303Magnetometer) clean() {
-	s.dev = nil
+	return s.bus.Close()
 }
