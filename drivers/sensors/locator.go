@@ -18,7 +18,7 @@ var I2CSensorsMap = map[uint8]func(bus int) Sensor{
 		return NewADXL345(ADXL345_ADDRESS, bus)
 	},
 	BMP280_ADDRESS: func(bus int) Sensor {
-		return NewBMP280(BMP280_ADDRESS, bus)
+		return NewBMXX80(BMP280_ADDRESS, bus)
 	},
 	CCS811_ADDRESS: func(bus int) Sensor {
 		return NewCCS811(CCS811_ADDRESS, bus)
