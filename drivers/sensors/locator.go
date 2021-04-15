@@ -42,4 +42,3 @@ var I2CSensorsMap = map[uint8]func(bus int) Sensor{
 		return NewMagnetometerLSM303(LSM303_MAGNETOMETER_ADDRESS, bus)
 	},
 }
-
