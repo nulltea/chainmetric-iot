@@ -3,7 +3,6 @@ package sensors
 import (
 	"math"
 
-	"github.com/d2r2/go-bsbmp"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 	"periph.io/x/periph/conn/physic"
 	"periph.io/x/periph/devices/bmxx80"
@@ -26,6 +25,10 @@ func NewBMXX80(addr uint16, bus int) *BMPxx {
 }
 
 func (s *BMPxx) ID() string {
+	if s.bmp == nil {
+		return "BMP280"
+	}
+
 	return s.bmp.String()
 }
 
@@ -55,7 +58,7 @@ func (s *BMPxx) Harvest(ctx *Context) {
 	ctx.For(metrics.Pressure).Write(float64(env.Pressure))
 	ctx.For(metrics.Altitude).Write(s.pressureToAltitude(float64(env.Pressure)))
 	ctx.For(metrics.Temperature).Write(env.Temperature.Celsius())
-	ctx.For(metrics.Humidity).Write(float64(env.Humidity))
+	// ctx.For(metrics.Humidity).Write(float64(env.Humidity)) TODO: test compatibility
 }
 
 func (s *BMPxx) Metrics() []models.Metric {
@@ -74,19 +77,6 @@ func (s *BMPxx) Active() bool {
 func (s *BMPxx) Close() error {
 	defer s.clean()
 	return s.dev.Close()
-}
-
-func sensorTypeBMP(deviceID string) bsbmp.SensorType {
-	switch deviceID {
-	case "BMP180":
-		return bsbmp.BMP180
-	case "BMP280":
-		return bsbmp.BMP280
-	case "BME280":
-		return bsbmp.BME280
-	default:
-		return bsbmp.BMP280
-	}
 }
 
 func (s *BMPxx) clean() {
