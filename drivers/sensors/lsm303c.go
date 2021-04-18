@@ -3,9 +3,8 @@ package sensors
 import (
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
-	"periph.io/x/periph/conn/i2c"
-	"periph.io/x/periph/conn/i2c/i2creg"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
@@ -15,43 +14,40 @@ import (
 type (
 	// LSM303Accelerometer defines accelerometer sensor device
 	LSM303Accelerometer struct {
-		addr uint8
-		n    int
-		bus  i2c.BusCloser
+		conn *peripherals.I2C
 		dev  *lsm303.Accelerometer
 	}
 
 	// LSM303Magnetometer defines magnetometer sensor device
 	LSM303Magnetometer struct {
-		addr uint8
-		n    int
-		bus  i2c.BusCloser
+		conn *peripherals.I2C
 		dev  *lsm303.Magnetometer
 	}
 )
 
-func NewAccelerometerLSM303(addr uint8, bus int) *LSM303Accelerometer {
+func NewAccelerometerLSM303(addr uint16, bus int) *LSM303Accelerometer {
 	return &LSM303Accelerometer{
-		addr: addr,
-		n:    bus,
+		conn: peripherals.NewI2C(addr, bus),
 	}
 }
 
-func NewMagnetometerLSM303(addr uint8, bus int) *LSM303Magnetometer {
+func NewMagnetometerLSM303(addr uint16, bus int) *LSM303Magnetometer {
 	return &LSM303Magnetometer{
-		addr: addr,
-		n:    bus,
+		conn: peripherals.NewI2C(addr, bus),
 	}
 }
 
 func (s *LSM303Accelerometer) Init() (err error) {
-	s.bus, err = i2creg.Open(shared.NtoI2cBusName(s.n)); if err != nil {
+	if err = s.conn.Init(); err != nil {
+		shared.Logger.Error("connection init", err)
 		return
 	}
 
-	s.dev, err = lsm303.NewAccelerometer(s.bus, &lsm303.DefaultAccelerometerOpts); if err != nil {
+	s.dev, err = lsm303.NewAccelerometer(s.conn.Bus, lsm303.WithAccelerometerSensorType(lsm303.LSM303C)); if err != nil {
+		shared.Logger.Error("NewAccelerometer init", err)
 		return
 	}
+
 
 	return
 }
@@ -83,7 +79,7 @@ func (s *LSM303Accelerometer) ReadAxesMS2() (model.Vector, error) {
 }
 
 func (s *LSM303Accelerometer) ID() string {
-	return "LSM303"
+	return "LSM303C-A"
 }
 
 func (s *LSM303Accelerometer) Harvest(ctx *Context) {
@@ -103,25 +99,20 @@ func (s *LSM303Accelerometer) Verify() bool {
 }
 
 func (s *LSM303Accelerometer) Active() bool {
-	return s.dev != nil
+	return s.conn.Active()
 }
 
 // Close disconnects from the device
 func (s *LSM303Accelerometer) Close() error {
-	defer s.clean()
-	return s.bus.Close()
-}
-
-func (s *LSM303Accelerometer) clean() {
-	s.dev = nil
+	return s.conn.Close()
 }
 
 func (s *LSM303Magnetometer) Init() (err error) {
-	s.bus, err = i2creg.Open(shared.NtoI2cBusName(s.n)); if err != nil {
+	if err = s.conn.Init();err != nil {
 		return
 	}
 
-	s.dev, err = lsm303.NewMagnetometer(s.bus, &lsm303.DefaultMagnetometerOpts); if err != nil {
+	s.dev, err = lsm303.NewMagnetometer(s.conn.Bus, lsm303.WithMagnetometerSensorType(lsm303.LSM303C)); if err != nil {
 		return
 	}
 
@@ -141,18 +132,29 @@ func (s *LSM303Magnetometer) ReadAxes() (model.Vector, error) {
 	}, nil
 }
 
+// ReadAxes parses data returned as magnetic force vector
+func (s *LSM303Magnetometer) ReadTemperature() (float64, error) {
+	t, err := s.dev.SenseRelativeTemperature(); if err != nil {
+		return 0, err
+	}
+
+	return t.Celsius(), nil
+}
+
 func (s *LSM303Magnetometer) ID() string {
-	return "LSM303"
+	return "LSM303C-M"
 }
 
 func (s *LSM303Magnetometer) Harvest(ctx *Context) {
 	ctx.For(metrics.Magnetism).WriteWithError(toMagnitude(s.ReadAxes()))
+	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
+
 }
 
 func (s *LSM303Magnetometer) Metrics() []models.Metric {
 	return []models.Metric{
-		metrics.AccelerationInG,
-		metrics.AccelerationInMS2,
+		metrics.Magnetism,
+		metrics.Temperature,
 	}
 }
 
@@ -161,14 +163,10 @@ func (s *LSM303Magnetometer) Verify() bool {
 }
 
 func (s *LSM303Magnetometer) Active() bool {
-	return s.dev != nil
+	return s.conn.Active()
 }
 
 // Close disconnects from the device
 func (s *LSM303Magnetometer) Close() error {
-	defer func() {
-		s.dev = nil
-	}()
-
-	return s.bus.Close()
+	return s.conn.Close()
 }

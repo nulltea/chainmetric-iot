@@ -9,7 +9,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-type i2cScanResults map[int][]uint8
+type i2cScanResults map[int][]uint16
 
 func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 	var (
@@ -20,7 +20,7 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		return nil, err
 	}
 
-	d.i2cScan = shared.ScanI2CAddrs(0x40, 0x76) // TODO: smart min & max addresses definition
+	d.i2cScan = shared.ScanI2CAddrs(0x1D, 0x76) // TODO: smart min & max addresses definition
 
 	for bus, addrs := range d.i2cScan {
 		for _, addr := range addrs {

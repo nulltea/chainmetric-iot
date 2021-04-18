@@ -18,3 +18,5 @@ require (
 )
 
 replace github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea => github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3
+
+replace github.com/bskari/go-lsm303 v0.0.0-20200927082938-3432d22cb4f1 => github.com/timoth-y/go-lsm303 v0.0.0-20210418023230-b62b80ae316d

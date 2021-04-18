@@ -21,8 +21,6 @@ github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bskari/go-lsm303 v0.0.0-20200927082938-3432d22cb4f1 h1:BbpX1r9y7n7GvV80rDDGUo6sXuvzZ9b60oPK4xqvnQQ=
-github.com/bskari/go-lsm303 v0.0.0-20200927082938-3432d22cb4f1/go.mod h1:cvdWdlvLMIV3OHO8GpARFsGW1QjModgHCUpTFXmFULQ=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/certifi/gocertifi v0.0.0-20180118203423-deb3ae2ef261/go.mod h1:GJKEexRPVJrBSOjoqN5VNOIKJ5Q3RViH6eu3puDRwx4=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
@@ -37,12 +35,8 @@ github.com/coreos/go-etcd v2.0.0+incompatible/go.mod h1:Jez6KQU2B/sWsbdaef3ED8Nz
 github.com/coreos/go-semver v0.2.0/go.mod h1:nnelYz7RCh+5ahJtPPxZlU+153eP4D4r3EedlOD2RNk=
 github.com/cpuguy83/go-md2man v1.0.10/go.mod h1:SmD6nW6nTyfqj6ABTjUi3V3JVMnlJmwcJI5acqYI6dE=
 github.com/cucumber/godog v0.8.0/go.mod h1:Cp3tEV1LRAyH/RuCThcxHS/+9ORZ+FMzPva2AZ5Ki+A=
-github.com/d2r2/go-bsbmp v0.0.0-20190515110334-3b4b3aea8375 h1:vdUOwcZdV+bBfGUUh5oPPWSzw9p+lBnNSuGgQwGpCH4=
-github.com/d2r2/go-bsbmp v0.0.0-20190515110334-3b4b3aea8375/go.mod h1:3iz1WHlYJU9b4NJei+Q8G7DN3K05arcCMlOQ+qNCDjo=
 github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218 h1:z3u7ZAkBvqHD2zaECn0qd1BwMCTiAYcQjFdU8vflVHo=
 github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218/go.mod h1:AzSqP4S4/6pINOKg3VC79WC7YY3zskQcrXMFzphCry0=
-github.com/d2r2/go-i2c v0.0.0-20191123181816-73a8a799d6bc h1:HLRSIWzUGMLCq4ldt0W1GLs3nnAxa5EGoP+9qHgh6j0=
-github.com/d2r2/go-i2c v0.0.0-20191123181816-73a8a799d6bc/go.mod h1:AwxDPnsgIpy47jbGXZHA9Rv7pDkOJvQbezPuK1Y+nNk=
 github.com/d2r2/go-logger v0.0.0-20181221090742-9998a510495e h1:ZG3JBA6rPRl0xxQ+nNSfO7tor8w+CNCTs05DNJQYbLM=
 github.com/d2r2/go-logger v0.0.0-20181221090742-9998a510495e/go.mod h1:oA+9PUt8F1aKJ6o4YU1T120i7sgo1T6/1LWEEBy0BSs=
 github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f h1:VrZEIdW45kHrPChbu4fvZnolG9l9Wu70znnLQUY/yFg=
@@ -233,6 +227,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
+github.com/timoth-y/go-lsm303 v0.0.0-20210418023230-b62b80ae316d h1:86yA9qjzHkahHRGZSx7fexNyj9nvohIepGCmMPf5c+o=
+github.com/timoth-y/go-lsm303 v0.0.0-20210418023230-b62b80ae316d/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea h1:293019pzJ8U0KaBKxDQiejdSkt3BVJtoantSSwH5kZA=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=

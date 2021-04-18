@@ -9,11 +9,11 @@ const (
 	MAX44009_ADDRESS = 0x4A
 	SI1145_ADDRESS   = 0x60
 
-	LSM303_ACCELEROMETER_ADDRESS = 0x19
-	LSM303_MAGNETOMETER_ADDRESS  = 0x1E
+	LSM303C_ACCELEROMETER_ADDRESS = 0x1D
+	LSM303C_MAGNETOMETER_ADDRESS  = 0x1E
 )
 
-var I2CSensorsMap = map[uint8]func(bus int) Sensor{
+var I2CSensorsMap = map[uint16]func(bus int) Sensor{
 	ADXL345_ADDRESS: func(bus int) Sensor {
 		return NewADXL345(ADXL345_ADDRESS, bus)
 	},
@@ -35,10 +35,10 @@ var I2CSensorsMap = map[uint8]func(bus int) Sensor{
 	SI1145_ADDRESS: func(bus int) Sensor {
 		return NewSI1145(SI1145_ADDRESS, bus)
 	},
-	LSM303_ACCELEROMETER_ADDRESS: func(bus int) Sensor {
-		return NewAccelerometerLSM303(LSM303_ACCELEROMETER_ADDRESS, bus)
+	LSM303C_ACCELEROMETER_ADDRESS: func(bus int) Sensor {
+		return NewAccelerometerLSM303(LSM303C_ACCELEROMETER_ADDRESS, bus)
 	},
-	LSM303_MAGNETOMETER_ADDRESS: func(bus int) Sensor {
-		return NewMagnetometerLSM303(LSM303_MAGNETOMETER_ADDRESS, bus)
+	LSM303C_MAGNETOMETER_ADDRESS: func(bus int) Sensor {
+		return NewMagnetometerLSM303(LSM303C_MAGNETOMETER_ADDRESS, bus)
 	},
 }

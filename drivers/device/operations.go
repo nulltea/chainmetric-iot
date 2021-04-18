@@ -55,5 +55,5 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 		shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
 	}
 
-	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted with =>", assetID), shared.PrettyPrint(readings))
+	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted with =>", assetID), shared.Prettify(readings))
 }

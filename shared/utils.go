@@ -13,7 +13,7 @@ func NtoI2cBusName(n int) string {
 	return fmt.Sprintf("/dev/i2c-%d", n)
 }
 
-func PrettyPrint(obj interface{}) string {
+func Prettify(obj interface{}) string {
 	pretty, err := json.MarshalIndent(obj, "", "\t"); if err != nil {
 		return err.Error()
 	}
