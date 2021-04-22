@@ -1,5 +1,5 @@
 OUTPUT=bin/sensor
-REMOTE_IP=192.168.31.180
+REMOTE_IP=192.168.31.182
 REMOTE_DIR=/home/pi/sensorsys
 CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
 
@@ -12,7 +12,7 @@ build-remote:
         go build -v  -o $(OUTPUT)
 
 sync:
-	rsync -r --delete . pi@$(REMOTE_IP):$(REMOTE_DIR)
+	rsync -r --delete --filter='P vendor' . pi@$(REMOTE_IP):$(REMOTE_DIR)
 
 crypto-sync:
 	scp $(CRYPTO_DIR)/signcerts/User1@supplier.iotchain.network-cert.pem pi@$(REMOTE_IP):identity.pem
