@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"periph.io/x/periph/conn/gpio"
 )
 
 type AnalogMCP3208 struct {
 	spi *SPI
 	cs  *GPIO
-	channels []AnalogChannel
+	channels []*AnalogChannel
 }
 
 // AnalogChannel is the implementation of the ADConverter interface.
@@ -26,13 +25,13 @@ func NewAnalogMCP3208(bus string, csPin int) *AnalogMCP3208 {
 	return &AnalogMCP3208{
 		spi: NewSPI(bus),
 		cs: NewGPIO(csPin),
-		channels: make([]AnalogChannel, 8),
+		channels: make([]*AnalogChannel, 8),
 	}
 }
 
 // Init sets up the device for communication and prepares all available channels
 func (d *AnalogMCP3208) Init() error {
-	if err := d.cs.Init(); d.cs == gpio.INVALID {
+	if err := d.cs.Init(); err != nil {
 		return errors.Wrap(err, "failed to connect CS pin")
 	}
 
@@ -57,8 +56,8 @@ func (d *AnalogMCP3208) Read(ch int) (uint16, error) {
 }
 
 // GetChannel returns an AnalogChannel for a specified channel number.
-func (d *AnalogMCP3208) GetChannel(ch int) AnalogChannel {
-	return AnalogChannel{
+func (d *AnalogMCP3208) GetChannel(ch int) *AnalogChannel {
+	return &AnalogChannel{
 		ch: ch,
 		dev: d,
 		tx: make([]byte, 3),

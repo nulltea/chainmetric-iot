@@ -27,6 +27,10 @@ func (w *metricWriter) Write(v interface{}) {
 		value = float64(t)
 	case int64:
 		value = float64(t)
+	case uint8:
+		value = float64(t)
+	case uint16:
+		value = float64(t)
 	default:
 		w.ctx.Error(fmt.Errorf("value type is not supported: %T", t))
 		return

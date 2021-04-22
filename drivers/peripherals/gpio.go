@@ -11,19 +11,24 @@ import (
 
 // GPIO provides wrapper for GPIO peripheral
 type GPIO struct {
+	pin int
 	gpio.PinIO
 }
 
 func NewGPIO(pin int) *GPIO {
 	return &GPIO{
-		gpioreg.ByName(shared.NtoPinName(pin)),
+		pin: pin,
 	}
 }
 
 func (g *GPIO) Init() error {
-	if g == gpio.INVALID {
-		return fmt.Errorf("pin %s is invalid", g.Name())
+	pin := gpioreg.ByName(shared.NtoPinName(g.pin))
+
+	if pin == gpio.INVALID || pin == nil {
+		return fmt.Errorf("pin %s is invalid", pin.Name())
 	}
+
+	g.PinIO = pin
 
 	return nil
 }
