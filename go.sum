@@ -227,8 +227,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
-github.com/timoth-y/go-lsm303 v0.0.0-20210418023230-b62b80ae316d h1:86yA9qjzHkahHRGZSx7fexNyj9nvohIepGCmMPf5c+o=
-github.com/timoth-y/go-lsm303 v0.0.0-20210418023230-b62b80ae316d/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
+github.com/timoth-y/go-lsm303 v0.0.0-20210418113746-a26cc847773d h1:FbTS34VQa4NzY40c3LxYSJ2Uyb1p4pRfZNngZ2lxCmw=
+github.com/timoth-y/go-lsm303 v0.0.0-20210418113746-a26cc847773d/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea h1:293019pzJ8U0KaBKxDQiejdSkt3BVJtoantSSwH5kZA=
 github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=

@@ -43,11 +43,13 @@ func (s *LSM303Accelerometer) Init() (err error) {
 		return
 	}
 
-	s.dev, err = lsm303.NewAccelerometer(s.conn.Bus, lsm303.WithAccelerometerSensorType(lsm303.LSM303C)); if err != nil {
+	s.dev, err = lsm303.NewAccelerometer(s.conn.Bus,
+		lsm303.WithAccelerometerSensorType(lsm303.LSM303C),
+		lsm303.WithAccelerometerAddress(s.conn.Addr),
+	); if err != nil {
 		shared.Logger.Error("NewAccelerometer init", err)
 		return
 	}
-
 
 	return
 }
@@ -108,11 +110,14 @@ func (s *LSM303Accelerometer) Close() error {
 }
 
 func (s *LSM303Magnetometer) Init() (err error) {
-	if err = s.conn.Init();err != nil {
+	if err = s.conn.Init(); err != nil {
 		return
 	}
 
-	s.dev, err = lsm303.NewMagnetometer(s.conn.Bus, lsm303.WithMagnetometerSensorType(lsm303.LSM303C)); if err != nil {
+	if s.dev, err = lsm303.NewMagnetometer(s.conn.Bus,
+		lsm303.WithMagnetometerSensorType(lsm303.LSM303C),
+		lsm303.WithMagnetometerAddress(s.conn.Addr),
+	); err != nil {
 		return
 	}
 
