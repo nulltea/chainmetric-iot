@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"fmt"
+
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -43,11 +45,11 @@ func (s *LSM303Accelerometer) Init() (err error) {
 		return
 	}
 
-	s.dev, err = lsm303.NewAccelerometer(s.conn.Bus,
+	if s.dev, err = lsm303.NewAccelerometer(s.conn.Bus,
 		lsm303.WithAccelerometerSensorType(lsm303.LSM303C),
 		lsm303.WithAccelerometerAddress(s.conn.Addr),
-	); if err != nil {
-		shared.Logger.Error("NewAccelerometer init", err)
+		lsm303.WithRange(lsm303.ACCELEROMETER_RANGE_2G),
+	); err != nil {
 		return
 	}
 
@@ -56,27 +58,31 @@ func (s *LSM303Accelerometer) Init() (err error) {
 
 // ReadAxesG retrieves axes acceleration data as multiplications of G
 func (s *LSM303Accelerometer) ReadAxesG() (model.Vector, error) {
-	x, y, z, err := s.dev.Sense(); if err != nil {
+	x, y, z, err := s.dev.SenseRaw(); if err != nil {
 		return model.Vector{}, err
 	}
 
-	return model.Vector {
-		X: round(float64(x) * earthGravityMS2, 4),
-		Y: round(float64(y) * earthGravityMS2, 4),
-		Z: round(float64(z) * earthGravityMS2, 4),
-	}, nil
+	v := model.Vector {
+		X: round(float64(x) * scaleMultiplier, 4),
+		Y: round(float64(y) * scaleMultiplier, 4),
+		Z: round(float64(z) * scaleMultiplier, 4),
+	}
+
+	fmt.Println("DEBUG", "LSM303Accelerometer::ReadAxesG", "x:", v.X, "y:", v.Y, "z:", v.Z)
+
+	return v, nil
 }
 
 // ReadAxesMS2 parses data returned by GetAxesG and returns them in [m/s^2]
 func (s *LSM303Accelerometer) ReadAxesMS2() (model.Vector, error) {
-	x, y, z, err := s.dev.Sense(); if err != nil {
+	x, y, z, err := s.dev.SenseRaw(); if err != nil {
 		return model.Vector{}, err
 	}
 
 	return model.Vector {
-		X: float64(x),
-		Y: float64(y),
-		Z: float64(z),
+		X: float64(x) * earthGravityMS2,
+		Y: float64(y) * earthGravityMS2,
+		Z: float64(z) * earthGravityMS2,
 	}, nil
 }
 
@@ -153,7 +159,6 @@ func (s *LSM303Magnetometer) ID() string {
 func (s *LSM303Magnetometer) Harvest(ctx *Context) {
 	ctx.For(metrics.Magnetism).WriteWithError(toMagnitude(s.ReadAxes()))
 	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
-
 }
 
 func (s *LSM303Magnetometer) Metrics() []models.Metric {
