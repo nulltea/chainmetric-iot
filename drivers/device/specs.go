@@ -32,6 +32,12 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		}
 	}
 
+	for _, ss := range d.staticSensors {
+		for _, metric := range ss.Metrics() {
+			availableMetrics[metric] = true
+		}
+	}
+
 	var (
 		supports = make([]string, len(availableMetrics))
 		i = 0

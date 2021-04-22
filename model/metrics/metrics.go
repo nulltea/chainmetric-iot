@@ -19,5 +19,6 @@ var (
 	AccelerationInMS2     models.Metric = "axms"
 	HeartRate             models.Metric = "hrt"
 	BloodOxidation        models.Metric = "blo"
+	Vibration             models.Metric = "vbr"
 	NoiseLevel            models.Metric = "nse"
 )
