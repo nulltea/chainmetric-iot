@@ -1,8 +1,6 @@
 package sensors
 
 import (
-	"fmt"
-
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -62,15 +60,11 @@ func (s *LSM303Accelerometer) ReadAxesG() (model.Vector, error) {
 		return model.Vector{}, err
 	}
 
-	v := model.Vector {
+	return model.Vector {
 		X: round(float64(x) * scaleMultiplier, 4),
 		Y: round(float64(y) * scaleMultiplier, 4),
 		Z: round(float64(z) * scaleMultiplier, 4),
-	}
-
-	fmt.Println("DEBUG", "LSM303Accelerometer::ReadAxesG", "x:", v.X, "y:", v.Y, "z:", v.Z)
-
-	return v, nil
+	}, nil
 }
 
 // ReadAxesMS2 parses data returned by GetAxesG and returns them in [m/s^2]
