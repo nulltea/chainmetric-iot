@@ -68,9 +68,9 @@ func (s *ADXL345) ReadAxesG() (model.Vector, error) {
 	z := int16(buf[4]) | (int16(buf[5]) << 8)
 
 	return model.Vector {
-		X: round(float64(x) *scaleMultiplier, 4),
-		Y: round(float64(y) *scaleMultiplier, 4),
-		Z: round(float64(z) *scaleMultiplier, 4),
+		X: round(float64(x) * scaleMultiplier, 4),
+		Y: round(float64(y) * scaleMultiplier, 4),
+		Z: round(float64(z) * scaleMultiplier, 4),
 	}, nil
 }
 

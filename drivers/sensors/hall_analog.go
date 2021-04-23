@@ -27,8 +27,24 @@ func (s *AnalogHall) Init() error {
 	return nil
 }
 
+func (s *AnalogHall) Read() float64 {
+	var (
+		v uint64
+		i int
+	)
+
+	for i != 100 {
+		if vc := s.ch.Get(); vc != 0 {
+			v += uint64(vc)
+			i++
+		}
+	}
+
+	return float64(v / 100)
+}
+
 func (s *AnalogHall) Harvest(ctx *Context) {
-	ctx.For(metrics.Magnetism).Write(s.ch.Get())
+	ctx.For(metrics.Magnetism).Write(s.Read())
 }
 
 func (s *AnalogHall) Metrics() []models.Metric {
