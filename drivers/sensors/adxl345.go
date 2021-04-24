@@ -11,23 +11,18 @@ import (
 )
 
 const (
-	// Earth Gravity constant in [m/s^2]
-	earthGravityMS2 = 9.80665
-
 	// The typical scale factor in g/LSB
 	scaleMultiplier = 0.0039
 )
 
 // Represents ADXL345 sensor device
 type ADXL345 struct {
-	addr uint8
-	bus  int
-	dev  *peripherals.I2C
+	*peripherals.I2C
 }
 
 func NewADXL345(addr uint16, bus int) *ADXL345 {
 	return &ADXL345{
-		dev: peripherals.NewI2C(addr, bus),
+		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -36,12 +31,12 @@ func (s *ADXL345) ID() string {
 }
 
 func (s *ADXL345) Init() (err error) {
-	if err = s.dev.Init(); err != nil {
+	if err = s.I2C.Init(); err != nil {
 		return
 	}
 
 	// changes the device bandwidth and output data rate
-	if err = s.dev.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
+	if err = s.I2C.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
 		return
 	}
 
@@ -50,16 +45,16 @@ func (s *ADXL345) Init() (err error) {
 	}
 
 	// enables measurement on sensor
-	if err = s.dev.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
+	if err = s.I2C.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
 		return
 	}
 
 	return
 }
 
-// ReadAxesG retrieves axes acceleration data as multiplications of G
-func (s *ADXL345) ReadAxesG() (model.Vector, error) {
-	buf, err := s.dev.ReadRegBytes(ADXL345_DATAX0, 6); if err != nil {
+// ReadAxes retrieves axes acceleration data as multiplications of G
+func (s *ADXL345) ReadAxes() (model.Vector, error) {
+	buf, err := s.ReadRegBytes(ADXL345_DATAX0, 6); if err != nil {
 		return model.Vector{}, err
 	}
 
@@ -74,28 +69,13 @@ func (s *ADXL345) ReadAxesG() (model.Vector, error) {
 	}, nil
 }
 
-// ReadAxesMS2 parses data returned by GetAxesG and returns them in [m/s^2]
-func (s *ADXL345) ReadAxesMS2() (model.Vector, error) {
-	gAxes, err := s.ReadAxesG(); if err != nil {
-		return model.Vector{}, err
-	}
-
-	return model.Vector {
-		X: round(gAxes.X * earthGravityMS2, 4),
-		Y: round(gAxes.Y * earthGravityMS2, 4),
-		Z: round(gAxes.Z * earthGravityMS2, 4),
-	}, nil
-}
-
 func (s *ADXL345) Harvest(ctx *Context) {
-	ctx.For(metrics.AccelerationInG).WriteWithError(toMagnitude(s.ReadAxesG()))
-	ctx.For(metrics.AccelerationInMS2).WriteWithError(toMagnitude(s.ReadAxesMS2()))
+	ctx.For(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
 }
 
 func (s *ADXL345) Metrics() []models.Metric {
 	return []models.Metric{
-		metrics.AccelerationInG,
-		metrics.AccelerationInMS2,
+		metrics.Acceleration,
 	}
 }
 
@@ -103,18 +83,9 @@ func (s *ADXL345) Verify() bool {
 	return true
 }
 
-func (s *ADXL345) Active() bool {
-	return s.dev.Active()
-}
-
-// Close disconnects from the device
-func (s *ADXL345) Close() error {
-	return s.dev.Close()
-}
-
 // setRange changes the range of sensor. Available ranges are 2G, 4G, 8G and 16G.
 func (s *ADXL345) setRange(newRange byte) error {
-	format, err := s.dev.ReadReg(ADXL345_DATA_FORMAT); if err != nil {
+	format, err := s.ReadReg(ADXL345_DATA_FORMAT); if err != nil {
 		return err
 	}
 
@@ -123,7 +94,7 @@ func (s *ADXL345) setRange(newRange byte) error {
 	value |= int32(newRange)
 	value |= 0x08
 
-	return s.dev.WriteRegBytes(ADXL345_DATA_FORMAT, byte(value))
+	return s.WriteRegBytes(ADXL345_DATA_FORMAT, byte(value))
 }
 
 func round(f float64, places int) float64 {

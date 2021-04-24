@@ -11,12 +11,12 @@ import (
 )
 
 type MAX44009 struct {
-	dev *peripherals.I2C
+	*peripherals.I2C
 }
 
 func NewMAX44009(addr uint16, bus int) *MAX44009 {
 	return &MAX44009{
-		dev: peripherals.NewI2C(addr, bus),
+		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -25,7 +25,7 @@ func (s *MAX44009) ID() string {
 }
 
 func (s *MAX44009) Init() error {
-	if err := s.dev.Init(); err != nil {
+	if err := s.I2C.Init(); err != nil {
 		return err
 	}
 
@@ -33,7 +33,7 @@ func (s *MAX44009) Init() error {
 		return fmt.Errorf("driver is not compatiple with specified sensor")
 	}
 
-	if err := s.dev.WriteBytes(MAX44009_APP_START); err != nil {
+	if err := s.WriteBytes(MAX44009_APP_START); err != nil {
 		return err
 	}
 
@@ -41,11 +41,11 @@ func (s *MAX44009) Init() error {
 }
 
 func (s *MAX44009) Read() (float64, error) {
-	buffer, err := s.dev.ReadBytes(2); if err != nil {
+	buffer, err := s.ReadBytes(2); if err != nil {
 		return math.NaN(), err
 	}
 
-	return dataToLuminance(buffer), nil
+	return s.dataToLuminance(buffer), nil
 }
 
 func (s *MAX44009) Harvest(ctx *Context) {
@@ -62,16 +62,7 @@ func (s *MAX44009) Verify() bool {
 	return true
 }
 
-func (s *MAX44009) Active() bool {
-	return s.dev.Active()
-}
-
-// Close disconnects from the device
-func (s *MAX44009) Close() error {
-	return s.dev.Close()
-}
-
-func dataToLuminance(d []byte) float64 {
+func (s *MAX44009) dataToLuminance(d []byte) float64 {
 	exponent := int((d[0] & 0xF0) >> 4)
 	mantissa := int(((d[0] & 0x0F) << 4) | (d[1] & 0x0F))
 	return math.Pow(float64(2), float64(exponent)) * float64(mantissa) * 0.045

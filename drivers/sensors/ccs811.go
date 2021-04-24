@@ -17,12 +17,12 @@ var (
 )
 
 type CCS811 struct {
-	dev *peripherals.I2C
+	*peripherals.I2C
 }
 
 func NewCCS811(addr uint16, bus int) *CCS811 {
 	return &CCS811{
-		dev: peripherals.NewI2C(addr, bus),
+		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -31,7 +31,7 @@ func (s *CCS811) ID() string {
 }
 
 func (s *CCS811) Init() (err error) {
-	if err = s.dev.Init(); err != nil {
+	if err = s.I2C.Init(); err != nil {
 		return
 	}
 
@@ -44,7 +44,7 @@ func (s *CCS811) Init() (err error) {
 
 	_, err = s.getStatus()
 
-	err = s.dev.WriteBytes(CCS811_BOOTLOADER_APP_START); if err != nil {
+	err = s.WriteBytes(CCS811_BOOTLOADER_APP_START); if err != nil {
 		return err
 	}
 
@@ -75,7 +75,7 @@ func (s *CCS811) Read() (eCO2 float64, eTVOC float64, err error) {
 			return 0, 0, err
 		}
 		if ready {
-			buffer, err := s.dev.ReadRegBytes(CCS811_ALG_RESULT_DATA, 4)
+			buffer, err := s.ReadRegBytes(CCS811_ALG_RESULT_DATA, 4)
 			if err != nil {
 				return 0, 0, err
 			}
@@ -111,21 +111,12 @@ func (s *CCS811) Metrics() []models.Metric {
 }
 
 func (s *CCS811) Verify() bool {
-	buffer, err := s.dev.ReadReg(CCS811_HW_ID)
+	buffer, err := s.ReadReg(CCS811_HW_ID)
 	if err == nil && buffer == CCS811_HW_ID_CODE {
 		return true
 	}
 
 	return false
-}
-
-func (s *CCS811) Active() bool {
-	return s.dev.Active()
-}
-
-// Close disconnects from the device
-func (s *CCS811) Close() error {
-	return s.dev.Close()
 }
 
 func (s *CCS811) isDataReady() (bool, error) {
@@ -138,7 +129,7 @@ func (s *CCS811) isDataReady() (bool, error) {
 }
 
 func (s *CCS811) getStatus() (byte, error) {
-	data, err := s.dev.ReadReg(CCS811_STATUS); if err != nil {
+	data, err := s.ReadReg(CCS811_STATUS); if err != nil {
 		return 0, err
 	}
 
@@ -152,9 +143,9 @@ func (s *CCS811) setConfig() error {
 	bin3 := 0x03 & SamplingRate
 	buffer[0] = bin1 << 2 | bin2 << 3 | bin3 << 4
 
-	return s.dev.WriteRegBytes(CCS811_MEAS_MODE, buffer...)
+	return s.WriteRegBytes(CCS811_MEAS_MODE, buffer...)
 }
 
 func (s *CCS811) setReset() error {
-	return s.dev.WriteRegBytes(CCS811_SW_RESET, 0x11, 0xE5, 0x72, 0x8A)
+	return s.WriteRegBytes(CCS811_SW_RESET, 0x11, 0xE5, 0x72, 0x8A)
 }

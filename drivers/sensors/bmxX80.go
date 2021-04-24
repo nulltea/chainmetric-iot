@@ -12,15 +12,13 @@ import (
 )
 
 type BMPxx struct {
-	addr uint8
-	bus  int
-	dev  *peripherals.I2C
+	*peripherals.I2C
 	bmp  *bmxx80.Dev
 }
 
 func NewBMXX80(addr uint16, bus int) *BMPxx {
 	return &BMPxx{
-		dev: peripherals.NewI2C(addr, bus),
+		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
@@ -33,15 +31,13 @@ func (s *BMPxx) ID() string {
 }
 
 func (s *BMPxx) Init() (err error) {
-	if err = s.dev.Init(); err != nil {
+	if err = s.I2C.Init(); err != nil {
 		return
 	}
 
-	if s.bmp, err = bmxx80.NewI2C(s.dev.Bus, s.dev.Addr, &bmxx80.DefaultOpts); err != nil {
+	if s.bmp, err = bmxx80.NewI2C(s.Bus, s.Addr, &bmxx80.DefaultOpts); err != nil {
 		return
 	}
-
-	s.bmp.String()
 
 	return
 }
@@ -68,20 +64,6 @@ func (s *BMPxx) Metrics() []models.Metric {
 		metrics.Temperature,
 		metrics.Humidity,
 	}
-}
-
-func (s *BMPxx) Active() bool {
-	return s.dev != nil && s.bmp != nil
-}
-
-func (s *BMPxx) Close() error {
-	defer s.clean()
-	return s.dev.Close()
-}
-
-func (s *BMPxx) clean() {
-	s.dev = nil
-	s.bmp = nil
 }
 
 func (s *BMPxx) pressureToAltitude(p float64) float64 {

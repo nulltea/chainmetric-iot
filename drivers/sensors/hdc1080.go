@@ -13,13 +13,13 @@ import (
 )
 
 type HDC1080 struct {
-	dev      *peripherals.I2C
+	*peripherals.I2C
 	attempts int
 }
 
 func NewHDC1080(addr uint16, bus int) *HDC1080 {
 	return &HDC1080{
-		dev:      peripherals.NewI2C(addr, bus),
+		I2C:      peripherals.NewI2C(addr, bus),
 		attempts: 10,
 	}
 }
@@ -29,7 +29,7 @@ func (s *HDC1080) ID() string {
 }
 
 func (s *HDC1080) Init() error {
-	if err := s.dev.Init(); err != nil {
+	if err := s.I2C.Init(); err != nil {
 		return err
 	}
 
@@ -37,7 +37,7 @@ func (s *HDC1080) Init() error {
 		return fmt.Errorf("driver is not compatiple with specified sensor")
 	}
 
-	if err := s.dev.WriteRegBytes(HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00); err != nil {
+	if err := s.WriteRegBytes(HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00); err != nil {
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (s *HDC1080) Init() error {
 }
 
 func (s *HDC1080) ReadTemperature() (float64, error) {
-	if err := s.dev.WriteBytes(HDC1080_TEMPERATURE_REGISTER); err != nil {
+	if err := s.WriteBytes(HDC1080_TEMPERATURE_REGISTER); err != nil {
 		return 0, errors.Wrap(err, "failed write to temperature register")
 	}
 
@@ -61,7 +61,7 @@ func (s *HDC1080) ReadTemperature() (float64, error) {
 		left--
 		time.Sleep(65 * time.Millisecond)
 
-		if data, err = s.dev.ReadBytes(2); err != nil {
+		if data, err = s.ReadBytes(2); err != nil {
 			continue
 		}
 
@@ -74,7 +74,7 @@ func (s *HDC1080) ReadTemperature() (float64, error) {
 }
 
 func (s *HDC1080) ReadHumidity() (float64, error) {
-	if err := s.dev.WriteBytes(HDC1080_HUMIDITY_REGISTER); err != nil {
+	if err := s.WriteBytes(HDC1080_HUMIDITY_REGISTER); err != nil {
 		return 0, errors.Wrap(err, "failed write to humidity register")
 	}
 
@@ -88,7 +88,7 @@ func (s *HDC1080) ReadHumidity() (float64, error) {
 		left--
 		time.Sleep(65 * time.Millisecond)
 
-		if data, err = s.dev.ReadBytes(2); err != nil {
+		if data, err = s.ReadBytes(2); err != nil {
 			continue
 		}
 
@@ -126,13 +126,4 @@ func (s *HDC1080) Metrics() []models.Metric {
 
 func (s *HDC1080) Verify() bool {
 	return true
-}
-
-func (s *HDC1080) Active() bool {
-	return s.dev.Active()
-}
-
-// Close disconnects from the device
-func (s *HDC1080) Close() error {
-	return s.dev.Close()
 }
