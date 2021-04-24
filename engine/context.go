@@ -7,7 +7,6 @@ import (
 
 	"github.com/op/go-logging"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
@@ -16,7 +15,6 @@ type Context struct {
 	Parent context.Context
 	Logger *logging.Logger
 	WaitGroup *sync.WaitGroup
-	Config config.Config
 }
 
 func NewContext(parent context.Context) *Context {
@@ -38,12 +36,6 @@ func (c *Context) SetLogger(logger *logging.Logger) *Context {
 	c.Logger = logger
 	return c
 }
-
-func (c *Context) SetConfig(config config.Config) *Context {
-	c.Config = config
-	return c
-}
-
 
 func (c *Context) Error(err error) {
 	if err != nil {

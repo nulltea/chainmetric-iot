@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
@@ -139,8 +140,7 @@ func aggregate(pipe model.MetricReadingsPipe) model.MetricReadings {
 	for metric, ch := range pipe {
 		readings := make([]model.MetricReading, 0)
 
-	LOOP:
-		for {
+	LOOP: for {
 			select {
 			case reading := <- ch:
 				readings = append(readings, reading)
@@ -170,18 +170,22 @@ func (s *SensorsReader) Close() {
 }
 
 func (s *SensorsReader) initSensor(sn sensors.Sensor) error {
+	var (
+		standby = viper.GetDuration("engine.sensor_sleep_standby_timeout")
+	)
+
 	if !sn.Active() {
 		if err := sn.Init(); err != nil {
 			return err
 		}
 	}
-	duration := time.Duration(s.context.Config.Worker.CloseOnStandbyTime) * time.Millisecond
+
 	if timer, ok := s.standbyTimers[sn]; ok && timer != nil {
-		if !timer.Reset(duration) {
+		if !timer.Reset(standby) {
 			go handleStandby(timer, sn)
 		}
 	} else {
-		s.standbyTimers[sn] = time.NewTimer(duration)
+		s.standbyTimers[sn] = time.NewTimer(standby)
 		go handleStandby(s.standbyTimers[sn], sn)
 	}
 

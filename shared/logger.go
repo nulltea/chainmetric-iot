@@ -28,6 +28,4 @@ func InitLogger() {
 	logging.SetLevel(level, "sensorsys")
 
 	logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
-	logger.ChangePackageLogLevel("i2c", logger.ErrorLevel)
-	logger.ChangePackageLogLevel("bsbmp", logger.ErrorLevel)
 }

@@ -11,7 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/config"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
 )
 

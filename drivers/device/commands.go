@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
+	"github.com/spf13/viper"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
@@ -50,7 +51,7 @@ func (d *Device) Init() error {
 		d.display.PowerOn()
 		defer d.display.PowerOff()
 
-		d.display.DrawImage(qr.Image(d.Config.Display.ImageSize))
+		d.display.DrawImage(qr.Image(viper.GetInt("display.image_size")))
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
