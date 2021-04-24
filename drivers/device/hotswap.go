@@ -20,8 +20,7 @@ func (d *Device) initHotswap() {
 	ctx, d.cancelHotswap = context.WithCancel(ctx)
 
 	go func() {
-	LOOP:
-		for {
+	LOOP: for {
 			startTime = time.Now()
 
 			if err := d.handleHotswap(); err != nil {
@@ -38,7 +37,7 @@ func (d *Device) initHotswap() {
 }
 
 func (d *Device) handleHotswap() error {
-	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesDiapason())
+	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesRange())
 
 	// TODO: implement hot swap changes for reader
 

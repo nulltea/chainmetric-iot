@@ -31,7 +31,8 @@ var (
 
 func init() {
 	shared.InitLogger()
-  shared.InitConfig()
+	shared.InitConfig()
+
 	periphery.Init()
 }
 

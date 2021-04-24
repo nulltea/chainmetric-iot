@@ -3,12 +3,13 @@ package device
 import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/netwrok"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/network"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
 type i2cScanResults map[int][]uint16
@@ -18,11 +19,11 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		availableMetrics = make(map[models.Metric]bool)
 	)
 
-	network, err := shared.GetNetworkEnvironmentInfo(); if err != nil {
+	network, err := network.GetNetworkEnvironmentInfo(); if err != nil {
 		return nil, err
 	}
 
-	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesDiapason())
+	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesRange())
 
 	for bus, addrs := range d.i2cScan {
 		for _, addr := range addrs {
