@@ -30,7 +30,7 @@ func (d *Device) initHotswap() {
 			cancel()
 			hotswapOnce = sync.Once{}
 		}
-		shared.Logger.Debug("initHotswap", viper.GetDuration("device.hotswap_detect_interval"))
+
 		go func() {
 		LOOP: for {
 			startTime = time.Now()
@@ -56,8 +56,6 @@ func (d *Device) handleHotswap() error {
 		contract = d.client.Contracts.Devices
 		isChanges bool
 	)
-
-	shared.Logger.Debug("handleHotswap")
 
 	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
 	for bus, addrs := range d.detectedI2Cs {
