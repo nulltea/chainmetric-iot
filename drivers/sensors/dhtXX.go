@@ -4,9 +4,15 @@ package sensors
 
 import (
 	"github.com/d2r2/go-dht"
+	"github.com/d2r2/go-logger"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+)
+
+var (
+	_ = logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
 )
 
 type DHTxx struct {
@@ -14,7 +20,7 @@ type DHTxx struct {
 	pin        int
 }
 
-func NewDHTxx(deviceID string, pin int) *DHTxx {
+func NewDHTxx(deviceID string, pin int) sensor.Sensor {
 	return &DHTxx{
 		sensorType: sensorTypeDHT(deviceID),
 		pin:        pin,
@@ -43,7 +49,7 @@ func (s *DHTxx) Init() error {
 	return nil
 }
 
-func (s *DHTxx) Harvest(ctx *Context) {
+func (s *DHTxx) Harvest(ctx *sensor.Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
 	ctx.For(metrics.Temperature).Write(temperature)

@@ -15,19 +15,16 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-const (
-	deviceIdentityFile = "../device.id"
-)
-
 func (d *Device) Init() error {
 	var (
 		err error
 		contract = d.client.Contracts.Devices
 	)
 
-	d.specs, err = d.DiscoverSpecs(); if err != nil {
+	d.specs, err = d.DiscoverSpecs(true); if err != nil {
 		return err
 	}
+	defer d.initHotswap()
 
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model != nil {
@@ -86,7 +83,7 @@ func (d *Device) Reset() error {
 		return err
 	}
 
-	if err := os.Remove(deviceIdentityFile); err != nil {
+	if err := os.Remove(viper.GetString("device.id_file_path")); err != nil {
 		return errors.Wrap(err, "failed to remove device's identity file")
 	}
 
@@ -103,7 +100,7 @@ func (d *Device) Off() error {
 }
 
 func isRegistered() (string, bool) {
-	id, err := ioutil.ReadFile(deviceIdentityFile); if err != nil {
+	id, err := ioutil.ReadFile(viper.GetString("device.id_file_path")); if err != nil {
 		if os.IsNotExist(err) {
 			return "", false
 		}
@@ -115,7 +112,7 @@ func isRegistered() (string, bool) {
 }
 
 func storeIdentity(id string) error {
-	f, err := os.Create(deviceIdentityFile); if err != nil {
+	f, err := os.Create(viper.GetString("device.id_file_path")); if err != nil {
 		return err
 	}
 

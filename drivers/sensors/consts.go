@@ -1,5 +1,20 @@
 package sensors
 
+const (
+	ADXL345_ADDRESS        = 0x53
+	BMP280_ADDRESS         = 0x76
+	CCS811_ADDRESS         = 0x5A
+	HDC1080_ADDRESS        = 0x40
+	MAX30102_ADDRESS       = 0x57
+	MAX44009_ADDRESS       = 0x4A
+	SI1145_ADDRESS         = 0x60
+	LSM303C_A_ADDRESS      = 0x1D
+	LSM303C_M_ADDRESS      = 0x1E
+	ADC_HALL_ADDRESS       = 0x48
+	ADC_PIEZO_ADDRESS      = 0x49
+	ADC_MICROPHONE_ADDRESS = 0x4C
+)
+
 // ADXL345 accelerometer sensor constants
 const (
 	// Registers

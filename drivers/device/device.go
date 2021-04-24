@@ -6,8 +6,10 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
@@ -23,10 +25,11 @@ type Device struct {
 	client  *blockchain.Client
 	display display.Display
 
-	i2cScan       i2cScanResults
-	staticSensors []sensors.Sensor
+	detectedI2Cs  periphery.I2CDetectResults
+	staticSensors []sensor.Sensor
 
 	cancelEvents context.CancelFunc
+	cancelHotswap context.CancelFunc
 }
 
 func NewDevice() *Device {
@@ -39,11 +42,11 @@ func NewDevice() *Device {
 			mutex: sync.Mutex{},
 			data:  make(map[string]*readingsRequest),
 		},
-		staticSensors: make([]sensors.Sensor, 0),
+		staticSensors: make([]sensor.Sensor, 0),
 	}
 }
 
-func (d *Device) RegisterStaticSensors(sensors ...sensors.Sensor) *Device {
+func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	d.staticSensors = append(d.staticSensors, sensors...)
 	return d
 }
@@ -70,6 +73,7 @@ func (d *Device) Close() error {
 	}
 
 	d.cancelEvents()
+	d.cancelHotswap()
 
 	d.reader.Close()
 

@@ -1,28 +1,24 @@
-package shared
+package periphery
 
 import (
 	"context"
 	"sync"
 	"time"
 
-	"github.com/timoth-y/iot-blockchain-contracts/shared"
 	"periph.io/x/periph/conn/i2c/i2creg"
-	"periph.io/x/periph/host"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-func InitPeriphery() {
-	if _, err := host.Init(); err != nil {
-		Logger.Fatal(err)
-	}
-}
+type I2CDetectResults map[int][]uint16
 
-func ScanI2CAddrs(start, end uint16) map[int][]uint16 {
+func DetectI2C(start, end uint16) I2CDetectResults {
 	var (
 		addrMap = make(map[int][]uint16)
 		wg = sync.WaitGroup{}
 	)
 
-	InitPeriphery()
+	Init()
 
 	for _, ref := range i2creg.All() {
 		ctx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
@@ -58,5 +54,3 @@ func ScanI2CAddrs(start, end uint16) map[int][]uint16 {
 
 	return addrMap
 }
-
-

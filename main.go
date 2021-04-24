@@ -10,6 +10,7 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
@@ -31,7 +32,8 @@ var (
 func init() {
 	shared.InitLogger()
 	shared.InitConfig()
-	shared.InitPeriphery()
+
+	periphery.Init()
 }
 
 func main() {

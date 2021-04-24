@@ -5,6 +5,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
@@ -25,13 +26,13 @@ type (
 	}
 )
 
-func NewAccelerometerLSM303(addr uint16, bus int) *LSM303Accelerometer {
+func NewAccelerometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Accelerometer{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
-func NewMagnetometerLSM303(addr uint16, bus int) *LSM303Magnetometer {
+func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Magnetometer{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -71,7 +72,7 @@ func (s *LSM303Accelerometer) ID() string {
 	return "LSM303C-A"
 }
 
-func (s *LSM303Accelerometer) Harvest(ctx *Context) {
+func (s *LSM303Accelerometer) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
 }
 
@@ -126,7 +127,7 @@ func (s *LSM303Magnetometer) ID() string {
 	return "LSM303C-M"
 }
 
-func (s *LSM303Magnetometer) Harvest(ctx *Context) {
+func (s *LSM303Magnetometer) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Magnetism).WriteWithError(toMagnitude(s.ReadAxes()))
 	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
 }

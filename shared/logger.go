@@ -3,7 +3,6 @@ package shared
 import (
 	"os"
 
-	"github.com/d2r2/go-logger"
 	"github.com/op/go-logging"
 )
 
@@ -25,7 +24,6 @@ func InitLogger() {
 	level, err := logging.LogLevel(os.Getenv("LOGGING")); if err != nil {
 		level = logging.DEBUG
 	}
-	logging.SetLevel(level, "sensorsys")
 
-	logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
+	logging.SetLevel(level, "sensorsys")
 }

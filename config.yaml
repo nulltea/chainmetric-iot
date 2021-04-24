@@ -1,4 +1,6 @@
 device:
+  id_file_path: ../device.id
+  hotswap_detect_interval: 3s
 
 engine:
   sensor_sleep_standby_timeout: 1m

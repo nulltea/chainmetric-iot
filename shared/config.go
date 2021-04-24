@@ -10,6 +10,9 @@ import (
 func InitConfig() {
 	viper.AutomaticEnv()
 
+	viper.SetDefault("device.id_file_path", "../device.id")
+	viper.SetDefault("device.hotswap_detect_interval", "3s")
+
 	viper.SetDefault("engine.sensor_sleep_standby_timeout", "1m")
 
 	viper.SetDefault("gateway.connection_config", "connection.yaml")
@@ -28,6 +31,7 @@ func InitConfig() {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("../")
 
 	if err := viper.ReadInConfig(); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to read viper config"))
