@@ -170,7 +170,7 @@ func (s *SensorsReader) Close() {
 }
 
 
-func (s *SensorsReader) initSensor(sn sensors.Sensor) error {
+func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
 	var (
 		standby = viper.GetDuration("engine.sensor_sleep_standby_timeout")
 	)

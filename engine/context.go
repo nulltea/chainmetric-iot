@@ -7,7 +7,6 @@ import (
 
 	"github.com/op/go-logging"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/config"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )

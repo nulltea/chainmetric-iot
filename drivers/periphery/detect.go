@@ -10,7 +10,9 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-func DetectI2C(start, end uint16) map[int][]uint16 {
+type I2CDetectResults map[int][]uint16
+
+func DetectI2C(start, end uint16) I2CDetectResults {
 	var (
 		addrMap = make(map[int][]uint16)
 		wg = sync.WaitGroup{}

@@ -3,7 +3,6 @@ package device
 import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/netwrok"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/network"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
@@ -11,8 +10,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
 )
-
-type i2cScanResults map[int][]uint16
 
 func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 	var (
@@ -23,9 +20,9 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		return nil, err
 	}
 
-	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesRange())
+	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
 
-	for bus, addrs := range d.i2cScan {
+	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
 			if sf, ok := sensors.LocateI2CSensor(addr); ok {
 				for _, metric := range sf.Build(bus).Metrics() {
@@ -63,11 +60,11 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 func (d *Device) SupportedSensors() []sensor.Sensor {
 	var supports = make([]sensor.Sensor, 0)
 
-	if d.i2cScan == nil {
+	if d.detectedI2Cs == nil {
 		d.DiscoverSpecs()
 	}
 
-	for bus, addrs := range d.i2cScan {
+	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
 			if sf, ok := sensors.LocateI2CSensor(addr); ok {
 				supports = append(supports, sf.Build(bus))

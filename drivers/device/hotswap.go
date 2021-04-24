@@ -37,7 +37,7 @@ func (d *Device) initHotswap() {
 }
 
 func (d *Device) handleHotswap() error {
-	d.i2cScan = periphery.DetectI2C(sensors.I2CAddressesRange())
+	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
 
 	// TODO: implement hot swap changes for reader
 
