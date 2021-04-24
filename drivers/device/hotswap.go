@@ -71,7 +71,7 @@ func (d *Device) handleHotswap() error {
 		if _, ok := detectedSensors[id]; !ok {
 			d.reader.UnregisterSensor(id)
 			isChanges = true
-			shared.Logger.Debugf("hotswap: %s sensor was detached from device", id)
+			shared.Logger.Debugf("hotswap: %s sensor was detached from the device", id)
 		}
 	}
 
@@ -79,7 +79,7 @@ func (d *Device) handleHotswap() error {
 		if _, ok := registeredSensors[id]; !ok {
 			d.reader.RegisterSensors(detectedSensors[id])
 			isChanges = true
-			shared.Logger.Debugf("hotswap: %s sensor was attached to device", id)
+			shared.Logger.Debugf("hotswap: %s sensor was attached to the device", id)
 		}
 	}
 
