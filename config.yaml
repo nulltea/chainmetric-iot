@@ -1,43 +1,29 @@
-worker:
-  closeOnStandbyTime: 60000
+device:
+
+engine:
+  sensor_sleep_standby_timeout: 1m
+
+gateway:
+  connection_config: connection.yaml
+  identity:
+    certificate: ../identity.pem
+    private_key: ../identity.key
+    user_id: device
+    org_id: supplier
+    msp_id: supplierMSP
+  channel_id: supply-channel
+  wallet_path: ../keystore
 
 sensors:
-  CCS811:
-    address: 0x5a
-    bus: 3
-    timeout: 2000
   DHT22:
     pin: 4
     timeout: 2000
-  MAX44009:
-    address: 0x4A
-    bus: 1
-    timeout: 500
-  MAX30102:
-    address: 0x57
-    bus: 2
-    timeout: 1000
-  SI1145:
-    address: 0x60
-    bus: 4
-    timeout: 500
 
 display:
   width: 240
   height: 240
-  imageSize: 150
+  image_size: 150
   bus: SPI0.0
-  dcPin: 25
-  backlightPin: 18
-  resetPin: 15
-
-gateway:
-  connectionConfig: connection.yaml
-  identity:
-    certificate: ../identity.pem
-    privateKey: ../identity.key
-    userID: device
-    orgID: supplier
-    mspID: supplierMSP
-  channelID: supply-channel
-  walletPath: ../keystore
+  dc_pin: 25
+  backlight_pin: 18
+  reset_pin: 15

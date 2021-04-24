@@ -7,7 +7,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
-	display2 "github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
@@ -22,8 +22,7 @@ type Device struct {
 
 	reader  *engine.SensorsReader
 	client  *blockchain.Client
-	display display2.Display
-	Config  config.Config
+	display display.Display
 
 	i2cScan       i2cScanResults
 	staticSensors []sensor.Sensor
@@ -46,12 +45,7 @@ func NewDevice() *Device {
 	}
 }
 
-func (d *Device) SetConfig(config config.Config) *Device {
-	d.Config = config
-	return d
-}
-
-func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
+func (d *Device) RegisterStaticSensors(sensors ...sensors.Sensor) *Device {
 	d.staticSensors = append(d.staticSensors, sensors...)
 	return d
 }
