@@ -19,4 +19,14 @@ bin/
 # Dependency directories (remove the comment below to include it)
 vendor/
 
+# Keys and certificates
+**/*.pem
+**/*.key
+
+# Local enviromental variables source files
+.env
+
+# Local files
+local/**
+
 connection.yaml

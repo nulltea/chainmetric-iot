@@ -16,5 +16,6 @@ type Display interface {
 	FillScreen(c color.RGBA)
 	SetPixel(x int16, y int16, c color.RGBA)
 	Size() (w, h int16)
+	Active() bool
 	Close() error
 }

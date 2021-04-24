@@ -31,7 +31,9 @@ type ST7789 struct {
 }
 
 func NewST7789() *ST7789 {
-	return &ST7789{}
+	return &ST7789{
+		spi: peripherals.NewSPI(""),
+	}
 }
 
 func (d *ST7789) Init(config config.DisplayConfig) (err error) {
@@ -302,6 +304,10 @@ func (d *ST7789) Command(cmd uint8) {
 // Data sends data to the device
 func (d *ST7789) Data(data uint8) {
 	d.SendData([]byte{data})
+}
+
+func (d *ST7789) Active() bool {
+	return d.spi.Active()
 }
 
 func (d *ST7789) Close() error {

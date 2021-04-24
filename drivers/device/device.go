@@ -67,9 +67,15 @@ func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 	return d
 }
 
+func (d * Device) DisplayAvailable() bool {
+	return d.display != nil && d.display.Active()
+}
+
 func (d *Device) Close() error {
-	if err := d.display.Close(); err != nil {
-		return err
+	if d.DisplayAvailable() {
+		if err := d.display.Close(); err != nil {
+			return err
+		}
 	}
 
 	d.cancelEvents()

@@ -22,6 +22,7 @@ sensors:
     timeout: 2000
 
 display:
+  enabled: true
   width: 240
   height: 240
   image_size: 150

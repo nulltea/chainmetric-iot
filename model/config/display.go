@@ -1,6 +1,7 @@
 package config
 
 type DisplayConfig struct {
+	Enabled   bool  `yaml:"enabled" mapstructure:"enabled"`
 	Width     int   `yaml:"width" mapstructure:"width"`
 	Height    int   `yaml:"height" mapstructure:"height"`
 	ImageSize int   `yaml:"image_size" mapstructure:"image_size"`
