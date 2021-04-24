@@ -10,6 +10,8 @@ import (
 func InitConfig() {
 	viper.AutomaticEnv()
 
+	viper.SetDefault("device.id_file_path", "../device.id")
+
 	viper.SetDefault("engine.sensor_sleep_standby_timeout", "1m")
 
 	viper.SetDefault("gateway.connection_config", "connection.yaml")

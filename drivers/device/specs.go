@@ -11,7 +11,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
 )
 
-func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
+func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {
 	var (
 		availableMetrics = make(map[models.Metric]bool)
 	)
@@ -20,7 +20,9 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 		return nil, err
 	}
 
-	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
+	if rescan || d.detectedI2Cs == nil {
+		d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
+	}
 
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
@@ -60,9 +62,7 @@ func (d *Device) DiscoverSpecs() (*model.DeviceSpecs, error) {
 func (d *Device) SupportedSensors() []sensor.Sensor {
 	var supports = make([]sensor.Sensor, 0)
 
-	if d.detectedI2Cs == nil {
-		d.DiscoverSpecs()
-	}
+	d.DiscoverSpecs(d.detectedI2Cs == nil)
 
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {

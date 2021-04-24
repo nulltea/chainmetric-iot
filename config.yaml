@@ -1,4 +1,5 @@
 device:
+  id_file_path: ../device.id
 
 engine:
   sensor_sleep_standby_timeout: 1m

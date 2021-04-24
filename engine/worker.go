@@ -17,7 +17,7 @@ import (
 
 type SensorsReader struct {
 	context       *Context
-	sensors       []sensor.Sensor
+	sensors       map[string]sensor.Sensor
 	requests      chan Request
 	standbyTimers map[sensor.Sensor]*time.Timer
 	done          chan struct{}
@@ -25,27 +25,46 @@ type SensorsReader struct {
 
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
-		sensors:       make([]sensor.Sensor, 0),
+		sensors:       make(map[string]sensor.Sensor),
 		requests:      make(chan Request),
 		standbyTimers: make(map[sensor.Sensor]*time.Timer),
 		done:          make(chan struct{}),
 	}
 }
 
-func (s *SensorsReader) Init(ctx *Context) error {
-	s.context = ctx
+func (r *SensorsReader) Init(ctx *Context) error {
+	r.context = ctx
 	return nil
 }
 
-func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
-	s.sensors = append(s.sensors, sensors...)
+func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
+	for i, sensor := range sensors {
+		r.sensors[sensor.ID()] = sensors[i]
+	}
 }
 
-func (s *SensorsReader) SubscribeReceiver(handler ReceiverFunc, period time.Duration, metrics ...models.Metric) context.CancelFunc {
-	ctx, cancel := context.WithCancel(s.context)
+func (r *SensorsReader) UnregisterSensor(id string) {
+	if sensor, ok := r.sensors[id]; ok {
+		sensor.Close()
+		delete(r.sensors, id)
+	}
+}
+
+func (r *SensorsReader) RegisteredSensors() map[string]sensor.Sensor {
+	sMap := make(map[string]sensor.Sensor)
+
+	for i, sensor := range r.sensors {
+		sMap[sensor.ID()] = r.sensors[i]
+	}
+
+	return sMap
+}
+
+func (r *SensorsReader) SubscribeReceiver(handler ReceiverFunc, period time.Duration, metrics ...models.Metric) context.CancelFunc {
+	ctx, cancel := context.WithCancel(r.context)
 	go func() {
 		for {
-			s.requests <- Request{
+			r.requests <- Request{
 				Metrics: metrics,
 				Handler: handler,
 			}
@@ -62,28 +81,28 @@ func (s *SensorsReader) SubscribeReceiver(handler ReceiverFunc, period time.Dura
 	return cancel
 }
 
-func (s *SensorsReader) SendRequest(handler ReceiverFunc, metrics ...models.Metric) {
-	s.requests <- Request{
+func (r *SensorsReader) SendRequest(handler ReceiverFunc, metrics ...models.Metric) {
+	r.requests <- Request{
 		Metrics: metrics,
 		Handler: handler,
 	}
 }
 
-func (s *SensorsReader) Process() {
+func (r *SensorsReader) Process() {
 	for {
 		select {
-		case request := <- s.requests:
-			go s.handleRequest(request)
-		case <- s.context.Done():
+		case request := <- r.requests:
+			go r.handleRequest(request)
+		case <- r.context.Done():
 			return
-		case <- s.done:
-			s.context.Info("Reader process ended")
+		case <- r.done:
+			r.context.Info("Reader process ended")
 			return
 		}
 	}
 }
 
-func (s *SensorsReader) handleRequest(req Request) {
+func (r *SensorsReader) handleRequest(req Request) {
 	var (
 		waitGroup = &sync.WaitGroup{}
 		pipe = make(model.MetricReadingsPipe)
@@ -94,13 +113,13 @@ func (s *SensorsReader) handleRequest(req Request) {
 		pipe[metric] = make(chan model.MetricReading, 3)
 	}
 
-	for _, sn := range s.sensors {
+	for _, sn := range r.sensors {
 		for _, metric := range req.Metrics {
 			if suitable(sn, metric) {
-				ctx := s.context.ForSensor(sn)
+				ctx := r.context.ForSensor(sn)
 				ctx.Pipe = pipe
 
-				if err := s.initSensor(sn); err != nil {
+				if err := r.initSensor(sn); err != nil {
 					ctx.Error(err)
 					continue
 				}
@@ -110,7 +129,7 @@ func (s *SensorsReader) handleRequest(req Request) {
 				ctx, cancel := ctx.SetTimeout(2 * time.Second) // TODO: configure or base on request period
 				defer cancel()
 
-				go s.readSensor(ctx, sn, waitGroup)
+				go r.readSensor(ctx, sn, waitGroup)
 
 				break
 			}
@@ -158,19 +177,19 @@ func aggregate(pipe model.MetricReadingsPipe) model.MetricReadings {
 }
 
 
-func (s *SensorsReader) Close() {
-	s.done <- struct{}{}
-	for _, sensor := range s.sensors {
+func (r *SensorsReader) Close() {
+	r.done <- struct{}{}
+	for _, sensor := range r.sensors {
 		if sensor.Active() {
 			if err := sensor.Close(); err != nil {
-				s.context.ForSensor(sensor).Error(err)
+				r.context.ForSensor(sensor).Error(err)
 			}
 		}
 	}
 }
 
 
-func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
+func (r *SensorsReader) initSensor(sn sensor.Sensor) error {
 	var (
 		standby = viper.GetDuration("engine.sensor_sleep_standby_timeout")
 	)
@@ -181,19 +200,19 @@ func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
 		}
 	}
 
-	if timer, ok := s.standbyTimers[sn]; ok && timer != nil {
+	if timer, ok := r.standbyTimers[sn]; ok && timer != nil {
 		if !timer.Reset(standby) {
 			go handleStandby(timer, sn)
 		}
 	} else {
-		s.standbyTimers[sn] = time.NewTimer(standby)
-		go handleStandby(s.standbyTimers[sn], sn)
+		r.standbyTimers[sn] = time.NewTimer(standby)
+		go handleStandby(r.standbyTimers[sn], sn)
 	}
 
 	return nil
 }
 
-func (s *SensorsReader) readSensor(ctx *sensor.Context, sn sensor.Sensor, wg *sync.WaitGroup) {
+func (r *SensorsReader) readSensor(ctx *sensor.Context, sn sensor.Sensor, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if !sn.Active() {
