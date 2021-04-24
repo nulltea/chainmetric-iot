@@ -22,7 +22,7 @@ func (d *Device) initHotswap() {
 	hotswapOnce.Do(func() {
 		var (
 			startTime  time.Time
-			interval = viper.GetDuration("hotswap_detect_interval")
+			interval = viper.GetDuration("device.hotswap_detect_interval")
 		)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -30,7 +30,7 @@ func (d *Device) initHotswap() {
 			cancel()
 			hotswapOnce = sync.Once{}
 		}
-
+		shared.Logger.Debug("initHotswap", viper.GetDuration("device.hotswap_detect_interval"))
 		go func() {
 		LOOP: for {
 			startTime = time.Now()
@@ -57,13 +57,14 @@ func (d *Device) handleHotswap() error {
 		isChanges bool
 	)
 
+	shared.Logger.Debug("handleHotswap")
+
 	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
 			if sf, ok := sensors.LocateI2CSensor(addr); ok {
 				s := sf.Build(bus)
 				detectedSensors[s.ID()] = s
-
 			}
 		}
 	}

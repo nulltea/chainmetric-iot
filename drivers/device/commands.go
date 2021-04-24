@@ -24,6 +24,7 @@ func (d *Device) Init() error {
 	d.specs, err = d.DiscoverSpecs(true); if err != nil {
 		return err
 	}
+	defer d.initHotswap()
 
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model != nil {
@@ -69,8 +70,6 @@ func (d *Device) Init() error {
 	}); err != nil {
 		return err
 	}
-
-	d.initHotswap()
 
 	return nil
 }

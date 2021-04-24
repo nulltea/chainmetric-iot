@@ -24,11 +24,7 @@ func NewBMXX80(addr uint16, bus int) sensor.Sensor {
 }
 
 func (s *BMPxx) ID() string {
-	if s.bmp == nil {
-		return "BMP280"
-	}
-
-	return s.bmp.String()
+	return "BMP280"
 }
 
 func (s *BMPxx) Init() (err error) {

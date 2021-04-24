@@ -45,7 +45,9 @@ func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 
 func (r *SensorsReader) UnregisterSensor(id string) {
 	if sensor, ok := r.sensors[id]; ok {
-		sensor.Close()
+		if sensor.Active() {
+			sensor.Close()
+		}
 		delete(r.sensors, id)
 	}
 }
