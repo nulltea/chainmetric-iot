@@ -25,7 +25,7 @@ type ADS1115 struct {
 }
 
 // NewADC returns a new ADC implementation via ADS1115 device driver.
-func NewADC(addr uint16, bus int) ADC {
+func NewADC(addr uint16, bus int) *ADS1115 {
 	return &ADS1115{
 		Bus: shared.NtoI2cBusName(bus),
 		Addr: addr,
