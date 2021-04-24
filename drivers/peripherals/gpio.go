@@ -11,8 +11,8 @@ import (
 
 // GPIO provides wrapper for GPIO peripheral
 type GPIO struct {
-	pin int
 	gpio.PinIO
+	pin int
 }
 
 func NewGPIO(pin int) *GPIO {

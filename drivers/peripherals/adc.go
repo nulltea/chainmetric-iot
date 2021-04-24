@@ -1,82 +1,53 @@
 package peripherals
 
 import (
-	"fmt"
-
+	"github.com/MichaelS11/go-ads"
 	"github.com/pkg/errors"
+
+	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-type AnalogMCP3208 struct {
-	spi *SPI
-	cs  *GPIO
-	channels []*AnalogChannel
+// ADC defines analog to digital peripheral interface.
+type ADC interface {
+	Init() error
+	Read() (uint16, error)
+	ReadRetry(int) (uint16, error)
+	Active() bool
+	Close() error
 }
 
-// AnalogChannel is the implementation of the ADConverter interface.
-type AnalogChannel struct {
-	ch int
-	dev *AnalogMCP3208
-	tx  []byte
-	rx  []byte
+// ADS1115 implements ADC driver for ADS1115 device.
+type ADS1115 struct {
+	*ads.ADS
+	Addr   uint16
+	Bus    string
+	active bool
 }
 
-// NewAnalogMCP3208 returns a new MCP3008 driver.
-func NewAnalogMCP3208(bus string, csPin int) *AnalogMCP3208 {
-	return &AnalogMCP3208{
-		spi: NewSPI(bus),
-		cs: NewGPIO(csPin),
-		channels: make([]*AnalogChannel, 8),
+// NewADC returns a new ADC implementation via ADS1115 device driver.
+func NewADC(addr uint16, bus int) ADC {
+	return &ADS1115{
+		Bus: shared.NtoI2cBusName(bus),
+		Addr: addr,
 	}
 }
 
-// Init sets up the device for communication and prepares all available channels
-func (d *AnalogMCP3208) Init() error {
-	if err := d.cs.Init(); err != nil {
-		return errors.Wrap(err, "failed to connect CS pin")
+// Init sets up the device for communication.
+func (d *ADS1115) Init() (err error) {
+	if d.ADS, err = ads.NewADS(d.Bus, d.Addr, "ADS1115"); err != nil {
+		return errors.Wrapf(err, "failed to init ADS1115 device on '%s' bus and 0x%X address", d.Bus, d.Addr)
 	}
 
-	if err := d.spi.Init(); err != nil {
-		return err
-	}
-
-	for ch := 0; ch < 8; ch++ {
-		d.channels[ch] = d.GetChannel(ch)
-	}
+	d.active = true
 
 	return nil
 }
 
-// Read analog reading from a specified channel.
-func (d *AnalogMCP3208) Read(ch int) (uint16, error) {
-	if ch < 0 || ch > 7 {
-		return 0, fmt.Errorf("channel CH%d is not sopported by MCP3208 device", ch)
-	}
-
-	return d.GetChannel(ch).Get(), nil
+func (d *ADS1115) Active() bool {
+	return d.active
 }
 
-// GetChannel returns an AnalogChannel for a specified channel number.
-func (d *AnalogMCP3208) GetChannel(ch int) *AnalogChannel {
-	return &AnalogChannel{
-		ch: ch,
-		dev: d,
-		tx: make([]byte, 3),
-		rx: make([]byte, 3),
-	}
-}
-
-// Get analog reading from current AnalogChannel.
-func (p AnalogChannel) Get() uint16 {
-	p.tx[0] = 0x01
-	p.tx[1] = byte(8 + p.ch) << 4
-	p.tx[2] = 0x00
-
-	p.dev.cs.Low()
-	p.dev.spi.Tx(p.tx, p.rx)
-
-	// scale result to 16bit value
-	result := uint16(p.rx[1] & 0x3) << 8 + uint16(p.rx[2]) << 6
-	p.dev.cs.High()
-
-	return result
+func (d *ADS1115) Close() error {
+	d.active = false
+	return d.ADS.Close()
 }
