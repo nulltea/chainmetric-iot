@@ -7,18 +7,19 @@ import (
 )
 
 var i2cSensorsLocatorMap = map[uint16]sensor.Factory{
-	ADXL345_ADDRESS:        sensor.I2CFactory(ADXL345_ADDRESS, NewADXL345),
-	BMP280_ADDRESS:         sensor.I2CFactory(BMP280_ADDRESS, NewBMXX80),
-	CCS811_ADDRESS:         sensor.I2CFactory(CCS811_ADDRESS, NewCCS811),
-	HDC1080_ADDRESS:        sensor.I2CFactory(HDC1080_ADDRESS, NewHDC1080),
-	MAX30102_ADDRESS:       sensor.I2CFactory(MAX30102_ADDRESS, NewMAX30102),
-	MAX44009_ADDRESS:       sensor.I2CFactory(MAX44009_ADDRESS, NewMAX44009),
-	SI1145_ADDRESS:         sensor.I2CFactory(SI1145_ADDRESS, NewSI1145),
-	LSM303C_A_ADDRESS:      sensor.I2CFactory(LSM303C_A_ADDRESS, NewAccelerometerLSM303),
-	LSM303C_M_ADDRESS:      sensor.I2CFactory(LSM303C_M_ADDRESS, NewMagnetometerLSM303),
-	ADC_HALL_ADDRESS:       sensor.I2CFactory(ADC_HALL_ADDRESS, NewADCHall),
-	ADC_PIEZO_ADDRESS:      sensor.I2CFactory(ADC_PIEZO_ADDRESS, NewADCPiezo),
-	ADC_MICROPHONE_ADDRESS: sensor.I2CFactory(ADC_MICROPHONE_ADDRESS, NewADCMicrophone),
+	ADXL345_ADDRESS:        sensor.I2CFactory(NewADXL345, ADXL345_ADDRESS),
+	BMP280_ADDRESS:         sensor.I2CFactory(NewBMXX80, BMP280_ADDRESS),
+	CCS811_ADDRESS:         sensor.I2CFactory(NewCCS811, CCS811_ADDRESS),
+	HDC1080_ADDRESS:        sensor.I2CFactory(NewHDC1080, HDC1080_ADDRESS),
+	MAX30102_ADDRESS:       sensor.I2CFactory(NewMAX30102, MAX30102_ADDRESS),
+	MAX44009_ADDRESS:       sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS),
+	0x4B:                   sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS),
+	SI1145_ADDRESS:         sensor.I2CFactory(NewSI1145, SI1145_ADDRESS),
+	LSM303C_A_ADDRESS:      sensor.I2CFactory(NewAccelerometerLSM303, LSM303C_A_ADDRESS),
+	LSM303C_M_ADDRESS:      sensor.I2CFactory(NewMagnetometerLSM303, LSM303C_M_ADDRESS),
+	ADC_HALL_ADDRESS:       sensor.I2CFactory(NewADCHall, ADC_HALL_ADDRESS),
+	ADC_PIEZO_ADDRESS:      sensor.I2CFactory(NewADCPiezo, ADC_PIEZO_ADDRESS),
+	ADC_MICROPHONE_ADDRESS: sensor.I2CFactory(NewADCMicrophone, ADC_MICROPHONE_ADDRESS),
 }
 
 // LocateI2CSensor locates I2C-based sensor.Sensor and provides its sensor.Factory.
@@ -37,5 +38,5 @@ func I2CAddressesRange() (from uint16, to uint16) {
 
 	sort.Ints(addresses)
 
-	return uint16(addresses[0]), uint16(len(addresses) - 1)
+	return uint16(addresses[0]), uint16(addresses[len(addresses) - 1])
 }
