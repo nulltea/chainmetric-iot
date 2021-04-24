@@ -8,6 +8,7 @@ import (
 	"periph.io/x/periph/devices/bmxx80"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -16,7 +17,7 @@ type BMPxx struct {
 	bmp  *bmxx80.Dev
 }
 
-func NewBMXX80(addr uint16, bus int) *BMPxx {
+func NewBMXX80(addr uint16, bus int) sensor.Sensor {
 	return &BMPxx{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -42,7 +43,7 @@ func (s *BMPxx) Init() (err error) {
 	return
 }
 
-func (s *BMPxx) Harvest(ctx *Context) {
+func (s *BMPxx) Harvest(ctx *sensor.Context) {
 	var env = physic.Env{}
 
 	if err := s.bmp.Sense(&env); err != nil {

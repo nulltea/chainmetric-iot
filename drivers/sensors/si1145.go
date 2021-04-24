@@ -6,6 +6,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -13,7 +14,7 @@ type SI1145 struct {
 	*peripherals.I2C
 }
 
-func NewSI1145(addr uint16, bus int) *SI1145 {
+func NewSI1145(addr uint16, bus int) sensor.Sensor {
 	return &SI1145{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -115,7 +116,7 @@ func (s *SI1145) ReadProximity() (float64, error) {
 	return float64(res), err
 }
 
-func (s *SI1145) Harvest(ctx *Context) {
+func (s *SI1145) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.UVLight).WriteWithError(s.ReadUV())
 	ctx.For(metrics.VisibleLight).WriteWithError(s.ReadVisible())
 	ctx.For(metrics.IRLight).WriteWithError(s.ReadIR())

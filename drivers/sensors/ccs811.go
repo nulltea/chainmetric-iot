@@ -7,6 +7,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -20,7 +21,7 @@ type CCS811 struct {
 	*peripherals.I2C
 }
 
-func NewCCS811(addr uint16, bus int) *CCS811 {
+func NewCCS811(addr uint16, bus int) sensor.Sensor {
 	return &CCS811{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -89,7 +90,7 @@ func (s *CCS811) Read() (eCO2 float64, eTVOC float64, err error) {
 	return
 }
 
-func (s *CCS811) Harvest(ctx *Context) {
+func (s *CCS811) Harvest(ctx *sensor.Context) {
 	eCO2, eTVOC, err := s.Read()
 
 	if eCO2 != 0 {

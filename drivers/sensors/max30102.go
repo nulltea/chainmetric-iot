@@ -4,6 +4,7 @@ import (
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
@@ -14,7 +15,7 @@ type MAX30102 struct {
 	bus int
 }
 
-func NewMAX30102(addr uint16, bus int) *MAX30102 {
+func NewMAX30102(addr uint16, bus int) sensor.Sensor {
 	return &MAX30102{
 		addr: addr,
 		bus: bus,
@@ -40,7 +41,7 @@ func (s *MAX30102) Init() (err error) {
 	return
 }
 
-func (s *MAX30102) Harvest(ctx *Context) {
+func (s *MAX30102) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.HeartRate).WriteWithError(s.HeartRate())
 	ctx.For(metrics.BloodOxidation).WriteWithError(s.SpO2())
 }

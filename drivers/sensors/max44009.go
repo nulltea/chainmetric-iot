@@ -7,6 +7,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -14,7 +15,7 @@ type MAX44009 struct {
 	*peripherals.I2C
 }
 
-func NewMAX44009(addr uint16, bus int) *MAX44009 {
+func NewMAX44009(addr uint16, bus int) sensor.Sensor {
 	return &MAX44009{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -48,7 +49,7 @@ func (s *MAX44009) Read() (float64, error) {
 	return s.dataToLuminance(buffer), nil
 }
 
-func (s *MAX44009) Harvest(ctx *Context) {
+func (s *MAX44009) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Luminosity).WriteWithError(s.Read())
 }
 

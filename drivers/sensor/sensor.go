@@ -1,4 +1,4 @@
-package sensors
+package sensor
 
 import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
@@ -12,3 +12,4 @@ type Sensor interface {
 	Active() bool
 	Close() error
 }
+

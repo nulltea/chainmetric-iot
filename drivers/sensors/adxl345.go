@@ -6,6 +6,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
@@ -20,7 +21,7 @@ type ADXL345 struct {
 	*peripherals.I2C
 }
 
-func NewADXL345(addr uint16, bus int) *ADXL345 {
+func NewADXL345(addr uint16, bus int) sensor.Sensor {
 	return &ADXL345{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
@@ -69,7 +70,7 @@ func (s *ADXL345) ReadAxes() (model.Vector, error) {
 	}, nil
 }
 
-func (s *ADXL345) Harvest(ctx *Context) {
+func (s *ADXL345) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
 }
 

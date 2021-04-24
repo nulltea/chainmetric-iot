@@ -4,6 +4,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -11,7 +12,7 @@ type ADCPiezo struct {
 	peripherals.ADC
 }
 
-func NewADCPiezo(addr uint16, bus int) *ADCPiezo {
+func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
 	return &ADCPiezo{
 		ADC: peripherals.NewADC(addr, bus),
 	}
@@ -21,7 +22,7 @@ func (s *ADCPiezo) ID() string {
 	return "ADC_Piezo"
 }
 
-func (s *ADCPiezo) Harvest(ctx *Context) {
+func (s *ADCPiezo) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Vibration).WriteWithError(s.ReadRetry(5))
 }
 

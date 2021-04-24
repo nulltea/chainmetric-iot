@@ -10,23 +10,23 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
 type SensorsReader struct {
 	context       *Context
-	sensors       []sensors.Sensor
+	sensors       []sensor.Sensor
 	requests      chan Request
-	standbyTimers map[sensors.Sensor]*time.Timer
+	standbyTimers map[sensor.Sensor]*time.Timer
 	done          chan struct{}
 }
 
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
-		sensors:       make([]sensors.Sensor, 0),
+		sensors:       make([]sensor.Sensor, 0),
 		requests:      make(chan Request),
-		standbyTimers: make(map[sensors.Sensor]*time.Timer),
+		standbyTimers: make(map[sensor.Sensor]*time.Timer),
 		done:          make(chan struct{}),
 	}
 }
@@ -36,7 +36,7 @@ func (s *SensorsReader) Init(ctx *Context) error {
 	return nil
 }
 
-func (s *SensorsReader) RegisterSensors(sensors ...sensors.Sensor) {
+func (s *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 	s.sensors = append(s.sensors, sensors...)
 }
 
@@ -124,7 +124,7 @@ func (s *SensorsReader) handleRequest(req Request) {
 	return
 }
 
-func suitable(sensor sensors.Sensor, metric models.Metric) bool {
+func suitable(sensor sensor.Sensor, metric models.Metric) bool {
 	for _, m := range sensor.Metrics() {
 		if metric == m {
 			return true
@@ -169,7 +169,7 @@ func (s *SensorsReader) Close() {
 	}
 }
 
-func (s *SensorsReader) initSensor(sn sensors.Sensor) error {
+func (s *SensorsReader) initSensor(sn sensor.Sensor) error {
 	if !sn.Active() {
 		if err := sn.Init(); err != nil {
 			return err
@@ -188,7 +188,7 @@ func (s *SensorsReader) initSensor(sn sensors.Sensor) error {
 	return nil
 }
 
-func (s *SensorsReader) readSensor(ctx *sensors.Context, sn sensors.Sensor, wg *sync.WaitGroup) {
+func (s *SensorsReader) readSensor(ctx *sensor.Context, sn sensor.Sensor, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if !sn.Active() {
@@ -218,7 +218,7 @@ func (s *SensorsReader) readSensor(ctx *sensors.Context, sn sensors.Sensor, wg *
 	}
 }
 
-func handleStandby(t *time.Timer, sn sensors.Sensor) {
+func handleStandby(t *time.Timer, sn sensor.Sensor) {
 	<- t.C
 	sn.Close()
 }

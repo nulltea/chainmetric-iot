@@ -9,6 +9,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 )
 
@@ -17,7 +18,7 @@ type HDC1080 struct {
 	attempts int
 }
 
-func NewHDC1080(addr uint16, bus int) *HDC1080 {
+func NewHDC1080(addr uint16, bus int) sensor.Sensor {
 	return &HDC1080{
 		I2C:      peripherals.NewI2C(addr, bus),
 		attempts: 10,
@@ -100,7 +101,7 @@ func (s *HDC1080) ReadHumidity() (float64, error) {
 	return 0, errors.Wrap(err, "failed read from humidity register")
 }
 
-func (s *HDC1080) Harvest(ctx *Context) {
+func (s *HDC1080) Harvest(ctx *sensor.Context) {
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 

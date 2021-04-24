@@ -6,7 +6,7 @@ import (
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 )
 
 type MockSensor struct {
@@ -30,7 +30,7 @@ func (s *MockSensor) Init() error {
 	return nil
 }
 
-func (s *MockSensor) Harvest(ctx *sensors.Context) {
+func (s *MockSensor) Harvest(ctx *sensor.Context) {
 	time.Sleep(s.duration)
 
 	for _, metric := range s.metrics {
