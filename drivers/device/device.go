@@ -7,8 +7,8 @@ import (
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	display2 "github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
@@ -22,13 +22,14 @@ type Device struct {
 
 	reader  *engine.SensorsReader
 	client  *blockchain.Client
-	display display.Display
+	display display2.Display
 	Config  config.Config
 
 	i2cScan       i2cScanResults
-	staticSensors []sensors.Sensor
+	staticSensors []sensor.Sensor
 
 	cancelEvents context.CancelFunc
+	cancelHotswap context.CancelFunc
 }
 
 func NewDevice() *Device {
@@ -41,7 +42,7 @@ func NewDevice() *Device {
 			mutex: sync.Mutex{},
 			data:  make(map[string]*readingsRequest),
 		},
-		staticSensors: make([]sensors.Sensor, 0),
+		staticSensors: make([]sensor.Sensor, 0),
 	}
 }
 
@@ -50,13 +51,13 @@ func (d *Device) SetConfig(config config.Config) *Device {
 	return d
 }
 
-func (d *Device) RegisterStaticSensors(sensors ...sensors.Sensor) *Device {
+func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	d.staticSensors = append(d.staticSensors, sensors...)
 	return d
 }
 
 
-func (d *Device) SetDisplay(dp display.Display) *Device {
+func (d *Device) SetDisplay(dp display2.Display) *Device {
 	d.display = dp
 	return d
 }
@@ -77,6 +78,7 @@ func (d *Device) Close() error {
 	}
 
 	d.cancelEvents()
+	d.cancelHotswap()
 
 	d.reader.Close()
 

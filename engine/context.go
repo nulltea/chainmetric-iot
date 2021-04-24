@@ -8,7 +8,7 @@ import (
 	"github.com/op/go-logging"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
@@ -25,8 +25,8 @@ func NewContext(parent context.Context) *Context {
 	}
 }
 
-func (c *Context) ForSensor(s sensors.Sensor) *sensors.Context {
-	return &sensors.Context{
+func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
+	return &sensor.Context{
 		Parent: c,
 		Logger: c.Logger,
 		SensorID: s.ID(),
