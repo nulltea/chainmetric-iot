@@ -30,6 +30,7 @@ func (d *Device) actOnRequest(request *readingsRequest) {
 
 	if request.period.Seconds() == 0 {
 		d.reader.SendRequest(handler, request.metrics...)
+		delete(d.requests.data, request.id)
 		return
 	}
 

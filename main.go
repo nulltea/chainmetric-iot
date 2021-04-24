@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
@@ -75,8 +73,6 @@ func run() {
 			shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
 		}
 	}
-
-	fmt.Println(viper.GetString("device.id_file_path"))
 
 	if err := Reader.Init(Context); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
