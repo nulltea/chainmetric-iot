@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
@@ -21,6 +22,7 @@ func (d *Device) initHotswap() {
 	hotswapOnce.Do(func() {
 		var (
 			startTime  time.Time
+			interval = viper.GetDuration("hotswap_detect_interval")
 		)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -38,7 +40,7 @@ func (d *Device) initHotswap() {
 			}
 
 			select {
-			case <-time.After(time.Second - time.Since(startTime)):
+			case <-time.After(interval - time.Since(startTime)):
 			case <- ctx.Done():
 				break LOOP
 			}
@@ -56,20 +58,13 @@ func (d *Device) handleHotswap() error {
 	)
 
 	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
-
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
 			if sf, ok := sensors.LocateI2CSensor(addr); ok {
 				s := sf.Build(bus)
 				detectedSensors[s.ID()] = s
-			}
-		}
-	}
 
-	for id := range detectedSensors {
-		if _, ok := registeredSensors[id]; !ok {
-			d.reader.RegisterSensors(detectedSensors[id])
-			isChanges = true
+			}
 		}
 	}
 
@@ -77,6 +72,15 @@ func (d *Device) handleHotswap() error {
 		if _, ok := detectedSensors[id]; !ok {
 			d.reader.UnregisterSensor(id)
 			isChanges = true
+			shared.Logger.Debugf("hotswap: %s sensor was detached from device", id)
+		}
+	}
+
+	for id := range detectedSensors {
+		if _, ok := registeredSensors[id]; !ok {
+			d.reader.RegisterSensors(detectedSensors[id])
+			isChanges = true
+			shared.Logger.Debugf("hotswap: %s sensor was attached to device", id)
 		}
 	}
 

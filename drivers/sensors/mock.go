@@ -1,4 +1,4 @@
-package mocks
+package sensors
 
 import (
 	"math/rand"
