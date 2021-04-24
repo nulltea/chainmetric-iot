@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/config"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
 )
 
 type Client struct {
