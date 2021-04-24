@@ -12,7 +12,9 @@ build-remote:
         go build -v  -o $(OUTPUT)
 
 sync:
-	rsync -r --delete --filter='P vendor' . pi@$(REMOTE_IP):$(REMOTE_DIR)
+	rsync -r --delete \
+	--filter 'P vendor' --exclude .env \
+	. pi@$(REMOTE_IP):$(REMOTE_DIR)
 
 crypto-sync:
 	scp $(CRYPTO_DIR)/signcerts/User1@supplier.iotchain.network-cert.pem pi@$(REMOTE_IP):identity.pem

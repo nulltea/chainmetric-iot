@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -11,9 +13,11 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
+	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -49,25 +53,36 @@ func main() {
 }
 
 func run() {
-	var bc config.BlockchainConfig
-	if err := viper.UnmarshalKey("gateway", &bc); err != nil {
+	var (
+		bc config.BlockchainConfig
+		dc config.DisplayConfig
+	)
+
+	if err := shared.UnmarshalFromConfig("gateway", &bc); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed parse blockchain config"))
 	}
+
+	if err := shared.UnmarshalFromConfig("display", &dc); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed parse display config"))
+	}
+
 	if err := Client.Init(bc); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing blockchain client"))
 	}
 
-	var dc config.DisplayConfig
-	if err := viper.UnmarshalKey("display", &dc); err != nil {
-		shared.Logger.Fatal(errors.Wrap(err, "failed parse display config"))
+	if dc.Enabled {
+		if err := Display.Init(dc); err != nil {
+			shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
+		}
 	}
-	if err := Display.Init(dc); err != nil {
-		shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
-	}
+
+	fmt.Println(viper.GetString("device.id_file_path"))
 
 	if err := Reader.Init(Context); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
 	}
+
+	Device.RegisterStaticSensors(sensors.NewMockSensor(time.Millisecond * 250, metrics.Acceleration, metrics.Vibration))
 
 	if err := Device.Init(); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed to initialize device"))
