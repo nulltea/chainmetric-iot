@@ -4,10 +4,15 @@ package sensors
 
 import (
 	"github.com/d2r2/go-dht"
+	"github.com/d2r2/go-logger"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+)
+
+var (
+	_ = logger.ChangePackageLogLevel("dht", logger.ErrorLevel)
 )
 
 type DHTxx struct {
