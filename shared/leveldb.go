@@ -1,13 +1,15 @@
 package shared
 
 import (
+	"unicode/utf8"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
 const (
-	compositeKeySeparatorRune = 0
+	compositeKeySeparatorRune = utf8.RuneSelf
 	compositeKeySeparator = string(compositeKeySeparatorRune)
 )
 

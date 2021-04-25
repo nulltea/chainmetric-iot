@@ -38,7 +38,7 @@ func CacheReadings(readings ...models.MetricReadings) (err error) {
 	return shared.LevelDB.Write(batch, nil)
 }
 
-func IterateOverCachedReadings(fn func(models.MetricReadings) error) {
+func IterateOverCachedReadings(fn func(string, models.MetricReadings) error, pop bool) {
 	var (
 		prefix = []byte(shared.FormCompositeKey("reading"))
 		iter = shared.LevelDB.NewIterator(util.BytesPrefix(prefix), nil)
@@ -52,7 +52,7 @@ func IterateOverCachedReadings(fn func(models.MetricReadings) error) {
 		)
 
 		if len(attrs) < 2 {
-			shared.Logger.Warningf("Invalid composite key %q: it must contain assetID and timestamp", key)
+			shared.Logger.Warningf("Invalid composite key '%s': it must contain assetID and timestamp", key)
 			continue
 		}
 
@@ -63,21 +63,28 @@ func IterateOverCachedReadings(fn func(models.MetricReadings) error) {
 		)
 
 		if len(assetID) == 0 || timestamp.IsZero() {
-			shared.Logger.Warningf("Invalid composite key data in %q", key)
+			shared.Logger.Warningf("Invalid composite key data in '%s'", key)
 			continue
 		}
 
 		if err := json.Unmarshal(iter.Value(), &values); err != nil {
-			shared.Logger.Error(errors.Wrapf(err, "failed to unmarshal values for key %q", key))
+			shared.Logger.Error(errors.Wrapf(err, "failed to unmarshal values for key '%s'", key))
 			continue
 		}
 
-		if err := fn(models.MetricReadings{
+		if err := fn(key, models.MetricReadings{
 			AssetID: assetID,
 			Timestamp: timestamp,
 			Values: values,
 		}); err != nil {
-			shared.Logger.Error(errors.Wrapf(err, "something went wrong when iterating over %q", key))
+			shared.Logger.Error(errors.Wrapf(err, "something went wrong when iterating over '%s'", key))
+		}
+
+		if pop {
+			if err := shared.LevelDB.Delete([]byte(key), nil); err != nil {
+				shared.Logger.Error(errors.Wrapf(err, "failed to delete on key '%s', will now stop iteration", key))
+				return
+			}
 		}
 	}
 }
