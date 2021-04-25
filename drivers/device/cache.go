@@ -18,14 +18,15 @@ type assetsCache struct {
 
 type requirementsCache struct {
 	mutex sync.Mutex
-	data map[string]*readingsRequest
+	data  map[string]*readingsRequest
 }
 
 type readingsRequest struct {
+	id      string
 	assetID string
-	period time.Duration
+	period  time.Duration
 	metrics models.Metrics
-	cancel context.CancelFunc
+	cancel  context.CancelFunc
 }
 
 func (d *Device) CacheBlockchainState() error {

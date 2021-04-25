@@ -22,10 +22,13 @@ func NewGPIO(pin int) *GPIO {
 }
 
 func (g *GPIO) Init() error {
-	pin := gpioreg.ByName(shared.NtoPinName(g.pin))
+	var (
+		name = shared.NtoPinName(g.pin)
+		pin = gpioreg.ByName(name)
+	)
 
 	if pin == gpio.INVALID || pin == nil {
-		return fmt.Errorf("pin %s is invalid", pin.Name())
+		return fmt.Errorf("pin %s is invalid", name)
 	}
 
 	g.PinIO = pin

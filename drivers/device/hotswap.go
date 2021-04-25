@@ -68,7 +68,7 @@ func (d *Device) handleHotswap() error {
 	}
 
 	for id := range registeredSensors {
-		if _, ok := detectedSensors[id]; !ok {
+		if _, ok := detectedSensors[id]; !ok && !d.isStaticSensor(id) {
 			d.reader.UnregisterSensor(id)
 			isChanges = true
 			shared.Logger.Debugf("hotswap: %s sensor was detached from the device", id)
@@ -92,4 +92,14 @@ func (d *Device) handleHotswap() error {
 	}
 
 	return nil
+}
+
+func (d *Device) isStaticSensor(id string) bool {
+	for i := range d.staticSensors {
+		if d.staticSensors[i].ID() == id {
+			return true
+		}
+	}
+
+	return false
 }

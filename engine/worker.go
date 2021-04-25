@@ -107,12 +107,12 @@ func (r *SensorsReader) Process() {
 func (r *SensorsReader) handleRequest(req Request) {
 	var (
 		waitGroup = &sync.WaitGroup{}
-		pipe = make(model.MetricReadingsPipe)
+		pipe = make(model.SensorReadingsPipe)
 	)
 
 
 	for _, metric := range req.Metrics {
-		pipe[metric] = make(chan model.MetricReading, 3)
+		pipe[metric] = make(chan model.SensorReading, 3)
 	}
 
 	for _, sn := range r.sensors {
@@ -156,10 +156,10 @@ func suitable(sensor sensor.Sensor, metric models.Metric) bool {
 	return false
 }
 
-func aggregate(pipe model.MetricReadingsPipe) model.MetricReadings {
-	results := make(model.MetricReadings)
+func aggregate(pipe model.SensorReadingsPipe) model.SensorsReadingResults {
+	results := make(model.SensorsReadingResults)
 	for metric, ch := range pipe {
-		readings := make([]model.MetricReading, 0)
+		readings := make([]model.SensorReading, 0)
 
 	LOOP: for {
 			select {
@@ -245,11 +245,11 @@ func (r *SensorsReader) readSensor(ctx *sensor.Context, sn sensor.Sensor, wg *sy
 }
 
 func handleStandby(t *time.Timer, sn sensor.Sensor) {
-	<- t.C
+	<-t.C
 	sn.Close()
 }
 
-func selectResult(results []model.MetricReading) (result float64) {
+func selectResult(results []model.SensorReading) (result float64) {
 	var (
 		getPrecision = func(v float64) int {
 			s := strconv.FormatFloat(v, 'f', -1, 64)

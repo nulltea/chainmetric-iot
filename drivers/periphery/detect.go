@@ -5,8 +5,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/viper"
 	"periph.io/x/periph/conn/i2c/i2creg"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -18,7 +20,9 @@ func DetectI2C(start, end uint16) I2CDetectResults {
 		wg = sync.WaitGroup{}
 	)
 
-	Init()
+	if viper.GetBool("mocks.debug_env") {
+		addrMap[1] = []uint16{sensors.MOCK_ADDRESS}
+	}
 
 	for _, ref := range i2creg.All() {
 		ctx, _ := context.WithTimeout(context.Background(), 1 * time.Second)

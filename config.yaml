@@ -1,6 +1,8 @@
 device:
   id_file_path: ../device.id
   hotswap_detect_interval: 3s
+  local_cache_path: /var/cache
+  ping_timer_interval: 10s
 
 engine:
   sensor_sleep_standby_timeout: 1m
@@ -22,6 +24,7 @@ sensors:
     timeout: 2000
 
 display:
+  enabled: true
   width: 240
   height: 240
   image_size: 150

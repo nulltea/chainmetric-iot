@@ -2,7 +2,6 @@ package blockchain
 
 import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
-
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 )
 
@@ -20,6 +19,5 @@ func NewReadingsContract(client *Client) *ReadingsContract {
 
 func (cc *ReadingsContract) Post(readings models.MetricReadings) error {
 	_, err := cc.contract.SubmitTransaction("Post", string(readings.Encode()))
-
 	return err
 }

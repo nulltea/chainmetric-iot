@@ -11,6 +11,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
@@ -30,9 +31,7 @@ var (
 )
 
 func init() {
-	shared.InitLogger()
-	shared.InitConfig()
-
+	shared.InitCore()
 	periphery.Init()
 }
 
@@ -49,24 +48,35 @@ func main() {
 }
 
 func run() {
-	var bc config.BlockchainConfig
-	if err := viper.UnmarshalKey("gateway", &bc); err != nil {
+	var (
+		bc config.BlockchainConfig
+		dc config.DisplayConfig
+	)
+
+	if err := shared.UnmarshalFromConfig("gateway", &bc); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed parse blockchain config"))
 	}
+
+	if err := shared.UnmarshalFromConfig("display", &dc); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed parse display config"))
+	}
+
 	if err := Client.Init(bc); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing blockchain client"))
 	}
 
-	var dc config.DisplayConfig
-	if err := viper.UnmarshalKey("display", &dc); err != nil {
-		shared.Logger.Fatal(errors.Wrap(err, "failed parse display config"))
-	}
-	if err := Display.Init(dc); err != nil {
-		shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
+	if dc.Enabled {
+		if err := Display.Init(dc); err != nil {
+			shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
+		}
 	}
 
 	if err := Reader.Init(Context); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
+	}
+
+	if viper.GetBool("mocks.debug_env") {
+		Device.RegisterStaticSensors(sensors.NewStaticSensorMock())
 	}
 
 	if err := Device.Init(); err != nil {
@@ -96,8 +106,9 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 		}
 	}
 
-
 	Client.Close()
+
+	shared.CloseCore()
 
 	close(done)
 }

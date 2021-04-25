@@ -3,6 +3,7 @@ package device
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -27,6 +28,8 @@ type Device struct {
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
+
+	pingTimer *time.Timer
 
 	cancelEvents context.CancelFunc
 	cancelHotswap context.CancelFunc
@@ -67,9 +70,15 @@ func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 	return d
 }
 
+func (d * Device) DisplayAvailable() bool {
+	return d.display != nil && d.display.Active()
+}
+
 func (d *Device) Close() error {
-	if err := d.display.Close(); err != nil {
-		return err
+	if d.DisplayAvailable() {
+		if err := d.display.Close(); err != nil {
+			return err
+		}
 	}
 
 	d.cancelEvents()

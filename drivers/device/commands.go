@@ -24,11 +24,16 @@ func (d *Device) Init() error {
 	d.specs, err = d.DiscoverSpecs(true); if err != nil {
 		return err
 	}
+
 	defer d.initHotswap()
+	defer func() {
+		go d.tryRepostCachedReadings()
+	}()
 
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model != nil {
 			if err := contract.UpdateSpecs(id, d.specs); err != nil {
+
 				return err
 			}
 
@@ -40,7 +45,7 @@ func (d *Device) Init() error {
 		shared.Logger.Warning("device was removed from network, must re-initialize now")
 	}
 
-	if d.display != nil {
+	if d.DisplayAvailable() {
 		qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
 			return err
 		}
@@ -49,6 +54,8 @@ func (d *Device) Init() error {
 		defer d.display.PowerOff()
 
 		d.display.DrawImage(qr.Image(viper.GetInt("display.image_size")))
+	} else {
+		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "local/qr.png")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)

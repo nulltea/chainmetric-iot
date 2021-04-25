@@ -13,13 +13,14 @@ var i2cSensorsLocatorMap = map[uint16]sensor.Factory{
 	HDC1080_ADDRESS:        sensor.I2CFactory(NewHDC1080, HDC1080_ADDRESS),
 	MAX30102_ADDRESS:       sensor.I2CFactory(NewMAX30102, MAX30102_ADDRESS),
 	MAX44009_ADDRESS:       sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS),
-	0x4B:                   sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS),
+	MAX44009_ALT_ADDRESS:   sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS),
 	SI1145_ADDRESS:         sensor.I2CFactory(NewSI1145, SI1145_ADDRESS),
 	LSM303C_A_ADDRESS:      sensor.I2CFactory(NewAccelerometerLSM303, LSM303C_A_ADDRESS),
 	LSM303C_M_ADDRESS:      sensor.I2CFactory(NewMagnetometerLSM303, LSM303C_M_ADDRESS),
 	ADC_HALL_ADDRESS:       sensor.I2CFactory(NewADCHall, ADC_HALL_ADDRESS),
 	ADC_PIEZO_ADDRESS:      sensor.I2CFactory(NewADCPiezo, ADC_PIEZO_ADDRESS),
 	ADC_MICROPHONE_ADDRESS: sensor.I2CFactory(NewADCMicrophone, ADC_MICROPHONE_ADDRESS),
+	MOCK_ADDRESS:           sensor.I2CFactory(NewI2CSensorMock, MOCK_ADDRESS),
 }
 
 // LocateI2CSensor locates I2C-based sensor.Sensor and provides its sensor.Factory.

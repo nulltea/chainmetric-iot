@@ -38,7 +38,7 @@ func (w *metricWriter) Write(v interface{}) {
 
 
 	if ch, ok := w.ctx.Pipe[w.metric]; ok {
-		ch <- model.MetricReading {
+		ch <- model.SensorReading{
 			Source: w.ctx.SensorID,
 			Value:  value,
 		}
