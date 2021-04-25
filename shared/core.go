@@ -6,3 +6,8 @@ func InitCore() {
 	initConfig()
 	initLevelDB()
 }
+
+// CloseCore performs core dependencies close sequence.
+func CloseCore() {
+	LevelDB.Close()
+}
