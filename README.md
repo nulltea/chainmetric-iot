@@ -71,7 +71,7 @@ $ make crypto-sync
 
 - [ ] Caching on network connection absence
 - [x] Sensor modules hot-swap support ([#1](https://github.com/timoth-y/chainmetric-sensorsys/pull/1))
-- [ ] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via [MCP3008][mcp3008]
+- [ ] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115]
 - [ ] [E-Ink display][e-ink display] support
 - [ ] A device as a blockchain node
 - [ ] Location tracking (GPS) support
@@ -107,6 +107,7 @@ Licensed under the [Apache 2.0][license file].
 
 [e-ink display]: https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT
 [mcp3008]: https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008
+[ads1115]: https://www.ti.com/lit/ds/symlink/ads1115.pdf
 [hall-effect]: https://www.ti.com/lit/ds/symlink/drv5053.pdf
 
 [chainmetric network repo]: https://github.com/timoth-y/chainmetric-network
