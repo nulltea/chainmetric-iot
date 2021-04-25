@@ -14,7 +14,7 @@ var (
 	Logger = logging.MustGetLogger("sensorsys")
 )
 
-func InitLogger() {
+func initLogger() {
 	backend := logging.NewBackendFormatter(
 		logging.NewLogBackend(os.Stderr, "", 0),
 		logging.MustStringFormatter(format))

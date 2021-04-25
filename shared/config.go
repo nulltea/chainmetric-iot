@@ -10,8 +10,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// InitConfig configures viper from environment variables and configuration files.
-func InitConfig() {
+// initConfig configures viper from environment variables and configuration files.
+func initConfig() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 

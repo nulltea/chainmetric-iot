@@ -1,6 +1,7 @@
 device:
   id_file_path: ../device.id
   hotswap_detect_interval: 3s
+  local_cache_path: /var/cache
 
 engine:
   sensor_sleep_standby_timeout: 1m
