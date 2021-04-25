@@ -3,15 +3,14 @@ package device
 import (
 	"time"
 
-	fabricStatus "github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/pkg/errors"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/storage"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
+// Operate registers supported sensors and starts asynchronously work on reading requests.
 func (d *Device) Operate() {
 	d.reader.RegisterSensors(d.SupportedSensors()...)
 
@@ -24,7 +23,7 @@ func (d *Device) Operate() {
 
 func (d *Device) actOnRequest(request *readingsRequest) {
 	var (
-		handler = func(readings model.MetricReadings) {
+		handler = func(readings model.SensorsReadingResults) {
 			d.postReadings(request.assetID, readings)
 		}
 	)
@@ -38,10 +37,10 @@ func (d *Device) actOnRequest(request *readingsRequest) {
 	request.cancel = d.reader.SubscribeReceiver(handler, request.period, request.metrics...)
 }
 
-func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
+func (d *Device) postReadings(assetID string, readings model.SensorsReadingResults) {
 	var (
 		contract = d.client.Contracts.Readings
-		reading = models.MetricReadings{
+		record = models.MetricReadings{
 			AssetID: assetID,
 			DeviceID: d.model.ID,
 			Timestamp: time.Now(),
@@ -54,29 +53,14 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 		return
 	}
 
-	if err := contract.Post(reading); err != nil {
-		d.handleReadingsPostErrors(err, reading)
+	if err := contract.Post(record); err != nil {
+		if detectNetworkAbsence(err) {
+			d.handleNetworkDisconnection(record)
+		} else {
+			shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
+		}
 		return
 	}
 
 	shared.Logger.Debugf("Readings for asset %s was posted with => %s", assetID, shared.Prettify(readings))
-}
-
-func (d *Device) handleReadingsPostErrors(err error, readings models.MetricReadings) {
-	if status, ok := fabricStatus.FromError(err); ok {
-		switch status.Group {
-		case fabricStatus.DiscoveryServerStatus:
-			if err := storage.CacheReadings(readings); err != nil {
-				shared.Logger.Error(errors.Wrap(err, "failed to cache readings while network connection absence"))
-				return
-			}
-
-			shared.Logger.Warning(
-				"Detected network connection absence, cached readings for asset %s to post later => %s",
-				shared.Prettify(readings),
-			)
-		}
-	}
-
-	shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
 }

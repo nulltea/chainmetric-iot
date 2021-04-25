@@ -14,7 +14,7 @@ type Context struct {
 	Parent    context.Context
 	SensorID  string
 	Logger    *logging.Logger
-	Pipe      model.MetricReadingsPipe
+	Pipe      model.SensorReadingsPipe
 }
 
 func (c *Context) For(metric models.Metric) *metricWriter {

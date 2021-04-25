@@ -238,8 +238,8 @@ github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFd
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae h1:ePgxzI5zYM/fuRQclwMK4NWVw1eH4a7AUPVNqJJV3ps=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
-github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea h1:293019pzJ8U0KaBKxDQiejdSkt3BVJtoantSSwH5kZA=
-github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210316013042-82c012a55cea/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
+github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210425145817-1fd109afeb60 h1:FMFCx5n54nc8xzaUActCLc6EaiJrcbk3R++nf2LBucs=
+github.com/timoth-y/iot-blockchain-contracts v0.0.0-20210425145817-1fd109afeb60/go.mod h1:mDyadTwYvrI4deprAj7zaFXUHnYA+HgRurGxxZq04I8=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3/go.mod h1:t553ts7ptTIMASPHACY/f8Rb2991hpAEnUiI2y0bWSk=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=

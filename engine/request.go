@@ -8,7 +8,7 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 )
 
-type ReceiverFunc func(model.MetricReadings)
+type ReceiverFunc func(model.SensorsReadingResults)
 
 type Request struct {
 	Context context.Context

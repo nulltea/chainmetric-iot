@@ -28,7 +28,7 @@ func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 		Parent: c,
 		Logger: c.Logger,
 		SensorID: s.ID(),
-		Pipe: make(model.MetricReadingsPipe),
+		Pipe: make(model.SensorReadingsPipe),
 	}
 }
 
