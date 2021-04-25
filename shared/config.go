@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/iot-blockchain-contracts/shared"
+	"github.com/timoth-y/chainmetric-core/shared"
 	"gopkg.in/yaml.v2"
 )
 

@@ -1,6 +1,6 @@
 package model
 
-import "github.com/timoth-y/iot-blockchain-contracts/models"
+import "github.com/timoth-y/chainmetric-core/models"
 
 type SensorReading struct {
 	Source string

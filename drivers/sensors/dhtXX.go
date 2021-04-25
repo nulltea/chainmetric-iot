@@ -5,10 +5,10 @@ package sensors
 import (
 	"github.com/d2r2/go-dht"
 	"github.com/d2r2/go-logger"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/model/metrics"
 )
 
 var (

@@ -1,14 +1,14 @@
 package device
 
 import (
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/network"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/network"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
+	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/model/state"
 )
 
 func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {

@@ -11,8 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 )
 
 // ST7789 is an open handle to the display controller.

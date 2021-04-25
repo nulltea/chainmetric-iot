@@ -4,7 +4,7 @@ import (
 	"github.com/MichaelS11/go-ads"
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 // ADC defines analog to digital peripheral interface.

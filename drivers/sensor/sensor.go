@@ -1,7 +1,7 @@
 package sensor
 
 import (
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 )
 
 type Sensor interface {

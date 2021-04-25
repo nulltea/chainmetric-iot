@@ -6,10 +6,10 @@ import (
 	fabricStatus "github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/storage"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/storage"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 func (d *Device) handleNetworkDisconnection(readings models.MetricReadings) {

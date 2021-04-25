@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
 type Display interface {

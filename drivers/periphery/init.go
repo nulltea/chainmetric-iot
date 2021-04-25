@@ -3,7 +3,7 @@ package periphery
 import (
 	"periph.io/x/periph/host"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 func Init() {
