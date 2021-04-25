@@ -6,7 +6,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/chainmetric-core/shared"
 	"gopkg.in/yaml.v2"
 )
 
@@ -46,7 +45,7 @@ func initConfig() {
 	viper.AddConfigPath("../")
 
 	if err := viper.ReadInConfig(); err != nil {
-		shared.Logger.Error(errors.Wrap(err, "failed to read viper config"))
+		Logger.Error(errors.Wrap(err, "failed to read viper config"))
 	}
 }
 

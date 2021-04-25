@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-core/utils"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/storage"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -22,7 +23,7 @@ func (d *Device) handleNetworkDisconnection(readings models.MetricReadings) {
 
 	shared.Logger.Warningf(
 		"Detected network connection absence, cached readings for %s to post later => %s", readings.AssetID,
-		shared.Prettify(readings),
+		utils.Prettify(readings),
 	)
 }
 
@@ -59,7 +60,7 @@ func (d *Device) tryRepostCachedReadings() {
 			return false, err
 		}
 
-		shared.Logger.Debugf("Successfully posted cached readings for key: %s => %s", key, shared.Prettify(record))
+		shared.Logger.Debugf("Successfully posted cached readings for key: %s => %s", key, utils.Prettify(record))
 
 		return false, nil
 	}, true)

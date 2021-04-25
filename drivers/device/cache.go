@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-core/models/request"
+	"github.com/timoth-y/chainmetric-core/models/requests"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -50,7 +50,7 @@ func (d *Device) locateAssets() error {
 
 	d.assets.data = make(map[string]bool)
 
-	assets, err := contract.Receive(request.AssetsQuery{
+	assets, err := contract.Receive(requests.AssetsQuery{
 		Location: &d.model.Location,
 	}); if err != nil {
 		return err

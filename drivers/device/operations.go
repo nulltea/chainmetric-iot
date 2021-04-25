@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-core/utils"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -62,5 +63,5 @@ func (d *Device) postReadings(assetID string, readings model.SensorsReadingResul
 		return
 	}
 
-	shared.Logger.Debugf("Readings for asset %s was posted with => %s", assetID, shared.Prettify(readings))
+	shared.Logger.Debugf("Readings for asset %s was posted with => %s", assetID, utils.Prettify(readings))
 }
