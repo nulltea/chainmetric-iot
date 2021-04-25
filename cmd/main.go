@@ -8,14 +8,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
-	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
+	"github.com/timoth-y/chainmetric-sensorsys/engine"
+	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 var (

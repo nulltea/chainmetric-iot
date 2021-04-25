@@ -6,7 +6,7 @@ import (
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 // GPIO provides wrapper for GPIO peripheral

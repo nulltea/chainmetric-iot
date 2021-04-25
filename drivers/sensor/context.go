@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
 type Context struct {

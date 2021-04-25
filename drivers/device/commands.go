@@ -9,10 +9,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/state"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/model/state"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 func (d *Device) Init() error {

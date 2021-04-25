@@ -3,7 +3,7 @@ package sensors
 import (
 	"sort"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 var i2cSensorsLocatorMap = map[uint16]sensor.Factory{

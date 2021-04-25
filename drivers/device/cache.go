@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/timoth-y/iot-blockchain-contracts/models"
-	"github.com/timoth-y/iot-blockchain-contracts/models/request"
+	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-core/models/request"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type assetsCache struct {

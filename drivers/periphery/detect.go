@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/viper"
 	"periph.io/x/periph/conn/i2c/i2creg"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type I2CDetectResults map[int][]uint16

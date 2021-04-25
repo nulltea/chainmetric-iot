@@ -2,7 +2,7 @@ package blockchain
 
 import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 )
 
 type ReadingsContract struct {

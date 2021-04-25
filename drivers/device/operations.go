@@ -4,10 +4,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 // Operate registers supported sensors and starts asynchronously work on reading requests.

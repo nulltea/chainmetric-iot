@@ -5,15 +5,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
-	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
-	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/engine"
+	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
 type Device struct {

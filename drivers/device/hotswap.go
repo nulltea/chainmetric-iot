@@ -8,10 +8,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 var (

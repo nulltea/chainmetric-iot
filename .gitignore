@@ -26,7 +26,4 @@ vendor/
 # Local enviromental variables source files
 .env
 
-# Local files
-local/**
-
 connection.yaml

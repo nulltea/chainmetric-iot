@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
+	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/peripherals"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensor"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/model/metrics"
 )
 
 type (
