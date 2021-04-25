@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
@@ -17,7 +17,6 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
-	"github.com/timoth-y/iot-blockchain-sensorsys/model/metrics"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
@@ -78,7 +77,9 @@ func run() {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
 	}
 
-	Device.RegisterStaticSensors(sensors.NewMockSensor(time.Millisecond * 250, metrics.Acceleration, metrics.Vibration))
+	if viper.GetBool("mocks.debug_env") {
+		Device.RegisterStaticSensors(sensors.NewStaticSensorMock())
+	}
 
 	if err := Device.Init(); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed to initialize device"))

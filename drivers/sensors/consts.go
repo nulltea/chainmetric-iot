@@ -7,12 +7,14 @@ const (
 	HDC1080_ADDRESS        = 0x40
 	MAX30102_ADDRESS       = 0x57
 	MAX44009_ADDRESS       = 0x4A
+	MAX44009_ALT_ADDRESS   = 0x4B
 	SI1145_ADDRESS         = 0x60
 	LSM303C_A_ADDRESS      = 0x1D
 	LSM303C_M_ADDRESS      = 0x1E
 	ADC_HALL_ADDRESS       = 0x48
 	ADC_PIEZO_ADDRESS      = 0x49
 	ADC_MICROPHONE_ADDRESS = 0x4C
+	MOCK_ADDRESS           = 0x88
 )
 
 // ADXL345 accelerometer sensor constants

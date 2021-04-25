@@ -34,6 +34,10 @@ func initConfig() {
 	viper.SetDefault("display.backlight_pin", 18)
 	viper.SetDefault("display.reset_pin", 15)
 
+	viper.SetDefault("mocks.debug_env", false)
+	viper.SetDefault("mocks.sensor_duration", "250ms")
+
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
