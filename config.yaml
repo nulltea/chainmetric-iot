@@ -19,7 +19,7 @@ gateway:
   wallet_path: ../keystore
 
 sensors:
-  DHT22:
+  dht22:
     pin: 4
     timeout: 2000
 
