@@ -2,7 +2,6 @@ package blockchain
 
 import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
-
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 )
 

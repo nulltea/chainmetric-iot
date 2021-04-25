@@ -50,7 +50,7 @@ func (d *Device) Init() error {
 
 		d.display.DrawImage(qr.Image(viper.GetInt("display.image_size")))
 	} else {
-		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "keys/qr.png")
+		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "local/qr.png")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
