@@ -1,12 +1,13 @@
 package device
 
 import (
-	"fmt"
 	"time"
 
+	fabricStatus "github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/pkg/errors"
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
+	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/storage"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model"
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
@@ -40,6 +41,12 @@ func (d *Device) actOnRequest(request *readingsRequest) {
 func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 	var (
 		contract = d.client.Contracts.Readings
+		reading = models.MetricReadings{
+			AssetID: assetID,
+			DeviceID: d.model.ID,
+			Timestamp: time.Now(),
+			Values: readings,
+		}
 	)
 
 	if len(readings) == 0 {
@@ -47,14 +54,29 @@ func (d *Device) postReadings(assetID string, readings model.MetricReadings) {
 		return
 	}
 
-	if err := contract.Post(models.MetricReadings{
-		AssetID: assetID,
-		DeviceID: d.model.ID,
-		Timestamp: time.Now(),
-		Values: readings,
-	}); err != nil {
-		shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
+	if err := contract.Post(reading); err != nil {
+		d.handleReadingsPostErrors(err, reading)
+		return
 	}
 
-	shared.Logger.Debug(fmt.Sprintf("Readings for asset %s was posted with =>", assetID), shared.Prettify(readings))
+	shared.Logger.Debugf("Readings for asset %s was posted with => %s", assetID, shared.Prettify(readings))
+}
+
+func (d *Device) handleReadingsPostErrors(err error, readings models.MetricReadings) {
+	if status, ok := fabricStatus.FromError(err); ok {
+		switch status.Group {
+		case fabricStatus.DiscoveryServerStatus:
+			if err := storage.CacheReadings(readings); err != nil {
+				shared.Logger.Error(errors.Wrap(err, "failed to cache readings while network connection absence"))
+				return
+			}
+
+			shared.Logger.Warning(
+				"Detected network connection absence, cached readings for asset %s to post later => %s",
+				shared.Prettify(readings),
+			)
+		}
+	}
+
+	shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
 }
