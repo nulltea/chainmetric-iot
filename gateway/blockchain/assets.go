@@ -8,7 +8,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-core/models/request"
+	"github.com/timoth-y/chainmetric-core/models/requests"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -25,7 +25,7 @@ func NewAssetsContract(client *Client) *AssetsContract {
 	}
 }
 
-func (ac *AssetsContract) Receive(query request.AssetsQuery) ([]*models.Asset, error) {
+func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, error) {
 	data, err := ac.contract.EvaluateTransaction("QueryRaw", string(query.Encode())); if err != nil {
 		return nil, err
 	}

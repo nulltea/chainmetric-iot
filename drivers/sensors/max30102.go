@@ -4,8 +4,9 @@ import (
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/chainmetric-core/models"
 
+	"github.com/timoth-y/chainmetric-core/models/metrics"
+
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/model/metrics"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 

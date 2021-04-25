@@ -5,9 +5,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models"
 
+	"github.com/timoth-y/chainmetric-core/models/metrics"
+
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/model/metrics"
 )
 
 type SI1145 struct {

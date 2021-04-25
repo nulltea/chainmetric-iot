@@ -9,7 +9,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-core/models/request"
+	"github.com/timoth-y/chainmetric-core/models/requests"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -55,7 +55,7 @@ func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 }
 
 func (cc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
-	data, err := json.Marshal(request.DeviceUpdateRequest{State: &state}); if err != nil {
+	data, err := json.Marshal(requests.DeviceUpdateRequest{State: &state}); if err != nil {
 		return err
 	}
 

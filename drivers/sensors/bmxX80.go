@@ -7,9 +7,10 @@ import (
 	"periph.io/x/periph/conn/physic"
 	"periph.io/x/periph/devices/bmxx80"
 
+	"github.com/timoth-y/chainmetric-core/models/metrics"
+
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/model/metrics"
 )
 
 type BMPxx struct {
