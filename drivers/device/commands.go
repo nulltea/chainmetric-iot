@@ -24,11 +24,16 @@ func (d *Device) Init() error {
 	d.specs, err = d.DiscoverSpecs(true); if err != nil {
 		return err
 	}
+
 	defer d.initHotswap()
+	defer func() {
+		go d.tryRepostCachedReadings()
+	}()
 
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model != nil {
 			if err := contract.UpdateSpecs(id, d.specs); err != nil {
+
 				return err
 			}
 

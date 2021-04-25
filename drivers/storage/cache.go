@@ -13,7 +13,10 @@ import (
 	"github.com/timoth-y/iot-blockchain-sensorsys/shared"
 )
 
-// CacheReadings stores models.MetricReadings into local cache DB
+// ReadingsCacheIteratorFunc defines function called by sensor readings cache iterator.
+type ReadingsCacheIteratorFunc func(key string, record models.MetricReadings) (toBreak bool, err error)
+
+// CacheReadings stores models.MetricReadings into local cache DB.
 func CacheReadings(readings ...models.MetricReadings) (err error) {
 	var (
 		batch = new(leveldb.Batch)
@@ -38,7 +41,9 @@ func CacheReadings(readings ...models.MetricReadings) (err error) {
 	return shared.LevelDB.Write(batch, nil)
 }
 
-func IterateOverCachedReadings(fn func(string, models.MetricReadings) error, pop bool) {
+// IterateOverCachedReadings performs iteration over all cached models.MetricReadings records.
+// allowing to `pop` them on fly.
+func IterateOverCachedReadings(fn ReadingsCacheIteratorFunc, pop bool) {
 	var (
 		prefix = []byte(shared.FormCompositeKey("reading"))
 		iter = shared.LevelDB.NewIterator(util.BytesPrefix(prefix), nil)
@@ -48,7 +53,7 @@ func IterateOverCachedReadings(fn func(string, models.MetricReadings) error, pop
 		var (
 			key = string(iter.Key())
 			_, attrs = shared.SplitCompositeKey(key)
-			values map[models.Metric]interface{}
+			values map[models.Metric]float64
 		)
 
 		if len(attrs) < 2 {
@@ -72,17 +77,25 @@ func IterateOverCachedReadings(fn func(string, models.MetricReadings) error, pop
 			continue
 		}
 
-		if err := fn(key, models.MetricReadings{
+		toBreak, err := fn(key, models.MetricReadings{
 			AssetID: assetID,
 			Timestamp: timestamp,
 			Values: values,
-		}); err != nil {
-			shared.Logger.Error(errors.Wrapf(err, "something went wrong when iterating over '%s'", key))
+		})
+
+		if err != nil {
+			shared.Logger.Error(errors.Wrapf(err,
+				"something went wrong when iterating over '%s' - stop iterating sequence", key))
+		}
+
+		if toBreak {
+			return
 		}
 
 		if pop {
 			if err := shared.LevelDB.Delete([]byte(key), nil); err != nil {
-				shared.Logger.Error(errors.Wrapf(err, "failed to delete on key '%s', will now stop iteration", key))
+				shared.Logger.Error(errors.Wrapf(err,
+					"failed to delete on key '%s' - stop iterating sequence", key))
 				return
 			}
 		}

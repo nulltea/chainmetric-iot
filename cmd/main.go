@@ -7,13 +7,11 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/iot-blockchain-contracts/models"
 
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/device"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/display"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/periphery"
 	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/sensors"
-	"github.com/timoth-y/iot-blockchain-sensorsys/drivers/storage"
 	"github.com/timoth-y/iot-blockchain-sensorsys/engine"
 	"github.com/timoth-y/iot-blockchain-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/iot-blockchain-sensorsys/model/config"
@@ -107,11 +105,6 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 			shared.Logger.Error(err)
 		}
 	}
-
-	storage.IterateOverCachedReadings(func(k string, r models.MetricReadings) error {
-		shared.Logger.Debug("Key:", k, "Value:", shared.Prettify(r))
-		return nil
-	}, true)
 
 	Client.Close()
 

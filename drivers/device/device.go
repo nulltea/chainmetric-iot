@@ -3,6 +3,7 @@ package device
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/timoth-y/iot-blockchain-contracts/models"
 
@@ -27,6 +28,8 @@ type Device struct {
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
+
+	pingTimer *time.Timer
 
 	cancelEvents context.CancelFunc
 	cancelHotswap context.CancelFunc
