@@ -15,7 +15,10 @@ type ADCHall struct {
 
 func NewADCHall(addr uint16, bus int) sensor.Sensor {
 	return &ADCHall{
-		ADC: peripherals.NewADC(addr, bus),
+		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
+			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			return volts * 1000 / ADC_HALL_SENSITIVITY
+		}), peripherals.WithBias(ADC_HALL_BIAS)),
 	}
 }
 
@@ -24,7 +27,7 @@ func (s *ADCHall) ID() string {
 }
 
 func (s *ADCHall) Read() float64 {
-	return s.Aggregate(100, nil) - ADC_HALL_BIAS
+	return s.RMS(100, nil)
 }
 
 func (s *ADCHall) Harvest(ctx *sensor.Context) {

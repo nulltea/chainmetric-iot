@@ -24,7 +24,7 @@ func (s *ADCMicrophone) ID() string {
 }
 
 func (s *ADCMicrophone) Read() float64 {
-	return ADC_MICROPHONE_REGRESSION_C1* (s.Aggregate(100, nil) -ADC_MICROPHONE_BIAS) +
+	return ADC_MICROPHONE_REGRESSION_C1 * (s.RMS(100, nil) - ADC_MICROPHONE_BIAS) +
 		ADC_MICROPHONE_REGRESSION_C2
 }
 

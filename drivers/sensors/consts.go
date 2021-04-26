@@ -21,6 +21,12 @@ const (
 
 // ADCMicrophone sensor constants
 const (
+	ADS1115_SAMPLES_PER_READ = 32767.0
+	ADS1115_VOLTS_PER_SAMPLE = 5
+) 
+
+// ADCMicrophone sensor constants
+const (
 	ADC_MICROPHONE_BIAS          = 2500
 	ADC_MICROPHONE_REGRESSION_C1 = 0.001276
 	ADC_MICROPHONE_REGRESSION_C2 = 47.56
@@ -28,17 +34,20 @@ const (
 
 // ADCHall sensor constants
 const (
-	ADC_HALL_BIAS = 5000
+	ADC_HALL_BIAS        = 400
+	ADC_HALL_SENSITIVITY = 1.9 // mV / Gauss
 )
 
 // ADCFlame sensor constants
 const (
-	ADC_FLAME_BIAS = 13500
+	ADC_FLAME_BIAS = 2
 )
 
 // ADCMQ9 sensor constants
 const (
-	ADC_MQ9_BIAS = 6500
+	ADC_MQ9_BIAS        = -50
+	ADC_MQ9_RESISTANCE  = 5
+	ADC_MQ9_SENSITIVITY = 9.9
 )
 
 // ADCPiezo sensor constants

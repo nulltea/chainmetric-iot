@@ -15,13 +15,11 @@ type ADCMQ9 struct {
 
 func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 	return &ADCMQ9{
-		ADC: peripherals.NewADC(addr, bus),
-	}
-}
-
-func NewADCMQ9_(addr uint16, bus int) *ADCMQ9 {
-	return &ADCMQ9{
-		ADC: peripherals.NewADC(addr, bus),
+		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
+			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			resAir := (ADC_MQ9_RESISTANCE - volts) / volts
+			return resAir / ADC_MQ9_SENSITIVITY * 1000
+		}), peripherals.WithBias(ADC_MQ9_BIAS)),
 	}
 }
 
@@ -30,14 +28,11 @@ func (s *ADCMQ9) ID() string {
 }
 
 func (s *ADCMQ9) Read() float64 {
-	raw := s.Aggregate(100, nil)
-	volts := (raw / 1024) * 5
-	resAir := (2 - volts) / volts
-	return resAir / 9.9 * -1000 + 100
+	return s.RMS(100, nil)
 }
 
 func (s *ADCMQ9) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.AirPetroleumConcentration).WriteWithError(s.ReadRetry(5))
+	ctx.For(metrics.AirPetroleumConcentration).Write(s.Read())
 }
 
 func (s *ADCMQ9) Metrics() []models.Metric {

@@ -1,8 +1,6 @@
 package sensors
 
 import (
-	"math"
-
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
@@ -17,7 +15,10 @@ type ADCFlame struct {
 
 func NewADCFlame(addr uint16, bus int) sensor.Sensor {
 	return &ADCFlame{
-		ADC: peripherals.NewADC(addr, bus),
+		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
+			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			return volts
+		}), peripherals.WithBias(ADC_FLAME_BIAS)),
 	}
 }
 
@@ -26,7 +27,7 @@ func (s *ADCFlame) ID() string {
 }
 
 func (s *ADCFlame) Read() float64 {
-	return math.Abs(s.Aggregate(100, nil) - ADC_FLAME_BIAS)
+	return s.RMS(100, nil)
 }
 
 func (s *ADCFlame) Harvest(ctx *sensor.Context) {
