@@ -13,14 +13,19 @@ import (
 
 // ADC defines analog to digital peripheral interface.
 type ADC interface {
+	// Init performs ADC driver initialisation.
 	Init() error
-	Read() (uint16, error)
-	ReadRetry(int) (uint16, error)
-	Aggregate(n int, t *time.Duration) float64
-	Max(n int, t *time.Duration) uint16
-	Min(n int, t *time.Duration) uint16
-	Sequence(n int, t *time.Duration) []int
+	// Read returns single analog sensor reading value.
+	Read() float64
+	// RMS aggregates `n` readings from analog sensor and calculates Root Mean Square function.
+	RMS(n int, t *time.Duration) float64
+	// Max returns max value from `n` analog sensor readings.
+	Max(n int, t *time.Duration) float64
+	// Min returns min value from `n` analog sensor readings.
+	Min(n int, t *time.Duration) float64
+	// Active determines whether the ADC device is active.
 	Active() bool
+	// Close closes connection to ADC device.
 	Close() error
 }
 
@@ -30,15 +35,27 @@ type ADS1115 struct {
 	Addr   uint16
 	Bus    string
 	active bool
-	bias uint16
+
+	bias float64
+	convertor func(float64) float64
 }
 
 // NewADC returns a new ADC implementation via ADS1115 device driver.
-func NewADC(addr uint16, bus int) *ADS1115 {
-	return &ADS1115{
+func NewADC(addr uint16, bus int, options ...ADCOption) *ADS1115 {
+	d := &ADS1115{
 		Bus: shared.NtoI2cBusName(bus),
 		Addr: addr,
+
+		convertor: func(v float64) float64 {
+			return v
+		},
 	}
+
+	for i := range options {
+		options[i].Apply(d)
+	}
+
+	return d
 }
 
 // Init sets up the device for communication.
@@ -52,14 +69,22 @@ func (d *ADS1115) Init() (err error) {
 	return nil
 }
 
-func (d *ADS1115) Aggregate(n int, t *time.Duration) float64 {
+func (d *ADS1115) Read() float64 {
+	if v, err := d.ADS.ReadRetry(5); err != nil {
+		return 0
+	} else {
+		return d.convertor(float64(v)) - d.bias
+	}
+}
+
+func (d *ADS1115) RMS(n int, t *time.Duration) float64 {
 	var (
 		sum float64
 		i = n
 	)
 
 	for i > 0 {
-		if v, err := d.Read(); err != nil {
+		if v, err := d.ADS.Read(); err != nil {
 			continue
 		} else {
 			sum +=  math.Pow(float64(v), 2)
@@ -72,33 +97,33 @@ func (d *ADS1115) Aggregate(n int, t *time.Duration) float64 {
 		i--
 	}
 
-	return math.Sqrt(sum / float64(n))
+	return d.convertor(math.Sqrt(sum / float64(n))) - d.bias
 }
 
-func (d *ADS1115) Max(n int, t *time.Duration) uint16 {
-	results := d.Sequence(n, t)
+func (d *ADS1115) Max(n int, t *time.Duration) float64 {
+	results := d.rawSequence(n, t)
 
 	sort.Ints(results)
 
-	return uint16(results[len(results) - 1])
+	return d.convertor(float64(results[len(results) - 1])) - d.bias
 }
 
-func (d *ADS1115) Min(n int, t *time.Duration) uint16 {
-	results := d.Sequence(n, t)
+func (d *ADS1115) Min(n int, t *time.Duration) float64 {
+	results := d.rawSequence(n, t)
 
 	sort.Ints(results)
 
-	return uint16(results[0])
+	return d.convertor(float64(results[0])) - d.bias
 }
 
-func (d ADS1115) Sequence(n int, t *time.Duration) []int {
+func (d ADS1115) rawSequence(n int, t *time.Duration) []int {
 	var (
 		i = n
 		results []int
 	)
 
 	for i > 0 {
-		if v, err := d.Read(); err != nil {
+		if v, err := d.ADS.Read(); err != nil {
 			continue
 		} else {
 			results = append(results, int(v))
