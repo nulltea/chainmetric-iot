@@ -1,6 +1,10 @@
 package peripherals
 
 import (
+	"math"
+	"sort"
+	"time"
+
 	"github.com/MichaelS11/go-ads"
 	"github.com/pkg/errors"
 
@@ -12,6 +16,10 @@ type ADC interface {
 	Init() error
 	Read() (uint16, error)
 	ReadRetry(int) (uint16, error)
+	Aggregate(n int, t *time.Duration) float64
+	Max(n int, t *time.Duration) uint16
+	Min(n int, t *time.Duration) uint16
+	Sequence(n int, t *time.Duration) []int
 	Active() bool
 	Close() error
 }
@@ -22,6 +30,7 @@ type ADS1115 struct {
 	Addr   uint16
 	Bus    string
 	active bool
+	bias uint16
 }
 
 // NewADC returns a new ADC implementation via ADS1115 device driver.
@@ -41,6 +50,68 @@ func (d *ADS1115) Init() (err error) {
 	d.active = true
 
 	return nil
+}
+
+func (d *ADS1115) Aggregate(n int, t *time.Duration) float64 {
+	var (
+		sum float64
+		i = n
+	)
+
+	for i > 0 {
+		if v, err := d.Read(); err != nil {
+			continue
+		} else {
+			sum +=  math.Pow(float64(v), 2)
+		}
+
+		if t != nil {
+			time.Sleep(*t)
+		}
+
+		i--
+	}
+
+	return math.Sqrt(sum / float64(n))
+}
+
+func (d *ADS1115) Max(n int, t *time.Duration) uint16 {
+	results := d.Sequence(n, t)
+
+	sort.Ints(results)
+
+	return uint16(results[len(results) - 1])
+}
+
+func (d *ADS1115) Min(n int, t *time.Duration) uint16 {
+	results := d.Sequence(n, t)
+
+	sort.Ints(results)
+
+	return uint16(results[0])
+}
+
+func (d ADS1115) Sequence(n int, t *time.Duration) []int {
+	var (
+		i = n
+		results []int
+	)
+
+	for i > 0 {
+		if v, err := d.Read(); err != nil {
+			continue
+		} else {
+			results = append(results, int(v))
+		}
+
+		if t != nil {
+			time.Sleep(*t)
+		}
+
+		i--
+	}
+
+	return results
 }
 
 func (d *ADS1115) Active() bool {
