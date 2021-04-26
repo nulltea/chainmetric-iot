@@ -18,8 +18,10 @@ var i2cSensorsLocatorMap = map[uint16]sensor.Factory{
 	LSM303C_A_ADDRESS:      sensor.I2CFactory(NewAccelerometerLSM303, LSM303C_A_ADDRESS),
 	LSM303C_M_ADDRESS:      sensor.I2CFactory(NewMagnetometerLSM303, LSM303C_M_ADDRESS),
 	ADC_HALL_ADDRESS:       sensor.I2CFactory(NewADCHall, ADC_HALL_ADDRESS),
-	ADC_PIEZO_ADDRESS:      sensor.I2CFactory(NewADCPiezo, ADC_PIEZO_ADDRESS),
 	ADC_MICROPHONE_ADDRESS: sensor.I2CFactory(NewADCMicrophone, ADC_MICROPHONE_ADDRESS),
+	ADC_PIEZO_ADDRESS:      sensor.I2CFactory(NewADCPiezo, ADC_PIEZO_ADDRESS),
+	ADC_FLAME_ADDRESS:      sensor.I2CFactory(NewADCFlame, ADC_FLAME_ADDRESS),
+	ADC_MQ9_ADDRESS:        sensor.I2CFactory(NewADCMQ9, ADC_MQ9_ADDRESS),
 	MOCK_ADDRESS:           sensor.I2CFactory(NewI2CSensorMock, MOCK_ADDRESS),
 }
 

@@ -11,10 +11,39 @@ const (
 	SI1145_ADDRESS         = 0x60
 	LSM303C_A_ADDRESS      = 0x1D
 	LSM303C_M_ADDRESS      = 0x1E
-	ADC_HALL_ADDRESS       = 0x48
-	ADC_PIEZO_ADDRESS      = 0x49
-	ADC_MICROPHONE_ADDRESS = 0x4C
+	ADC_HALL_ADDRESS       = 0x48 //
+	ADC_MICROPHONE_ADDRESS = 0x44 //
+	ADC_PIEZO_ADDRESS      = 0x4C //
+	ADC_FLAME_ADDRESS      = 0x4E //
+	ADC_MQ9_ADDRESS        = 0x49
 	MOCK_ADDRESS           = 0x88
+)
+
+// ADCMicrophone sensor constants
+const (
+	ADC_MICROPHONE_BIAS          = 2500
+	ADC_MICROPHONE_REGRESSION_C1 = 0.001276
+	ADC_MICROPHONE_REGRESSION_C2 = 47.56
+)
+
+// ADCHall sensor constants
+const (
+	ADC_HALL_BIAS = 5000
+)
+
+// ADCFlame sensor constants
+const (
+	ADC_FLAME_BIAS = 13500
+)
+
+// ADCMQ9 sensor constants
+const (
+	ADC_MQ9_BIAS = 6500
+)
+
+// ADCPiezo sensor constants
+const (
+	ADC_PIEZO_BIAS = 0
 )
 
 // ADXL345 accelerometer sensor constants

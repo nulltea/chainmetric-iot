@@ -23,6 +23,10 @@ func (s *ADCPiezo) ID() string {
 	return "ADC_Piezo"
 }
 
+func (s *ADCPiezo) Read() float64 {
+	return s.Aggregate(100, nil) - ADC_PIEZO_BIAS
+}
+
 func (s *ADCPiezo) Harvest(ctx *sensor.Context) {
 	ctx.For(metrics.Vibration).WriteWithError(s.ReadRetry(5))
 }

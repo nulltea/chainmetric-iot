@@ -19,8 +19,21 @@ func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 	}
 }
 
+func NewADCMQ9_(addr uint16, bus int) *ADCMQ9 {
+	return &ADCMQ9{
+		ADC: peripherals.NewADC(addr, bus),
+	}
+}
+
 func (s *ADCMQ9) ID() string {
 	return "ADC-MQ9"
+}
+
+func (s *ADCMQ9) Read() float64 {
+	raw := s.Aggregate(100, nil)
+	volts := (raw / 1024) * 5
+	resAir := (2 - volts) / volts
+	return resAir / 9.9 * -1000 + 100
 }
 
 func (s *ADCMQ9) Harvest(ctx *sensor.Context) {

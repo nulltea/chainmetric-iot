@@ -23,8 +23,12 @@ func (s *ADCHall) ID() string {
 	return "ADC_Hall"
 }
 
+func (s *ADCHall) Read() float64 {
+	return s.Aggregate(100, nil) - ADC_HALL_BIAS
+}
+
 func (s *ADCHall) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Magnetism).WriteWithError(s.ReadRetry(5))
+	ctx.For(metrics.Magnetism).Write(s.Read())
 }
 
 func (s *ADCHall) Metrics() []models.Metric {

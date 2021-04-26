@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"math"
+
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
@@ -23,8 +25,12 @@ func (s *ADCFlame) ID() string {
 	return "ADC_Flame"
 }
 
+func (s *ADCFlame) Read() float64 {
+	return math.Abs(s.Aggregate(100, nil) - ADC_FLAME_BIAS)
+}
+
 func (s *ADCFlame) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Flame).WriteWithError(s.ReadRetry(5))
+	ctx.For(metrics.Flame).Write(s.Read())
 }
 
 func (s *ADCFlame) Metrics() []models.Metric {

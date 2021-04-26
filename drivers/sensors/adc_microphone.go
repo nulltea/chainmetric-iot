@@ -23,8 +23,13 @@ func (s *ADCMicrophone) ID() string {
 	return "ADC_Microphone"
 }
 
+func (s *ADCMicrophone) Read() float64 {
+	return ADC_MICROPHONE_REGRESSION_C1* (s.Aggregate(100, nil) -ADC_MICROPHONE_BIAS) +
+		ADC_MICROPHONE_REGRESSION_C2
+}
+
 func (s *ADCMicrophone) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.NoiseLevel).WriteWithError(s.ReadRetry(5))
+	ctx.For(metrics.NoiseLevel).Write(s.Read())
 }
 
 func (s *ADCMicrophone) Metrics() []models.Metric {
