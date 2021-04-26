@@ -4,14 +4,12 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -113,27 +111,4 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	shared.CloseCore()
 
 	close(done)
-}
-
-func testAnalog() {
-	i2c := peripherals.NewI2C(0x49, 4)
-
-	i2c.Init()
-
-	id, err := i2c.ReadReg(0x01)
-
-	shared.Logger.Debugf("CHIP_ID=0x%X, Err=%s", id, err)
-
-	i2c.Close()
-
-	sensor := sensors.NewADCMQ9_(0x49, 4)
-
-	if err := sensor.Init(); err != nil {
-		shared.Logger.Fatal(err)
-	}
-
-	for {
-		shared.Logger.Debugf("ADS_MQ9 -> %f ppm", sensor.Read())
-		time.Sleep(time.Millisecond * 250)
-	}
 }

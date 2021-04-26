@@ -1,7 +1,7 @@
 device:
   id_file_path: ../device.id
   hotswap_detect_interval: 3s
-  local_cache_path: /var/cache
+  local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
 
 engine:
