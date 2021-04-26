@@ -26,6 +26,8 @@ func initConfig() {
 	viper.SetDefault("gateway.identity.private_key", "../identity.key")
 	viper.SetDefault("gateway.wallet_path", "../keystore")
 
+	viper.SetDefault("sensors.analog.samples_per_read", 100)
+
 	viper.SetDefault("display.enabled", true)
 	viper.SetDefault("display.width", 240)
 	viper.SetDefault("display.height", 240)

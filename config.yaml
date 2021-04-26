@@ -19,6 +19,8 @@ gateway:
   wallet_path: ../keystore
 
 sensors:
+  analog:
+    samples_per_read: 100
   dht22:
     pin: 4
     timeout: 2000

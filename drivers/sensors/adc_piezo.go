@@ -1,6 +1,7 @@
 package sensors
 
 import (
+	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
@@ -11,6 +12,7 @@ import (
 
 type ADCPiezo struct {
 	peripherals.ADC
+	samples int
 }
 
 func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
@@ -19,6 +21,7 @@ func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
 			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
 			return volts
 		})),
+		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }
 
@@ -27,7 +30,7 @@ func (s *ADCPiezo) ID() string {
 }
 
 func (s *ADCPiezo) Read() float64 {
-	return s.RMS(100, nil)
+	return s.RMS(s.samples, nil)
 }
 
 func (s *ADCPiezo) Harvest(ctx *sensor.Context) {
