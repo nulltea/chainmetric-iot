@@ -327,3 +327,8 @@ const(
 	SI1145_REG_PARAMRD     = 0x2E
 	SI1145_REG_CHIPSTAT    = 0x30
 )
+
+const (
+	MOCK_DEVICE_ID_REGISTER = 0x0F
+	MOCK_DEVICE_ID          = 0x69
+)
