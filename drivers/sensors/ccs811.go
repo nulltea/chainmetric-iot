@@ -113,8 +113,8 @@ func (s *CCS811) Metrics() []models.Metric {
 }
 
 func (s *CCS811) Verify() bool {
-	buffer, err := s.ReadReg(CCS811_HW_ID)
-	if err == nil && buffer == CCS811_HW_ID_CODE {
+	buffer, err := s.ReadReg(CCS811_DEVICE_ID_REGISTER)
+	if err == nil && buffer == CCS811_DEVICE_ID {
 		return true
 	}
 

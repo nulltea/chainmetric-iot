@@ -13,22 +13,22 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
-type BMPxx struct {
+type BMP280 struct {
 	*peripherals.I2C
 	bmp  *bmxx80.Dev
 }
 
 func NewBMXX80(addr uint16, bus int) sensor.Sensor {
-	return &BMPxx{
+	return &BMP280{
 		I2C: peripherals.NewI2C(addr, bus),
 	}
 }
 
-func (s *BMPxx) ID() string {
+func (s *BMP280) ID() string {
 	return "BMP280"
 }
 
-func (s *BMPxx) Init() (err error) {
+func (s *BMP280) Init() (err error) {
 	if err = s.I2C.Init(); err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (s *BMPxx) Init() (err error) {
 	return
 }
 
-func (s *BMPxx) Harvest(ctx *sensor.Context) {
+func (s *BMP280) Harvest(ctx *sensor.Context) {
 	var env = physic.Env{}
 
 	if err := s.bmp.Sense(&env); err != nil {
@@ -55,7 +55,7 @@ func (s *BMPxx) Harvest(ctx *sensor.Context) {
 	// ctx.For(metrics.Humidity).Write(float64(env.Humidity)) TODO: test compatibility
 }
 
-func (s *BMPxx) Metrics() []models.Metric {
+func (s *BMP280) Metrics() []models.Metric {
 	return []models.Metric {
 		metrics.Pressure,
 		metrics.Altitude,
@@ -64,7 +64,7 @@ func (s *BMPxx) Metrics() []models.Metric {
 	}
 }
 
-func (s *BMPxx) pressureToAltitude(p float64) float64 {
+func (s *BMP280) pressureToAltitude(p float64) float64 {
 	// Approximate atmospheric pressure at sea level in Pa
 	p0 := 1013250.0
 	a := 44330 * (1 - math.Pow(p / p0, 1/5.255))

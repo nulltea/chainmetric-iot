@@ -19,10 +19,14 @@ const (
 	MOCK_ADDRESS           = 0x88
 )
 
-// ADCMicrophone sensor constants
+// peripherals.ADS1115 ADC chip constants
 const (
+	// Conversion constants
 	ADS1115_SAMPLES_PER_READ = 32767.0
 	ADS1115_VOLTS_PER_SAMPLE = 5
+
+	ADS1115_DEVICE_ID_REGISTER = 0x0E
+	ADS1115_DEVICE_ID          = 0x80
 ) 
 
 // ADCMicrophone sensor constants
@@ -58,10 +62,14 @@ const (
 // ADXL345 accelerometer sensor constants
 const (
 	// Registers
-	ADXL345_DATA_FORMAT = 0x31
-	ADXL345_BW_RATE     = 0x2C
-	ADXL345_POWER_CTL   = 0x2D
-	ADXL345_MEASURE     = 0x08
+	ADXL345_DEVICE_ID_REGISTER = 0x00
+	ADXL345_DATA_FORMAT        = 0x31
+	ADXL345_BW_RATE            = 0x2C
+	ADXL345_POWER_CTL          = 0x2D
+	ADXL345_MEASURE            = 0x08
+
+	// Constants
+	ADXL345_DEVICE_ID = 0xE5
 
 	// Device bandwidth and output data rates
 	ADXL345_Rate1600HZ = 0x0F
@@ -87,23 +95,33 @@ const (
 	ADXL345_DATAZ1 = 0x37
 )
 
+// BMP280 barometer sensor constants
+const (
+	BMP280_DEVICE_ID_REGISTER = 0xD0
+	BMP280_DEVICE_ID = 0x60
+)
+
 // CCS811 air quality sensor constants
-const(
+const (
 	// Registers
-	CCS811_STATUS          = 0x00
-	CCS811_MEAS_MODE       = 0x01
-	CCS811_ALG_RESULT_DATA = 0x02
-	CCS811_RAW_DATA        = 0x03
-	CCS811_ENV_DATA        = 0x05
-	CCS811_NTC             = 0x06
-	CCS811_THRESHOLDS      = 0x10
-	CCS811_BASELINE        = 0x11
-	CCS811_HW_ID           = 0x20
-	CCS811_HW_VERSION      = 0x21
-	CCS811_FW_BOOT_VERSION = 0x23
-	CCS811_FW_APP_VERSION  = 0x24
-	CCS811_ERROR_ID        = 0xE0
-	CCS811_SW_RESET        = 0xFF
+	CCS811_STATUS             = 0x00
+	CCS811_MEAS_MODE          = 0x01
+	CCS811_ALG_RESULT_DATA    = 0x02
+	CCS811_RAW_DATA           = 0x03
+	CCS811_ENV_DATA           = 0x05
+	CCS811_NTC                = 0x06
+	CCS811_THRESHOLDS         = 0x10
+	CCS811_BASELINE           = 0x11
+	CCS811_DEVICE_ID_REGISTER = 0x20
+	CCS811_HW_VERSION         = 0x21
+	CCS811_FW_BOOT_VERSION    = 0x23
+	CCS811_FW_APP_VERSION     = 0x24
+	CCS811_ERROR_ID           = 0xE0
+	CCS811_SW_RESET           = 0xFF
+
+	// Constants
+	CCS811_DEVICE_ID    = 0x81
+	CCS811_REF_RESISTOR = 100000
 
 	// Bootloader Registers
 	CCS811_BOOTLOADER_APP_ERASE  = 0xF1
@@ -117,10 +135,6 @@ const(
 	CCS811_DRIVE_MODE_10SEC = 0x02
 	CCS811_DRIVE_MODE_60SEC = 0x03
 	CCS811_DRIVE_MODE_250MS = 0x04
-
-	// Constants
-	CCS811_HW_ID_CODE   = 0x81
-	CCS811_REF_RESISTOR = 100000
 
 	// STATUS - Bitwise
 	CCS811_ERROR_BIT      = 0x01
@@ -148,6 +162,10 @@ const (
 	HDC1080_TEMPERATURE_REGISTER =          0x00
 	HDC1080_HUMIDITY_REGISTER =             0x01
 	HDC1080_CONFIGURATION_REGISTER =        0x02
+	HDC1080_DEVICE_ID_REGISTER =            0xFF
+
+	// Device ID
+	HDC1080_DEVICE_ID = 0x10
 
 	// Configuration Register Bits
 	HDC1080_CONFIG_RESET_BIT =                0x8000
@@ -157,14 +175,38 @@ const (
 	HDC1080_CONFIG_HUMIDITY_RESOLUTION_LBIT = 0x0100
 )
 
+// LSM303Accelerometer and LSM303Magnetometer sensors constants
+const (
+	// Registers
+	LSM303C_A_DEVICE_ID_REGISTER = 0x0F
+	LSM303C_M_DEVICE_ID_REGISTER = 0x0F
+
+	// Constants
+	LSM303C_A_DEVICE_ID = 0x41
+	LSM303C_M_DEVICE_ID = 0x3D
+)
+
+// MAX30102 pulse-oximeter sensor constants
+const(
+	MAX30102_DEVICE_ID_REGISTER = 0xFF
+	MAX30102_DEVICE_ID = 0x15
+)
+
 // MAX44009 luminosity sensor constants
 const(
+	// Commands
 	MAX44009_APP_START = 0x03
+
+	// Registers
+	MAX44009_DEVICE_ID_REGISTER = 0x0F
+
+	// Constants
+	MAX44009_DEVICE_ID = 0x3F
 )
 
 // SI1145 ambient light sensor constants
 const(
-	// COMMANDS
+	// Commands
 	SI1145_PARAM_QUERY = 0x80
 	SI1145_PARAM_SET   = 0xA0
 	SI1145_NOP         = 0x0
@@ -181,8 +223,10 @@ const(
 	SI1145_PSALS_AUTO  = 0x0F
 	SI1145_GET_CAL     = 0x12
 
-	// Parameters
+	SI1145_DEVICE_ID_REGISTER = 0x02
+	SI1145_DEVICE_ID = 0x08
 
+	// Parameters
 	SI1145_PARAM_I2CADDR         = 0x00
 	SI1145_PARAM_CHLIST          = 0x01
 	SI1145_PARAM_CHLIST_ENUV     = 0x80
