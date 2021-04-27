@@ -11,23 +11,13 @@ const (
 	SI1145_ADDRESS         = 0x60
 	LSM303C_A_ADDRESS      = 0x1D
 	LSM303C_M_ADDRESS      = 0x1E
-	ADC_HALL_ADDRESS       = 0x48 //
-	ADC_MICROPHONE_ADDRESS = 0x44 //
-	ADC_PIEZO_ADDRESS      = 0x4C //
-	ADC_FLAME_ADDRESS      = 0x4E //
-	ADC_MQ9_ADDRESS        = 0x49
+	ADC_HALL_ADDRESS       = 0x48
+	ADC_MICROPHONE_ADDRESS = 0x49
+	ADC_MQ9_ADDRESS        = 0x4A
+	ADC_FLAME_ADDRESS      = 0x4B
+	ADC_PIEZO_ADDRESS      = 0x4E
 	MOCK_ADDRESS           = 0x88
 )
-
-// peripherals.ADS1115 ADC chip constants
-const (
-	// Conversion constants
-	ADS1115_SAMPLES_PER_READ = 32767.0
-	ADS1115_VOLTS_PER_SAMPLE = 5
-
-	ADS1115_DEVICE_ID_REGISTER = 0x0E
-	ADS1115_DEVICE_ID          = 0x80
-) 
 
 // ADCMicrophone sensor constants
 const (

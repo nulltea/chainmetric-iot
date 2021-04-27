@@ -60,7 +60,7 @@ func (d *Device) handleHotswap() error {
 	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr); ok {
+			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
 				s := sf.Build(bus)
 				detectedSensors[s.ID()] = s
 			}

@@ -15,21 +15,6 @@ import (
 // I2CDetectResults stores I2C identified I2C-based peripheral devices.
 type I2CDetectResults map[int][]uint16
 
-// I2CDetectKey defines constants needed to identify I2C-based peripheral devices.
-type I2CDetectKey struct {
-	Address    uint16
-	IDRegister uint16
-	ID         uint16
-}
-
-func NewI2CDetectKey(addr, reg, id uint16) I2CDetectKey {
-	return I2CDetectKey{
-		Address: addr,
-		IDRegister: reg,
-		ID: reg,
-	}
-}
-
 func DetectI2C(start, end uint16) I2CDetectResults {
 	var (
 		addrMap = make(map[int][]uint16)
