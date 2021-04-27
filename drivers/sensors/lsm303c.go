@@ -9,7 +9,6 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 
@@ -41,7 +40,6 @@ func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 
 func (s *LSM303Accelerometer) Init() (err error) {
 	if err = s.I2C.Init(); err != nil {
-		shared.Logger.Error("connection init", err)
 		return
 	}
 
@@ -84,7 +82,15 @@ func (s *LSM303Accelerometer) Metrics() []models.Metric {
 }
 
 func (s *LSM303Accelerometer) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(LSM303C_A_DEVICE_ID_REGISTER); err == nil {
+		return devID == LSM303C_A_DEVICE_ID
+	}
+
+	return false
 }
 
 func (s *LSM303Magnetometer) Init() (err error) {
@@ -141,5 +147,13 @@ func (s *LSM303Magnetometer) Metrics() []models.Metric {
 }
 
 func (s *LSM303Magnetometer) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(LSM303C_M_DEVICE_ID_REGISTER); err == nil {
+		return devID == LSM303C_M_DEVICE_ID
+	}
+
+	return false
 }

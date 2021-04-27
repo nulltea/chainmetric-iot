@@ -12,6 +12,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
+// I2CDetectResults stores I2C identified I2C-based peripheral devices.
 type I2CDetectResults map[int][]uint16
 
 func DetectI2C(start, end uint16) I2CDetectResults {

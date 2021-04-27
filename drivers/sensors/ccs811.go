@@ -37,10 +37,6 @@ func (s *CCS811) Init() (err error) {
 		return
 	}
 
-	if !s.Verify() {
-		return fmt.Errorf("not that sensorType")
-	}
-
 	err = s.setReset()
 	time.Sleep(CCS811_RESET_TIME * time.Millisecond)
 
@@ -113,9 +109,12 @@ func (s *CCS811) Metrics() []models.Metric {
 }
 
 func (s *CCS811) Verify() bool {
-	buffer, err := s.ReadReg(CCS811_HW_ID)
-	if err == nil && buffer == CCS811_HW_ID_CODE {
-		return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(CCS811_DEVICE_ID_REGISTER); err == nil {
+		return devID == CCS811_DEVICE_ID
 	}
 
 	return false

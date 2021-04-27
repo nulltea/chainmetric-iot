@@ -9,6 +9,7 @@ type Sensor interface {
 	Init() error
 	Harvest(ctx *Context)
 	Metrics() []models.Metric
+	Verify() bool
 	Active() bool
 	Close() error
 }

@@ -1,7 +1,6 @@
 package sensors
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/timoth-y/chainmetric-core/models"
@@ -31,10 +30,6 @@ func (s *MAX44009) Init() error {
 		return err
 	}
 
-	if !s.Verify() {
-		return fmt.Errorf("driver is not compatiple with specified sensor")
-	}
-
 	if err := s.WriteBytes(MAX44009_APP_START); err != nil {
 		return err
 	}
@@ -61,7 +56,15 @@ func (s *MAX44009) Metrics() []models.Metric {
 }
 
 func (s *MAX44009) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(MAX44009_DEVICE_ID_REGISTER); err == nil {
+		return devID == MAX44009_DEVICE_ID
+	}
+
+	return false
 }
 
 func (s *MAX44009) dataToLuminance(d []byte) float64 {

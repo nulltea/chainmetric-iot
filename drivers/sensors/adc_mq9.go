@@ -1,6 +1,7 @@
 package sensors
 
 import (
+	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
@@ -11,11 +12,17 @@ import (
 
 type ADCMQ9 struct {
 	peripherals.ADC
+	samples int
 }
 
 func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 	return &ADCMQ9{
-		ADC: peripherals.NewADC(addr, bus),
+		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
+			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
+			resAir := (ADC_MQ9_RESISTANCE - volts) / volts
+			return resAir / ADC_MQ9_SENSITIVITY * 1000
+		}), peripherals.WithBias(ADC_MQ9_BIAS)),
+		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }
 
@@ -23,8 +30,12 @@ func (s *ADCMQ9) ID() string {
 	return "ADC-MQ9"
 }
 
+func (s *ADCMQ9) Read() float64 {
+	return s.RMS(s.samples, nil)
+}
+
 func (s *ADCMQ9) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.AirPetroleumConcentration).WriteWithError(s.ReadRetry(5))
+	ctx.For(metrics.AirPetroleumConcentration).Write(s.Read())
 }
 
 func (s *ADCMQ9) Metrics() []models.Metric {

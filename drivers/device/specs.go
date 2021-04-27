@@ -26,7 +26,7 @@ func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {
 
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr); ok {
+			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
 				for _, metric := range sf.Build(bus).Metrics() {
 					availableMetrics[metric] = true
 				}
@@ -66,7 +66,7 @@ func (d *Device) SupportedSensors() []sensor.Sensor {
 
 	for bus, addrs := range d.detectedI2Cs {
 		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr); ok {
+			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
 				supports = append(supports, sf.Build(bus))
 			}
 		}

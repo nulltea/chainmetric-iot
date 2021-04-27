@@ -18,12 +18,12 @@ type I2C struct {
 	active bool
 }
 
-func NewI2C(addr uint16, bn int) *I2C {
+func NewI2C(addr uint16, bus int) *I2C {
 	return &I2C{
 		Dev: i2c.Dev{
 			Addr: addr,
 		},
-		name: shared.NtoI2cBusName(bn),
+		name: shared.NtoI2cBusName(bus),
 	}
 }
 
@@ -142,6 +142,16 @@ func (i *I2C) WriteRegBytes(reg byte, data ...byte) error {
 	}
 
 	return nil
+}
+
+func (i *I2C) Verify() bool {
+	if !i.active {
+		if err := i.Init(); err != nil {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (i *I2C) Active() bool {

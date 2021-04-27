@@ -1,7 +1,7 @@
 device:
   id_file_path: ../device.id
   hotswap_detect_interval: 3s
-  local_cache_path: /var/cache
+  local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
 
 engine:
@@ -19,7 +19,9 @@ gateway:
   wallet_path: ../keystore
 
 sensors:
-  DHT22:
+  analog:
+    samples_per_read: 100
+  dht22:
     pin: 4
     timeout: 2000
 

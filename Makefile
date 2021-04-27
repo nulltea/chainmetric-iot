@@ -12,8 +12,8 @@ build-remote:
         go build -v  -o $(OUTPUT) ./cmd
 
 sync:
-	rsync -r --delete \
-	--filter 'P vendor' --exclude .env \
+	rsync -r --exclude .env \
+	 --delete --filter 'P vendor' --filter 'P bin' \
 	. pi@$(REMOTE_IP):$(REMOTE_DIR)
 
 crypto-sync:
@@ -22,6 +22,9 @@ crypto-sync:
 
 run:
 	sudo ./$(OUTPUT)
+
+kill:
+
 
 i2c:
 	sudo i2cdetect -l

@@ -1,8 +1,6 @@
 package sensors
 
 import (
-	"fmt"
-
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
@@ -28,10 +26,6 @@ func (s *SI1145) ID() string {
 func (s *SI1145) Init() (err error) {
 	if err = s.I2C.Init(); err != nil {
 		return
-	}
-
-	if !s.Verify() {
-		return fmt.Errorf("not SI1145 sensorType")
 	}
 
 	// Enable UV index measurement coefficients
@@ -134,7 +128,15 @@ func (s *SI1145) Metrics() []models.Metric {
 }
 
 func (s *SI1145) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(SI1145_DEVICE_ID_REGISTER); err == nil {
+		return devID == SI1145_DEVICE_ID
+	}
+
+	return false
 }
 
 func (s *SI1145) writeParam(p, v uint8) (uint8, error) {

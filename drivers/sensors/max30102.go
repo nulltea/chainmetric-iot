@@ -6,18 +6,21 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type MAX30102 struct {
 	*max3010x.Device
+	i2c *peripherals.I2C
 	addr uint16
 	bus int
 }
 
 func NewMAX30102(addr uint16, bus int) sensor.Sensor {
 	return &MAX30102{
+		i2c: peripherals.NewI2C(addr, bus),
 		addr: addr,
 		bus: bus,
 	}
@@ -52,6 +55,18 @@ func (s *MAX30102) Metrics() []models.Metric {
 		metrics.HeartRate,
 		metrics.BloodOxidation,
 	}
+}
+
+func (s *MAX30102) Verify() bool {
+	if !s.i2c.Verify() {
+		return false
+	}
+
+	if devID, err := s.i2c.ReadReg(MAX30102_DEVICE_ID_REGISTER); err == nil {
+		return devID == MAX30102_DEVICE_ID
+	}
+
+	return false
 }
 
 func (s *MAX30102) Active() bool {

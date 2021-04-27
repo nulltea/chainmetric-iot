@@ -112,4 +112,3 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 
 	close(done)
 }
-
