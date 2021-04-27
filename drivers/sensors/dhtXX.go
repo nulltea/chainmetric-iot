@@ -7,8 +7,9 @@ import (
 	"github.com/d2r2/go-logger"
 	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-core/models/metrics"
+
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 var (
@@ -62,6 +63,11 @@ func (s *DHTxx) Metrics() []models.Metric {
 		metrics.Temperature,
 		metrics.Humidity,
 	}
+}
+
+func (s *DHTxx) Verify() bool {
+	_, _, err := dht.ReadDHTxx(s.sensorType, s.pin, false)
+	return err == nil
 }
 
 func (s *DHTxx) Active() bool {

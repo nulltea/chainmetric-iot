@@ -18,7 +18,7 @@ type ADCFlame struct {
 func NewADCFlame(addr uint16, bus int) sensor.Sensor {
 	return &ADCFlame{
 		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
-			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
 			return volts
 		}), peripherals.WithBias(ADC_FLAME_BIAS)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),

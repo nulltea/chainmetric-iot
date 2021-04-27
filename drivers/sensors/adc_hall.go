@@ -18,7 +18,7 @@ type ADCHall struct {
 func NewADCHall(addr uint16, bus int) sensor.Sensor {
 	return &ADCHall{
 		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
-			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
 			return volts * 1000 / ADC_HALL_SENSITIVITY
 		}), peripherals.WithBias(ADC_HALL_BIAS)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),

@@ -64,6 +64,18 @@ func (s *BMP280) Metrics() []models.Metric {
 	}
 }
 
+func (s *BMP280) Verify() bool {
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(BMP280_DEVICE_ID_REGISTER); err == nil {
+		return devID == BMP280_DEVICE_ID
+	}
+
+	return false
+}
+
 func (s *BMP280) pressureToAltitude(p float64) float64 {
 	// Approximate atmospheric pressure at sea level in Pa
 	p0 := 1013250.0

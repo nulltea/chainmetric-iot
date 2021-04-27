@@ -57,6 +57,10 @@ func (s *I2CSensorMock) Metrics() []models.Metric {
 	return s.metrics
 }
 
+func (s *I2CSensorMock) Verify() bool {
+	return true
+}
+
 func (s *I2CSensorMock) Active() bool {
 	return s.active
 }
@@ -92,6 +96,10 @@ func (s *StaticSensorMock) Harvest(ctx *sensor.Context) {
 
 func (s *StaticSensorMock) Metrics() []models.Metric {
 	return s.metrics
+}
+
+func (s *StaticSensorMock) Verify() bool {
+	return true
 }
 
 func (s *StaticSensorMock) Active() bool {

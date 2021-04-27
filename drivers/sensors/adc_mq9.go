@@ -18,7 +18,7 @@ type ADCMQ9 struct {
 func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 	return &ADCMQ9{
 		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
-			volts := raw / ADS1115_SAMPLES_PER_READ * ADS1115_VOLTS_PER_SAMPLE
+			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
 			resAir := (ADC_MQ9_RESISTANCE - volts) / volts
 			return resAir / ADC_MQ9_SENSITIVITY * 1000
 		}), peripherals.WithBias(ADC_MQ9_BIAS)),

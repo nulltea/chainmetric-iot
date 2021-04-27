@@ -144,6 +144,16 @@ func (i *I2C) WriteRegBytes(reg byte, data ...byte) error {
 	return nil
 }
 
+func (i *I2C) Verify() bool {
+	if !i.active {
+		if err := i.Init(); err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (i *I2C) Active() bool {
 	return i.active
 }

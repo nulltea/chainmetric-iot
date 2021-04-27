@@ -38,7 +38,7 @@ func (s *ADXL345) Init() (err error) {
 	}
 
 	// changes the device bandwidth and output data rate
-	if err = s.I2C.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
+	if err = s.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
 		return
 	}
 
@@ -47,7 +47,7 @@ func (s *ADXL345) Init() (err error) {
 	}
 
 	// enables measurement on sensor
-	if err = s.I2C.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
+	if err = s.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
 		return
 	}
 
@@ -82,7 +82,15 @@ func (s *ADXL345) Metrics() []models.Metric {
 }
 
 func (s *ADXL345) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(ADXL345_DEVICE_ID_REGISTER); err == nil {
+		return devID == ADXL345_DEVICE_ID
+	}
+
+	return false
 }
 
 // setRange changes the range of sensor. Available ranges are 2G, 4G, 8G and 16G.

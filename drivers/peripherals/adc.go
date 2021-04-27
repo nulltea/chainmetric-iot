@@ -11,6 +11,16 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
+// ADS1115 ADC chip constants
+const (
+	// Conversion constants
+	ADS1115_SAMPLES_PER_READ = 32767.0
+	ADS1115_VOLTS_PER_SAMPLE = 5
+
+	ADS1115_DEVICE_ID_REGISTER = 0x0E
+	ADS1115_DEVICE_ID          = 0x80
+)
+
 // ADC defines analog to digital peripheral interface.
 type ADC interface {
 	// Init performs ADC driver initialisation.
@@ -23,6 +33,8 @@ type ADC interface {
 	Max(n int, t *time.Duration) float64
 	// Min returns min value from `n` analog sensor readings.
 	Min(n int, t *time.Duration) float64
+	// Verify identifies ADC device and checks it according to implemented driver.
+	Verify() bool
 	// Active determines whether the ADC device is active.
 	Active() bool
 	// Close closes connection to ADC device.
@@ -34,6 +46,7 @@ type ADS1115 struct {
 	*ads.ADS
 	Addr   uint16
 	Bus    string
+	i2c *I2C
 	active bool
 
 	bias float64
@@ -45,6 +58,7 @@ func NewADC(addr uint16, bus int, options ...ADCOption) *ADS1115 {
 	d := &ADS1115{
 		Bus: shared.NtoI2cBusName(bus),
 		Addr: addr,
+		i2c: NewI2C(addr, bus),
 
 		convertor: func(v float64) float64 {
 			return v
@@ -137,6 +151,18 @@ func (d ADS1115) rawSequence(n int, t *time.Duration) []int {
 	}
 
 	return results
+}
+
+func (d *ADS1115) Verify() bool {
+	if !d.i2c.Verify() {
+		return false
+	}
+
+	if devID, err := d.i2c.ReadReg(ADS1115_DEVICE_ID_REGISTER); err == nil {
+		return devID == ADS1115_DEVICE_ID
+	}
+
+	return false
 }
 
 func (d *ADS1115) Active() bool {

@@ -1,7 +1,6 @@
 package sensors
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -33,10 +32,6 @@ func (s *HDC1080) ID() string {
 func (s *HDC1080) Init() error {
 	if err := s.I2C.Init(); err != nil {
 		return err
-	}
-
-	if !s.Verify() {
-		return fmt.Errorf("driver is not compatiple with specified sensor")
 	}
 
 	if err := s.WriteRegBytes(HDC1080_CONFIGURATION_REGISTER, HDC1080_CONFIG_ACQUISITION_MODE >> 8, 0x00); err != nil {
@@ -127,5 +122,13 @@ func (s *HDC1080) Metrics() []models.Metric {
 }
 
 func (s *HDC1080) Verify() bool {
-	return true
+	if !s.I2C.Verify() {
+		return false
+	}
+
+	if devID, err := s.I2C.ReadReg(HDC1080_DEVICE_ID_REGISTER); err == nil {
+		return devID == HDC1080_DEVICE_ID
+	}
+
+	return false
 }
