@@ -1,6 +1,8 @@
 package display
 
 import (
+	"image"
+
 	"github.com/pkg/errors"
 	"periph.io/x/periph/experimental/devices/epd"
 
@@ -21,7 +23,7 @@ type EInk struct {
 	config config.DisplayConfig
 }
 
-func NewEInk(config config.DisplayConfig) *EInk {
+func NewEInk(config config.DisplayConfig) Display {
 	return &EInk{
 		SPI: peripherals.NewSPI(config.Bus),
 		dc: peripherals.NewGPIO(config.DCPin),
@@ -65,3 +67,6 @@ func (d *EInk) Init() (err error) {
 	return
 }
 
+func (d *EInk) DrawImage(src image.Image) error {
+	return d.Draw(d.Bounds(), src, image.Point{})
+}
