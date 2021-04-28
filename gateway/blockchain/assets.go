@@ -21,8 +21,11 @@ type AssetsContract struct {
 func NewAssetsContract(client *Client) *AssetsContract {
 	return &AssetsContract{
 		client: client,
-		contract: client.network.GetContract("assets"),
 	}
+}
+
+func (ac *AssetsContract) Init() {
+	ac.contract = ac.client.network.GetContract("assets")
 }
 
 func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, error) {

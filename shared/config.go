@@ -56,6 +56,13 @@ func UnmarshalFromConfig(key string, v interface{}) error {
 	return viper.UnmarshalKey(key, v)
 }
 
+func MustUnmarshalFromConfig(key string, v interface{}) {
+	bindEnvs(key, v)
+	if err := viper.UnmarshalKey(key, v); err != nil {
+		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))
+	}
+}
+
 func bindEnvs(key string, rawVal interface{}) {
 	for _, k := range allKeys(key, rawVal) {
 		val := viper.Get(k)

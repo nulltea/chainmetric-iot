@@ -5,15 +5,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/op/go-logging"
-
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type Context struct {
 	Parent context.Context
-	Logger *logging.Logger
 	WaitGroup *sync.WaitGroup
 }
 
@@ -26,31 +24,25 @@ func NewContext(parent context.Context) *Context {
 func (c *Context) ForSensor(s sensor.Sensor) *sensor.Context {
 	return &sensor.Context{
 		Parent: c,
-		Logger: c.Logger,
 		SensorID: s.ID(),
 		Pipe: make(model.SensorReadingsPipe),
 	}
 }
 
-func (c *Context) SetLogger(logger *logging.Logger) *Context {
-	c.Logger = logger
-	return c
-}
-
 func (c *Context) Error(err error) {
 	if err != nil {
-		c.Logger.Errorf("worker: %v", err)
+		shared.Logger.Errorf("worker: %v", err)
 	}
 }
 
 func (c *Context) Fatal(err error) {
 	if err != nil {
-		c.Logger.Fatalf("worker: %v", err)
+		shared.Logger.Fatalf("worker: %v", err)
 	}
 }
 
 func (c *Context) Info(info string) {
-	c.Logger.Infof("worker: %v", info)
+	shared.Logger.Infof("worker: %v", info)
 }
 
 func (c *Context) Deadline() (deadline time.Time, ok bool) {

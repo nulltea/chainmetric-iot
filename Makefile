@@ -9,7 +9,7 @@ build:
 build-remote:
 	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ \
         CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=6 \
-        go build -v  -o $(OUTPUT) ./cmd
+        go build -v  -o $(OUTPUT) .
 
 sync:
 	rsync -r --exclude .env \

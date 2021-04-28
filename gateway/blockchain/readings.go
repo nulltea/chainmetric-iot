@@ -17,7 +17,11 @@ func NewReadingsContract(client *Client) *ReadingsContract {
 	}
 }
 
-func (cc *ReadingsContract) Post(readings models.MetricReadings) error {
-	_, err := cc.contract.SubmitTransaction("Post", string(readings.Encode()))
+func (rc *ReadingsContract) Init() {
+	rc.contract = rc.client.network.GetContract("readings")
+}
+
+func (rc *ReadingsContract) Post(readings models.MetricReadings) error {
+	_, err := rc.contract.SubmitTransaction("Post", string(readings.Encode()))
 	return err
 }

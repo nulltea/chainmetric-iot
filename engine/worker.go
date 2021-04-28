@@ -25,16 +25,12 @@ type SensorsReader struct {
 
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
+		context:       NewContext(context.Background()),
 		sensors:       make(map[string]sensor.Sensor),
 		requests:      make(chan Request),
 		standbyTimers: make(map[sensor.Sensor]*time.Timer),
 		done:          make(chan struct{}),
 	}
-}
-
-func (r *SensorsReader) Init(ctx *Context) error {
-	r.context = ctx
-	return nil
 }
 
 func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {

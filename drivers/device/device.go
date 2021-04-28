@@ -35,7 +35,7 @@ type Device struct {
 	cancelHotswap context.CancelFunc
 }
 
-func NewDevice() *Device {
+func New() *Device {
 	return &Device{
 		assets: &assetsCache{
 			mutex: sync.Mutex{},

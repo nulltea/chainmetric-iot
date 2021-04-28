@@ -24,6 +24,10 @@ func NewRequirementsContract(client *Client) *RequirementsContract {
 	}
 }
 
+func (rc *RequirementsContract) Init() {
+	rc.contract = rc.client.network.GetContract("requirements")
+}
+
 func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requirements, error) {
 	request, _ := json.Marshal(assets)
 
