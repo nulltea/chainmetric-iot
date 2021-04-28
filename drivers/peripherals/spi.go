@@ -36,6 +36,10 @@ func (s *SPI) Init() (err error) {
 	return
 }
 
+func (s *SPI) Port() spi.Port {
+	return s.port
+}
+
 func (s *SPI) Active() bool {
 	return s.active
 }
