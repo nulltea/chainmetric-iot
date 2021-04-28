@@ -32,5 +32,6 @@ display:
   image_size: 150
   bus: SPI0.0
   dc_pin: 25
-  backlight_pin: 18
-  reset_pin: 15
+  cs_pin: 8
+  reset_pin: 17
+  busy_pin: 24
