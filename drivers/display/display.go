@@ -7,6 +7,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
+// Display defines base methods for controlling display device.
 type Display interface {
 	Init(cnf config.DisplayConfig) error
 	PowerOn() error

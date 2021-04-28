@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -20,13 +19,13 @@ import (
 
 var (
 	Client = blockchain.NewBlockchainClient()
-	Display = display.NewST7789()
+	// Display = display.NewEInk()
 	Reader = engine.NewSensorsReader()
 	Context = engine.NewContext(context.Background()).
 		SetLogger(shared.Logger)
 	Device = device.NewDevice().
 		SetClient(Client).
-		SetDisplay(Display).
+		// SetDisplay(Display).
 		SetReader(Reader)
 )
 
@@ -65,11 +64,11 @@ func run() {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing blockchain client"))
 	}
 
-	if dc.Enabled {
-		if err := Display.Init(dc); err != nil {
-			shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
-		}
-	}
+	// if dc.Enabled {
+	// 	if err := Display.Init(dc); err != nil {
+	// 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing display"))
+	// 	}
+	// }
 
 	if err := Reader.Init(Context); err != nil {
 		shared.Logger.Fatal(errors.Wrap(err, "failed initializing reader engine"))
