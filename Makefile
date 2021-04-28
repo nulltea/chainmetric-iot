@@ -4,7 +4,7 @@ REMOTE_DIR=/home/pi/sensorsys
 CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
 
 build:
-	CGO_ENABLED=1 go mod vendor && go build -v  -o $(OUTPUT) ./cmd
+	CGO_ENABLED=1 go mod vendor && go build -v  -o $(OUTPUT) .
 
 build-remote:
 	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ \
