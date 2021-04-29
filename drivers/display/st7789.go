@@ -12,7 +12,7 @@ package display
 // 	"github.com/pkg/errors"
 //
 // 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
-// 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+// 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 // )
 //
 // // ST7789 is an implementation of Display driver for TFT 1.14" display based on ST7789 chip.

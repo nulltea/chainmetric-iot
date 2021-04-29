@@ -1,4 +1,4 @@
-package peripherals
+package peripheries
 
 // An ADCOption configures a ADC driver.
 type ADCOption interface {

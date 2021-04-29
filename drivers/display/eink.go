@@ -11,18 +11,18 @@ import (
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
 // EInk is an implementation of Display driver for E-Ink 2.13" display.
 type EInk struct {
-	*peripherals.SPI
+	*peripheries.SPI
 
-	dc   *peripherals.GPIO
-	cs   *peripherals.GPIO
-	rst  *peripherals.GPIO
-	busy *peripherals.GPIO
+	dc   *peripheries.GPIO
+	cs   *peripheries.GPIO
+	rst  *peripheries.GPIO
+	busy *peripheries.GPIO
 
 	rect image.Rectangle
 
@@ -31,12 +31,12 @@ type EInk struct {
 
 func NewEInk(config config.DisplayConfig) Display {
 	return &EInk{
-		SPI: peripherals.NewSPI(config.Bus),
-		dc: peripherals.NewGPIO(config.DCPin),
-		cs: peripherals.NewGPIO(config.CSPin),
-		rst: peripherals.NewGPIO(config.ResetPin),
-		busy:  peripherals.NewGPIO(config.BusyPin),
-		rect: image.Rect(0, 0, config.Width, config.Height),
+		SPI:    peripheries.NewSPI(config.Bus),
+		dc:     peripheries.NewGPIO(config.DCPin),
+		cs:     peripheries.NewGPIO(config.CSPin),
+		rst:    peripheries.NewGPIO(config.ResetPin),
+		busy:   peripheries.NewGPIO(config.BusyPin),
+		rect:   image.Rect(0, 0, config.Width, config.Height),
 		config: config,
 	}
 }
@@ -122,7 +122,7 @@ func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error
 }
 
 func (d *EInk) Draw(src image.Image) error {
-	return d.DrawRaw(src.Bounds(), src, image.Point{0, 0})
+	return d.DrawRaw(d.Bounds(), src, image.Point{})
 }
 
 func (d *EInk) DrawAndRefresh(src image.Image) error {

@@ -101,7 +101,7 @@ func DebugDisplay() {
 	w := bounds.Dx()
 	h := bounds.Dy()
 	dc := gg.NewContext(w, h)
-	im, err := gg.LoadPNG("love.png")
+	im, err := gg.LoadPNG("ky.png")
 	if err != nil {
 		panic(err)
 	}

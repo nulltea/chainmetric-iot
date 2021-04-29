@@ -6,21 +6,21 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 type ADCFlame struct {
-	peripherals.ADC
+	peripheries.ADC
 	samples int
 }
 
 func NewADCFlame(addr uint16, bus int) sensor.Sensor {
 	return &ADCFlame{
-		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
-			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
+		ADC: peripheries.NewADC(addr, bus, peripheries.WithConversion(func(raw float64) float64 {
+			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
 			return volts
-		}), peripherals.WithBias(ADC_FLAME_BIAS)),
+		}), peripheries.WithBias(ADC_FLAME_BIAS)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

@@ -1,4 +1,4 @@
-package peripherals
+package peripheries
 
 import (
 	"fmt"

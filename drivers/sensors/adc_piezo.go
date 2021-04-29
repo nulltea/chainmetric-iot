@@ -6,19 +6,19 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 type ADCPiezo struct {
-	peripherals.ADC
+	peripheries.ADC
 	samples int
 }
 
 func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
 	return &ADCPiezo{
-		ADC: peripherals.NewADC(addr, bus, peripherals.WithConversion(func(raw float64) float64 {
-			volts := raw / peripherals.ADS1115_SAMPLES_PER_READ * peripherals.ADS1115_VOLTS_PER_SAMPLE
+		ADC: peripheries.NewADC(addr, bus, peripheries.WithConversion(func(raw float64) float64 {
+			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
 			return volts
 		})),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
