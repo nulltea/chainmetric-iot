@@ -29,15 +29,16 @@ type contracts struct {
 	Readings     *ReadingsContract
 }
 
-func NewClient(config config.BlockchainConfig) (bc *Client) {
-	bc = &Client{
+func NewClient(config config.BlockchainConfig) *Client {
+	bc := &Client{
 		config: config,
-		Contracts: contracts{
-			Devices:      NewDevicesContract(bc),
-			Assets:       NewAssetsContract(bc),
-			Requirements: NewRequirementsContract(bc),
-			Readings:     NewReadingsContract(bc),
-		},
+	}
+
+	bc.Contracts = contracts{
+		Devices:      NewDevicesContract(bc),
+		Assets:       NewAssetsContract(bc),
+		Requirements: NewRequirementsContract(bc),
+		Readings:     NewReadingsContract(bc),
 	}
 
 	return bc
@@ -73,6 +74,11 @@ func (bc *Client) Init() (err error) {
 		err = errors.Wrapf(err, "failed to create new client of channel %s", bc.config.ChannelID)
 		return
 	}
+
+	bc.Contracts.Assets.Init()
+	bc.Contracts.Devices.Init()
+	bc.Contracts.Requirements.Init()
+	bc.Contracts.Readings.Init()
 
 	return
 }

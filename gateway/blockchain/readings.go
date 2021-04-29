@@ -13,7 +13,6 @@ type ReadingsContract struct {
 func NewReadingsContract(client *Client) *ReadingsContract {
 	return &ReadingsContract{
 		client: client,
-		contract: client.network.GetContract("readings"),
 	}
 }
 

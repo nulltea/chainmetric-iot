@@ -20,7 +20,6 @@ type RequirementsContract struct {
 func NewRequirementsContract(client *Client) *RequirementsContract {
 	return &RequirementsContract{
 		client: client,
-		contract: client.network.GetContract("requirements"),
 	}
 }
 
