@@ -14,6 +14,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type Device struct {
@@ -71,11 +72,14 @@ func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 }
 
 func (d * Device) DisplayAvailable() bool {
+	shared.Logger.Debugf("DisplayAvailable: %v && %v",  d.display != nil,  d.display != nil && d.display.Active())
 	return d.display != nil && d.display.Active()
 }
 
 func (d *Device) Close() error {
 	if d.DisplayAvailable() {
+		d.display.Reset()
+
 		if err := d.display.Close(); err != nil {
 			return err
 		}

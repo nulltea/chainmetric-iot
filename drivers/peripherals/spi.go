@@ -23,12 +23,21 @@ func NewSPI(name string) *SPI {
 }
 
 func (s *SPI) Init() (err error) {
-	if s.port, err = spireg.Open(s.name); err != nil {
-		return errors.Wrapf(err, "failed to open an SPI port on %s", s.name)
+	if err = s.InitPort(); err != nil {
+		return err
 	}
 
-	if s.Conn, err = s.port.Connect(80 * physic.MegaHertz, spi.Mode0, 8); err != nil {
+	if s.Conn, err = s.port.Connect(20 * physic.MegaHertz, spi.Mode0, 8); err != nil {
 		return errors.Wrapf(err, "failed to connect vis SPI device on %s", s.name)
+	}
+
+	return
+}
+
+// InitPort initialises SPI port but not connects to it.
+func (s *SPI) InitPort() (err error) {
+	if s.port, err = spireg.Open(s.name); err != nil {
+		return errors.Wrapf(err, "failed to open an SPI port on %s", s.name)
 	}
 
 	s.active = true

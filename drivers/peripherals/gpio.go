@@ -1,8 +1,7 @@
 package peripherals
 
 import (
-	"fmt"
-
+	"github.com/pkg/errors"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
 
@@ -21,9 +20,9 @@ func NewGPIO(pin int) *GPIO {
 	}
 }
 
-func NewSpiCSPin(ce int) *GPIO {
+func NewSpiCSPin(cs string) *GPIO {
 	return &GPIO{
-		pin: shared.NtoPinName(ce),
+		pin: cs,
 	}
 }
 
@@ -33,10 +32,14 @@ func (g *GPIO) Init() error {
 	)
 
 	if pin == gpio.INVALID || pin == nil {
-		return fmt.Errorf("pin %s is invalid", g.pin)
+		return errors.Errorf("pin %s is invalid", g.pin)
 	}
 
 	g.PinIO = pin
+
+	if err := g.Low(); err != nil {
+		return errors.Wrapf(err, "failed initialising pin", g.pin)
+	}
 
 	return nil
 }

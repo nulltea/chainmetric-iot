@@ -7,7 +7,7 @@ import (
 )
 
 func NtoPinName(pin int) string {
-	return fmt.Sprintf("GPIO%02d", pin)
+	return fmt.Sprintf("GPIO%d", pin)
 }
 
 func NtoI2cBusName(n int) string {

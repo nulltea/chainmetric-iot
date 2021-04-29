@@ -46,14 +46,14 @@ func (d *Device) Init() error {
 	}
 
 	if d.DisplayAvailable() {
+		shared.Logger.Debug("Init: drawing QR")
 		qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
 			return err
 		}
 
-		d.display.PowerOn()
-		defer d.display.PowerOff()
+		// defer d.display.Halt()
 
-		d.display.DrawImage(qr.Image(viper.GetInt("display.image_size")))
+		d.display.DrawAndRefresh(qr.Image(viper.GetInt("display.image_size")))
 	} else {
 		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "local/qr.png")
 	}
@@ -99,7 +99,7 @@ func (d *Device) Reset() error {
 	return nil
 }
 
-func (d *Device) Off() error {
+func (d *Device) NotifyOff() error {
 	if d.client == nil || d.model == nil {
 		return nil
 	}
