@@ -15,6 +15,7 @@ func initConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("device.id_file_path", "../device.id")
+	viper.SetDefault("device.register_timeout_duration", "1m")
 	viper.SetDefault("device.hotswap_detect_interval", "3s")
 	viper.SetDefault("device.local_cache_path", "/var/cache")
 	viper.SetDefault("device.ping_timer_interval", "1m")

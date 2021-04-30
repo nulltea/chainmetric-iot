@@ -7,17 +7,17 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models"
 
-
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type Device struct {
+	ctx context.Context
+
 	specs    *model.DeviceSpecs
 	model    *models.Device
 	assets   *assetsCache
@@ -32,12 +32,15 @@ type Device struct {
 
 	pingTimer *time.Timer
 
-	cancelEvents context.CancelFunc
-	cancelHotswap context.CancelFunc
+	active bool
+	cancelDevice context.CancelFunc
 }
 
 func New() *Device {
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &Device{
+		ctx: ctx,
 		assets: &assetsCache{
 			mutex: sync.Mutex{},
 			data:  make(map[string]bool),
@@ -47,6 +50,7 @@ func New() *Device {
 			data:  make(map[string]*readingsRequest),
 		},
 		staticSensors: make([]sensor.Sensor, 0),
+		cancelDevice: cancel,
 	}
 }
 
@@ -72,23 +76,12 @@ func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 }
 
 func (d * Device) DisplayAvailable() bool {
-	shared.Logger.Debugf("DisplayAvailable: %v && %v",  d.display != nil,  d.display != nil && d.display.Active())
 	return d.display != nil && d.display.Active()
 }
 
 func (d *Device) Close() error {
-	if d.DisplayAvailable() {
-		d.display.Reset()
-
-		if err := d.display.Close(); err != nil {
-			return err
-		}
-	}
-
-	d.cancelEvents()
-	d.cancelHotswap()
-
-	d.reader.Close()
+	d.active = false
+	d.cancelDevice()
 
 	return nil
 }

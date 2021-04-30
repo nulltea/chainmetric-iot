@@ -66,6 +66,7 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event devices.%s", event)
 			default:
+				shared.Logger.Debug("Requirements blockchain event listener ended.")
 				return nil
 			}
 		}

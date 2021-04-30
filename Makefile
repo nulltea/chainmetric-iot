@@ -24,7 +24,7 @@ run:
 	sudo ./$(OUTPUT)
 
 kill:
-	ps aux |  awk '{print $2"\t"$11}' | grep -E '^\d+\t'"\."'$' | awk '{print $1}' | xargs kill -SIGTERM
+	ps aux | awk '{print $$2"\t"$$11}' | grep -E ./$(OUTPUT) | awk '{print $$1}' | sudo xargs kill -SIGTERM
 
 i2c:
 	sudo i2cdetect -l

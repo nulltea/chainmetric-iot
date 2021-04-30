@@ -66,6 +66,7 @@ func (ac *AssetsContract) Subscribe(ctx context.Context, event string, action fu
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event assets.%s", event)
 			default:
+				shared.Logger.Debug("Assets blockchain event listener ended.")
 				return nil
 			}
 		}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
@@ -26,39 +25,38 @@ func (d *Device) Init() error {
 	}
 
 	defer d.initHotswap()
+
 	defer func() {
 		go d.tryRepostCachedReadings()
 	}()
 
+	defer func() {
+		d.active = err == nil && d.model != nil
+	}()
+
 	if id, is := isRegistered(); is {
 		if d.model, _ = contract.Retrieve(id); d.model != nil {
-			if err := contract.UpdateSpecs(id, d.specs); err != nil {
+			shared.Logger.Infof("Device specs has being updated in blockchain with id: %s", id)
 
-				return err
-			}
-
-			shared.Logger.Infof("Device specs been updated in blockchain with id: %s", id)
-
-			return nil
+			return contract.UpdateSpecs(id, d.specs)
 		}
 
-		shared.Logger.Warning("device was removed from network, must re-initialize now")
+		shared.Logger.Warning("Device was removed from network, must re-initialize now")
 	}
 
 	if d.DisplayAvailable() {
-		shared.Logger.Debug("Init: drawing QR")
 		qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
 			return err
 		}
 
-		// defer d.display.Halt()
+		defer d.display.ClearAndRefresh()
 
 		d.display.DrawAndRefresh(qr.Image(viper.GetInt("display.image_size")))
 	} else {
 		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "local/qr.png")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
+	ctx, cancel := context.WithTimeout(d.ctx, viper.GetDuration("device.register_timeout_duration"))
 
 	if err := contract.Subscribe(ctx, "inserted", func(device *models.Device, _ string) error {
 		if device.Hostname == d.specs.Hostname {
@@ -68,8 +66,9 @@ func (d *Device) Init() error {
 				shared.Logger.Fatal(errors.Wrap(err, "failed to store device's identity file"))
 			}
 
-			shared.Logger.Infof("Device is been registered with id: %s", device.ID)
+			shared.Logger.Infof("Device has being registered with id: %s", device.ID)
 			d.model = device
+
 			return contract.UpdateSpecs(device.ID, d.specs)
 		}
 

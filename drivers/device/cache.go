@@ -30,6 +30,10 @@ type readingsRequest struct {
 }
 
 func (d *Device) CacheBlockchainState() error {
+	if !d.active {
+		return nil
+	}
+
 	if err := d.locateAssets(); err != nil {
 		return err
 	}

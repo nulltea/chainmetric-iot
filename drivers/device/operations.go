@@ -13,6 +13,10 @@ import (
 
 // Operate registers supported sensors and starts asynchronously work on reading requests.
 func (d *Device) Operate() {
+	if !d.active {
+		return
+	}
+
 	d.reader.RegisterSensors(d.SupportedSensors()...)
 
 	for _, request := range d.requests.Get() {

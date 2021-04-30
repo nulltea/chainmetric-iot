@@ -3,9 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/fogleman/gg"
 	"github.com/spf13/viper"
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
@@ -61,8 +59,6 @@ func startup() {
 		shared.MustExecute(display.Init, "failed initializing display")
 	}
 
-	DebugDisplay()
-
 	if viper.GetBool("mocks.debug_env") {
 		device.RegisterStaticSensors(sensors.NewStaticSensorMock())
 	}
@@ -79,43 +75,16 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	<-quit
 	shared.Logger.Info("Shutting down...")
 
-	if err := device.NotifyOff(); err != nil {
-		shared.Logger.Error(err)
+	if dcf.Enabled {
+		shared.Execute(display.ClearAndRefresh, "error during clearing display")
+		shared.Execute(display.Close, "error during closing connection to display")
 	}
 
-	if err := device.Close(); err != nil {
-		shared.Logger.Error(err)
-	}
+	shared.Execute(device.NotifyOff, "error during emitting 'off' event")
+	shared.Execute(device.Close, "error during device shutdown")
 
 	client.Close()
-
 	shared.CloseCore()
 
 	close(done)
-}
-
-func DebugDisplay() {
-	time.Sleep(10 *time.Second)
-
-	bounds := display.Bounds()
-	w := bounds.Dx()
-	h := bounds.Dy()
-	dc := gg.NewContext(w, h)
-	im, err := gg.LoadPNG("ky.png")
-	if err != nil {
-		panic(err)
-	}
-	dc.SetRGB(1, 1, 1)
-	dc.Clear()
-	dc.SetRGB(0, 0, 0)
-	dc.Rotate(gg.Radians(90))
-	dc.Translate(0.0, -float64(h/2))
-	dc.DrawImage(im, 0, 0)
-	dc.Fill()
-	img := dc.Image()
-
-	display.DrawAndRefresh(img)
-
-
-	time.Sleep(10 *time.Second)
 }

@@ -103,6 +103,7 @@ func (dc *DevicesContract) Subscribe(ctx context.Context, event string, action f
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event devices.%s", event)
 			default:
+				shared.Logger.Debug("Device blockchain event listener ended.")
 				return nil
 			}
 		}
