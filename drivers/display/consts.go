@@ -1,6 +1,6 @@
 package display
 
-// EPD commands
+// EInk display commands.
 const (
 	driverOutputControl            byte = 0x01
 	boosterSoftStartControl        byte = 0x0C
