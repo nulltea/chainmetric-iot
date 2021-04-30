@@ -48,7 +48,7 @@ func (d *Device) tryRepostCachedReadings() {
 		contract = d.client.Contracts.Readings
 	)
 
-	storage.IterateOverCachedReadings(func(key string, record models.MetricReadings) (toBreak bool, err error) {
+	storage.IterateOverCachedReadings(d.ctx, func(key string, record models.MetricReadings) (toBreak bool, err error) {
 		if err = contract.Post(record); err != nil {
 			if detectNetworkAbsence(err) {
 				d.pingNetworkConnection()
