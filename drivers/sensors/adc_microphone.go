@@ -6,18 +6,18 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 type ADCMicrophone struct {
-	peripherals.ADC
+	peripheries.ADC
 	samples int
 }
 
 func NewADCMicrophone(addr uint16, bus int) sensor.Sensor {
 	return &ADCMicrophone{
-		ADC: peripherals.NewADC(addr, bus),
+		ADC:     peripheries.NewADC(addr, bus),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

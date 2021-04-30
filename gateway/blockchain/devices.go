@@ -23,63 +23,67 @@ type DevicesContract struct {
 func NewDevicesContract(client *Client) *DevicesContract {
 	return &DevicesContract{
 		client: client,
-		contract: client.network.GetContract("devices"),
 	}
 }
-func (cc *DevicesContract) Retrieve(id string) (*models.Device, error) {
-	resp, err := cc.contract.EvaluateTransaction("Retrieve", id); if err != nil {
+
+func (dc *DevicesContract) Init() {
+	dc.contract = dc.client.network.GetContract("devices")
+}
+
+func (dc *DevicesContract) Retrieve(id string) (*models.Device, error) {
+	resp, err := dc.contract.EvaluateTransaction("Retrieve", id); if err != nil {
 		return nil, err
 	}
 
 	return models.Device{}.Decode(resp)
 }
 
-func (cc *DevicesContract) Exists(id string) (bool, error) {
-	resp, err := cc.contract.EvaluateTransaction("Exists", id); if err != nil {
+func (dc *DevicesContract) Exists(id string) (bool, error) {
+	resp, err := dc.contract.EvaluateTransaction("Exists", id); if err != nil {
 		return false, err
 	}
 
 	return strconv.ParseBool(string(resp))
 }
 
-func (cc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) error {
+func (dc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) error {
 	data, err := json.Marshal(specs); if err != nil {
 		return err
 	}
 
-	if  _, err = cc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
+	if  _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (cc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
+func (dc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
 	data, err := json.Marshal(requests.DeviceUpdateRequest{State: &state}); if err != nil {
 		return err
 	}
 
-	if  _, err = cc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
+	if  _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (cc *DevicesContract) Unbind(id string) error {
-	if  _, err := cc.contract.SubmitTransaction("Unbind", id); err != nil {
+func (dc *DevicesContract) Unbind(id string) error {
+	if  _, err := dc.contract.SubmitTransaction("Unbind", id); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (cc *DevicesContract) Subscribe(ctx context.Context, event string, action func(*models.Device, string) error) error {
-	reg, notifier, err := cc.contract.RegisterEvent(eventFilter("devices", event)); if err != nil {
+func (dc *DevicesContract) Subscribe(ctx context.Context, event string, action func(*models.Device, string) error) error {
+	reg, notifier, err := dc.contract.RegisterEvent(eventFilter("devices", event)); if err != nil {
 		return err
 	}
 
-	defer cc.contract.Unregister(reg)
+	defer dc.contract.Unregister(reg)
 
 	for {
 		select {
@@ -99,6 +103,7 @@ func (cc *DevicesContract) Subscribe(ctx context.Context, event string, action f
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event devices.%s", event)
 			default:
+				shared.Logger.Debug("Device blockchain event listener ended.")
 				return nil
 			}
 		}

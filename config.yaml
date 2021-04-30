@@ -1,5 +1,6 @@
 device:
   id_file_path: ../device.id
+  register_timeout_duration: 1m
   hotswap_detect_interval: 3s
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
@@ -27,10 +28,11 @@ sensors:
 
 display:
   enabled: true
-  width: 240
-  height: 240
-  image_size: 150
+  width: 128
+  height: 250
+  image_size: 128
   bus: SPI0.0
   dc_pin: 25
-  backlight_pin: 18
-  reset_pin: 15
+  cs_pin: 8
+  reset_pin: 22
+  busy_pin: 16

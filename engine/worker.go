@@ -13,6 +13,7 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type SensorsReader struct {
@@ -25,16 +26,12 @@ type SensorsReader struct {
 
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
+		context:       NewContext(context.Background()),
 		sensors:       make(map[string]sensor.Sensor),
 		requests:      make(chan Request),
 		standbyTimers: make(map[sensor.Sensor]*time.Timer),
-		done:          make(chan struct{}),
+		done:          make(chan struct{}, 1),
 	}
-}
-
-func (r *SensorsReader) Init(ctx *Context) error {
-	r.context = ctx
-	return nil
 }
 
 func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
@@ -98,7 +95,7 @@ func (r *SensorsReader) Process() {
 		case <- r.context.Done():
 			return
 		case <- r.done:
-			r.context.Info("Reader process ended")
+			shared.Logger.Debug("Sensors reader process ended.")
 			return
 		}
 	}
@@ -180,7 +177,8 @@ func aggregate(pipe model.SensorReadingsPipe) model.SensorsReadingResults {
 
 
 func (r *SensorsReader) Close() {
-	r.done <- struct{}{}
+	close(r.done)
+
 	for _, sensor := range r.sensors {
 		if sensor.Active() {
 			if err := sensor.Close(); err != nil {

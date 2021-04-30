@@ -1,8 +1,7 @@
-package peripherals
+package peripheries
 
 import (
-	"fmt"
-
+	"github.com/pkg/errors"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
 
@@ -12,26 +11,35 @@ import (
 // GPIO provides wrapper for GPIO peripheral
 type GPIO struct {
 	gpio.PinIO
-	pin int
+	pin string
 }
 
 func NewGPIO(pin int) *GPIO {
 	return &GPIO{
-		pin: pin,
+		pin: shared.NtoPinName(pin),
+	}
+}
+
+func NewSpiCSPin(cs string) *GPIO {
+	return &GPIO{
+		pin: cs,
 	}
 }
 
 func (g *GPIO) Init() error {
 	var (
-		name = shared.NtoPinName(g.pin)
-		pin = gpioreg.ByName(name)
+		pin = gpioreg.ByName(g.pin)
 	)
 
 	if pin == gpio.INVALID || pin == nil {
-		return fmt.Errorf("pin %s is invalid", name)
+		return errors.Errorf("pin %s is invalid", g.pin)
 	}
 
 	g.PinIO = pin
+
+	if err := g.Low(); err != nil {
+		return errors.Wrapf(err, "failed initialising pin", g.pin)
+	}
 
 	return nil
 }

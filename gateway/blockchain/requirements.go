@@ -20,8 +20,11 @@ type RequirementsContract struct {
 func NewRequirementsContract(client *Client) *RequirementsContract {
 	return &RequirementsContract{
 		client: client,
-		contract: client.network.GetContract("requirements"),
 	}
+}
+
+func (rc *RequirementsContract) Init() {
+	rc.contract = rc.client.network.GetContract("requirements")
 }
 
 func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requirements, error) {
@@ -63,6 +66,7 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event devices.%s", event)
 			default:
+				shared.Logger.Debug("Requirements blockchain event listener ended.")
 				return nil
 			}
 		}

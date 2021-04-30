@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -43,13 +44,19 @@ func CacheReadings(readings ...models.MetricReadings) (err error) {
 
 // IterateOverCachedReadings performs iteration over all cached models.MetricReadings records.
 // allowing to `pop` them on fly.
-func IterateOverCachedReadings(fn ReadingsCacheIteratorFunc, pop bool) {
+func IterateOverCachedReadings(ctx context.Context, fn ReadingsCacheIteratorFunc, pop bool) {
 	var (
 		prefix = []byte(shared.FormCompositeKey("reading"))
 		iter = shared.LevelDB.NewIterator(util.BytesPrefix(prefix), nil)
 	)
 
 	for iter.Next() {
+		select {
+		case <- ctx.Done():
+			return
+		default:
+		}
+
 		var (
 			key = string(iter.Key())
 			_, attrs = shared.SplitCompositeKey(key)

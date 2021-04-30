@@ -6,23 +6,23 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type MAX30102 struct {
 	*max3010x.Device
-	i2c *peripherals.I2C
+	i2c *peripheries.I2C
 	addr uint16
 	bus int
 }
 
 func NewMAX30102(addr uint16, bus int) sensor.Sensor {
 	return &MAX30102{
-		i2c: peripherals.NewI2C(addr, bus),
+		i2c:  peripheries.NewI2C(addr, bus),
 		addr: addr,
-		bus: bus,
+		bus:  bus,
 	}
 }
 

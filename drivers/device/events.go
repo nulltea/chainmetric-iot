@@ -11,20 +11,18 @@ import (
 )
 
 var (
-	once = sync.Once{}
+	eventsOnce = sync.Once{}
 )
 
 func (d *Device) WatchForBlockchainEvents() {
-	var (
-		ctx context.Context
-	)
+	if !d.active {
+		return
+	}
 
-	ctx, d.cancelEvents = context.WithCancel(context.Background())
-
-	once.Do(func() {
-		go d.watchAssets(ctx)
-		go d.watchDevice(ctx)
-		go d.watchRequirements(ctx)
+	eventsOnce.Do(func() {
+		go d.watchAssets(d.ctx)
+		go d.watchDevice(d.ctx)
+		go d.watchRequirements(d.ctx)
 	})
 }
 

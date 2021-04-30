@@ -4,12 +4,12 @@ REMOTE_DIR=/home/pi/sensorsys
 CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
 
 build:
-	CGO_ENABLED=1 go mod vendor && go build -v  -o $(OUTPUT) ./cmd
+	CGO_ENABLED=1 go mod vendor && go build -v  -o $(OUTPUT) .
 
 build-remote:
 	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ \
         CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=6 \
-        go build -v  -o $(OUTPUT) ./cmd
+        go build -v  -o $(OUTPUT) .
 
 sync:
 	rsync -r --exclude .env \
@@ -24,7 +24,7 @@ run:
 	sudo ./$(OUTPUT)
 
 kill:
-
+	ps aux | awk '{print $$2"\t"$$11}' | grep -E ./$(OUTPUT) | awk '{print $$1}' | sudo xargs kill -SIGTERM
 
 i2c:
 	sudo i2cdetect -l

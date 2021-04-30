@@ -17,6 +17,8 @@ type Client struct {
 	gateway *gateway.Gateway
 	network *gateway.Network
 
+	config config.BlockchainConfig
+
 	Contracts contracts
 }
 
@@ -27,39 +29,9 @@ type contracts struct {
 	Readings     *ReadingsContract
 }
 
-func NewBlockchainClient() *Client {
-	return &Client{}
-}
-
-func (bc *Client) Init(config config.BlockchainConfig) (err error) {
-	configProvider := fabconfig.FromFile(config.ConnectionConfig)
-
-	bc.wallet, err = gateway.NewFileSystemWallet(config.WalletPath)
-	if err != nil {
-		err = errors.Wrapf(err, "failed to create new wallet on %s", config.WalletPath)
-		return
-	}
-
-	identity, err := newX509Identity(config.Identity); if err != nil {
-		err = errors.Wrap(err, "failed to build X509 identity")
-		return
-	}
-
-	if err = bc.wallet.Put(config.Identity.UserID, identity); err != nil {
-		err = errors.Wrap(err, "failed to put identity to wallet")
-		return
-	}
-
-	bc.gateway, err = gateway.Connect(
-		gateway.WithConfig(configProvider),
-		gateway.WithIdentity(bc.wallet, config.Identity.UserID),
-	); if err != nil {
-		return errors.Wrap(err, "failed to connect to blockchain gateway")
-	}
-
-	bc.network, err = bc.gateway.GetNetwork(config.ChannelID); if err != nil {
-		err = errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
-		return
+func NewClient(config config.BlockchainConfig) *Client {
+	bc := &Client{
+		config: config,
 	}
 
 	bc.Contracts = contracts{
@@ -68,6 +40,45 @@ func (bc *Client) Init(config config.BlockchainConfig) (err error) {
 		Requirements: NewRequirementsContract(bc),
 		Readings:     NewReadingsContract(bc),
 	}
+
+	return bc
+}
+
+func (bc *Client) Init() (err error) {
+	configProvider := fabconfig.FromFile(bc.config.ConnectionConfig)
+
+	bc.wallet, err = gateway.NewFileSystemWallet(bc.config.WalletPath)
+	if err != nil {
+		err = errors.Wrapf(err, "failed to create new wallet on %s", bc.config.WalletPath)
+		return
+	}
+
+	identity, err := newX509Identity(bc.config.Identity); if err != nil {
+		err = errors.Wrap(err, "failed to build X509 identity")
+		return
+	}
+
+	if err = bc.wallet.Put(bc.config.Identity.UserID, identity); err != nil {
+		err = errors.Wrap(err, "failed to put identity to wallet")
+		return
+	}
+
+	bc.gateway, err = gateway.Connect(
+		gateway.WithConfig(configProvider),
+		gateway.WithIdentity(bc.wallet, bc.config.Identity.UserID),
+	); if err != nil {
+		return errors.Wrap(err, "failed to connect to blockchain gateway")
+	}
+
+	bc.network, err = bc.gateway.GetNetwork(bc.config.ChannelID); if err != nil {
+		err = errors.Wrapf(err, "failed to create new client of channel %s", bc.config.ChannelID)
+		return
+	}
+
+	bc.Contracts.Assets.Init()
+	bc.Contracts.Devices.Init()
+	bc.Contracts.Requirements.Init()
+	bc.Contracts.Readings.Init()
 
 	return
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
@@ -15,26 +15,26 @@ import (
 type (
 	// LSM303Accelerometer defines accelerometer sensor device
 	LSM303Accelerometer struct {
-		*peripherals.I2C
+		*peripheries.I2C
 		dev  *lsm303.Accelerometer
 	}
 
 	// LSM303Magnetometer defines magnetometer sensor device
 	LSM303Magnetometer struct {
-		*peripherals.I2C
+		*peripheries.I2C
 		dev  *lsm303.Magnetometer
 	}
 )
 
 func NewAccelerometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Accelerometer{
-		I2C: peripherals.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus),
 	}
 }
 
 func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Magnetometer{
-		I2C: peripherals.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus),
 	}
 }
 

@@ -15,6 +15,7 @@ func initConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("device.id_file_path", "../device.id")
+	viper.SetDefault("device.register_timeout_duration", "1m")
 	viper.SetDefault("device.hotswap_detect_interval", "3s")
 	viper.SetDefault("device.local_cache_path", "/var/cache")
 	viper.SetDefault("device.ping_timer_interval", "1m")
@@ -54,6 +55,13 @@ func initConfig() {
 func UnmarshalFromConfig(key string, v interface{}) error {
 	bindEnvs(key, v)
 	return viper.UnmarshalKey(key, v)
+}
+
+func MustUnmarshalFromConfig(key string, v interface{}) {
+	bindEnvs(key, v)
+	if err := viper.UnmarshalKey(key, v); err != nil {
+		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))
+	}
 }
 
 func bindEnvs(key string, rawVal interface{}) {

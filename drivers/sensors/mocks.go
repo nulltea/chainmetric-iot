@@ -9,13 +9,13 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 type (
 	I2CSensorMock struct {
-		*peripherals.I2C
+		*peripheries.I2C
 		duration time.Duration
 		metrics  []models.Metric
 		active   bool
@@ -29,7 +29,7 @@ type (
 
 func NewI2CSensorMock(addr uint16, bus int) sensor.Sensor {
 	return &I2CSensorMock{
-		I2C:      peripherals.NewI2C(addr, bus),
+		I2C:      peripheries.NewI2C(addr, bus),
 		duration: viper.GetDuration("mocks.sensor_duration"),
 		metrics:  []models.Metric{metrics.AirCO2Concentration, metrics.Luminosity, metrics.Magnetism},
 	}

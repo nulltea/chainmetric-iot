@@ -4,16 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/op/go-logging"
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type Context struct {
 	Parent    context.Context
 	SensorID  string
-	Logger    *logging.Logger
 	Pipe      model.SensorReadingsPipe
 }
 
@@ -26,16 +25,16 @@ func (c *Context) For(metric models.Metric) *metricWriter {
 
 func (c *Context) Error(err error) {
 	if err != nil {
-		c.Logger.Errorf("%v: %v", c.SensorID, err)
+		shared.Logger.Errorf("%v: %v", c.SensorID, err)
 	}
 }
 
 func (c *Context) Warning(msg string) {
-	c.Logger.Errorf("%v: %v", c.SensorID, msg)
+	shared.Logger.Errorf("%v: %v", c.SensorID, msg)
 }
 
 func (c *Context) Info(info string) {
-	c.Logger.Infof("%v: %v", c.SensorID, info)
+	shared.Logger.Infof("%v: %v", c.SensorID, info)
 }
 
 func (c *Context) SetTimeout(timeout time.Duration) (*Context, context.CancelFunc) {

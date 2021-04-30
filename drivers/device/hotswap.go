@@ -1,7 +1,6 @@
 package device
 
 import (
-	"context"
 	"sync"
 	"time"
 
@@ -19,32 +18,31 @@ var (
 )
 
 func (d *Device) initHotswap() {
+	if !d.active {
+		return
+	}
+
 	hotswapOnce.Do(func() {
 		var (
 			startTime  time.Time
 			interval = viper.GetDuration("device.hotswap_detect_interval")
 		)
 
-		ctx, cancel := context.WithCancel(context.Background())
-		d.cancelHotswap = func() {
-			cancel()
-			hotswapOnce = sync.Once{}
-		}
-
 		go func() {
-		LOOP: for {
-			startTime = time.Now()
+			LOOP: for {
+				startTime = time.Now()
 
-			if err := d.handleHotswap(); err != nil {
-				shared.Logger.Error(errors.Wrap(err, "failed to handle hotswap"))
-			}
+				if err := d.handleHotswap(); err != nil {
+					shared.Logger.Error(errors.Wrap(err, "failed to handle hotswap"))
+				}
 
-			select {
-			case <-time.After(interval - time.Since(startTime)):
-			case <- ctx.Done():
-				break LOOP
+				select {
+				case <-time.After(interval - time.Since(startTime)):
+				case <- d.ctx.Done():
+					shared.Logger.Debug("Hotswap routine ended.")
+					break LOOP
+				}
 			}
-		}
 		}()
 	})
 }

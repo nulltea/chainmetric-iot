@@ -7,7 +7,6 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models"
 
-
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
@@ -17,6 +16,8 @@ import (
 )
 
 type Device struct {
+	ctx context.Context
+
 	specs    *model.DeviceSpecs
 	model    *models.Device
 	assets   *assetsCache
@@ -31,12 +32,15 @@ type Device struct {
 
 	pingTimer *time.Timer
 
-	cancelEvents context.CancelFunc
-	cancelHotswap context.CancelFunc
+	active bool
+	cancelDevice context.CancelFunc
 }
 
-func NewDevice() *Device {
+func New() *Device {
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &Device{
+		ctx: ctx,
 		assets: &assetsCache{
 			mutex: sync.Mutex{},
 			data:  make(map[string]bool),
@@ -46,6 +50,7 @@ func NewDevice() *Device {
 			data:  make(map[string]*readingsRequest),
 		},
 		staticSensors: make([]sensor.Sensor, 0),
+		cancelDevice: cancel,
 	}
 }
 
@@ -75,16 +80,8 @@ func (d * Device) DisplayAvailable() bool {
 }
 
 func (d *Device) Close() error {
-	if d.DisplayAvailable() {
-		if err := d.display.Close(); err != nil {
-			return err
-		}
-	}
-
-	d.cancelEvents()
-	d.cancelHotswap()
-
-	d.reader.Close()
+	d.active = false
+	d.cancelDevice()
 
 	return nil
 }

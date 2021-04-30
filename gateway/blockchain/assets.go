@@ -21,8 +21,11 @@ type AssetsContract struct {
 func NewAssetsContract(client *Client) *AssetsContract {
 	return &AssetsContract{
 		client: client,
-		contract: client.network.GetContract("assets"),
 	}
+}
+
+func (ac *AssetsContract) Init() {
+	ac.contract = ac.client.network.GetContract("assets")
 }
 
 func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, error) {
@@ -63,6 +66,7 @@ func (ac *AssetsContract) Subscribe(ctx context.Context, event string, action fu
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event assets.%s", event)
 			default:
+				shared.Logger.Debug("Assets blockchain event listener ended.")
 				return nil
 			}
 		}

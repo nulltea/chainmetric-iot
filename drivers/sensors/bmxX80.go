@@ -9,18 +9,18 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripherals"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
 type BMP280 struct {
-	*peripherals.I2C
+	*peripheries.I2C
 	bmp  *bmxx80.Dev
 }
 
 func NewBMXX80(addr uint16, bus int) sensor.Sensor {
 	return &BMP280{
-		I2C: peripherals.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus),
 	}
 }
 
