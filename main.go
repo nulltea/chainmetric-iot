@@ -8,6 +8,7 @@ import (
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	displays "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -40,6 +41,8 @@ func init() {
 		SetClient(client).
 		SetReader(reader).
 		SetDisplay(display)
+
+	gui.Init(display)
 }
 
 func main() {
@@ -67,6 +70,8 @@ func startup() {
 	shared.MustExecute(device.Init, "failed to initialize device")
 	shared.MustExecute(device.CacheBlockchainState, "failed to cache the state of blockchain")
 
+	gui.Text("ChainMetric")
+
 	device.WatchForBlockchainEvents()
 	device.Operate()
 }
@@ -77,6 +82,7 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 
 	if dcf.Enabled {
 		shared.Execute(display.ClearAndRefresh, "error during clearing display")
+		shared.Execute(display.Reset, "error during resetting display")
 		shared.Execute(display.Close, "error during closing connection to display")
 	}
 

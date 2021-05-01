@@ -245,7 +245,6 @@ func (d *EInk) Bounds() image.Rectangle {
 	return d.rect
 }
 
-
 // SendCommandArgs overrides peripheries.SPI send command with args method
 // by additionally sending signals to DC and CS GPIO pins.
 func (d *EInk) SendCommandArgs(cmd byte, data ...byte) error {
@@ -413,3 +412,4 @@ func (d *EInk) setMemoryArea(xStart, yStart, xEnd, yEnd int) error {
 		byte((yEnd >> 8) & 0xFF),
 	)
 }
+
