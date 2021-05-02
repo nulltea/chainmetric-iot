@@ -17,8 +17,9 @@ type I2CDetectResults map[int][]uint16
 
 func DetectI2C(start, end uint16) I2CDetectResults {
 	var (
-		addrMap = make(map[int][]uint16)
-		wg = sync.WaitGroup{}
+		addrMap     = make(map[int][]uint16)
+		wg          = sync.WaitGroup{}
+		reservedBus = viper.GetInt("device.battery_monitor_bus")
 	)
 
 	if viper.GetBool("mocks.debug_env") {
@@ -26,6 +27,10 @@ func DetectI2C(start, end uint16) I2CDetectResults {
 	}
 
 	for _, ref := range i2creg.All() {
+		if ref.Number == reservedBus {
+			continue
+		}
+
 		ctx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
 		wg.Add(1)
 

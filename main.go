@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/spf13/viper"
 
@@ -47,7 +48,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
-	go startup()
+	go debugBattery()
 	go shutdown(quit, done)
 
 	<-done
@@ -87,4 +88,24 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	shared.CloseCore()
 
 	close(done)
+}
+
+func debugBattery() {
+	var (
+		dev = sensors.NewINA219(0x44, 5)
+	)
+
+	shared.MustExecute(dev.Init, "")
+
+	for {
+		if v, err := dev.ReadVoltage(); err == nil {
+			shared.Logger.Debug("Battery voltage:", v)
+		}
+
+		if v, err := dev.ReadCurrent(); err == nil {
+			shared.Logger.Debug("Battery current:", v)
+		}
+
+		time.Sleep(1 * time.Second)
+	}
 }

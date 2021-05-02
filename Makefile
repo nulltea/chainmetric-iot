@@ -32,3 +32,4 @@ i2c:
 	sudo i2cdetect -y 2
 	sudo i2cdetect -y 3
 	sudo i2cdetect -y 4
+	sudo i2cdetect -y 5
