@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	adcPiezoMutex = sync.Mutex{}
+	adcPiezoMutex = &sync.Mutex{}
 )
 
 type ADCPiezo struct {
@@ -29,7 +29,7 @@ func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
 			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
 			shared.Logger.Debug("ADC_Piezo", "-> volts =", volts)
 			return volts
-		})),
+		}), peripheries.WithI2CMutex(adcPiezoMutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

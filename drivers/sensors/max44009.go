@@ -22,7 +22,7 @@ type MAX44009 struct {
 
 func NewMAX44009(addr uint16, bus int) sensor.Sensor {
 	return &MAX44009{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(max44009Mutex)),
 	}
 }
 
@@ -69,5 +69,5 @@ func (s *MAX44009) Verify() bool {
 		return devID == MAX44009_DEVICE_ID
 	}
 
-	return true
+	return false
 }

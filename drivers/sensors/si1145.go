@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	si1145Mutex = sync.Mutex{}
+	si1145Mutex = &sync.Mutex{}
 )
 
 type SI1145 struct {
@@ -21,7 +21,7 @@ type SI1145 struct {
 
 func NewSI1145(addr uint16, bus int) sensor.Sensor {
 	return &SI1145{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(si1145Mutex)),
 	}
 }
 

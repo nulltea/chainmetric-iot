@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	adcMicMutex = sync.Mutex{}
+	adcMicMutex = &sync.Mutex{}
 )
 
 type ADCMic struct {
@@ -23,7 +23,7 @@ type ADCMic struct {
 
 func NewADCMicrophone(addr uint16, bus int) sensor.Sensor {
 	return &ADCMic{
-		ADC:     peripheries.NewADC(addr, bus),
+		ADC:     peripheries.NewADC(addr, bus, peripheries.WithI2CMutex(adcMicMutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

@@ -15,10 +15,10 @@ func (f I2COptionFunc) Apply(i2c *I2C) {
 	f(i2c)
 }
 
-// WithConversion can be used to setup ADC readings conversion.
-// Default is a function that returns input value as is.
+// WithMutex can be used to setup mutex I2C driver.
+// Default is a new sync.Mutex instance.
 func WithMutex(mutex *sync.Mutex) I2COption {
 	return I2COptionFunc(func(d *I2C) {
-		d.mutex = mutex
+		d.Mutex = mutex
 	})
 }

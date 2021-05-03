@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	adxl345Mutex = sync.Mutex{}
+	adxl345Mutex = &sync.Mutex{}
 )
 
 const (
@@ -29,7 +29,7 @@ type ADXL345 struct {
 
 func NewADXL345(addr uint16, bus int) sensor.Sensor {
 	return &ADXL345{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(adxl345Mutex)),
 	}
 }
 

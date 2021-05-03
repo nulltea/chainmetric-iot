@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	hdc1080Mutex = sync.Mutex{}
+	hdc1080Mutex = &sync.Mutex{}
 )
 
 type HDC1080 struct {
@@ -24,7 +24,7 @@ type HDC1080 struct {
 
 func NewHDC1080(addr uint16, bus int) sensor.Sensor {
 	return &HDC1080{
-		I2C:      peripheries.NewI2C(addr, bus),
+		I2C:      peripheries.NewI2C(addr, bus, peripheries.WithMutex(hdc1080Mutex)),
 		attempts: 10,
 	}
 }
@@ -48,6 +48,9 @@ func (s *HDC1080) Init() error {
 }
 
 func (s *HDC1080) ReadTemperature() (float64, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	if err := s.WriteBytes(HDC1080_TEMPERATURE_REGISTER); err != nil {
 		return 0, errors.Wrap(err, "failed write to temperature register")
 	}
@@ -75,6 +78,9 @@ func (s *HDC1080) ReadTemperature() (float64, error) {
 }
 
 func (s *HDC1080) ReadHumidity() (float64, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	if err := s.WriteBytes(HDC1080_HUMIDITY_REGISTER); err != nil {
 		return 0, errors.Wrap(err, "failed write to humidity register")
 	}

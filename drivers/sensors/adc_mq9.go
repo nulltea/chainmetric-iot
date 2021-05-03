@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	adcMQ9Mutex = sync.Mutex{}
+	adcMQ9Mutex = &sync.Mutex{}
 )
 
 type ADCMQ9 struct {
@@ -27,7 +27,7 @@ func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
 			resAir := (ADC_MQ9_RESISTANCE - volts) / volts
 			return resAir / ADC_MQ9_SENSITIVITY * 1000
-		}), peripheries.WithBias(ADC_MQ9_BIAS)),
+		}), peripheries.WithBias(ADC_MQ9_BIAS), peripheries.WithI2CMutex(adcMQ9Mutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

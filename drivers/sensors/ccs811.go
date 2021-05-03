@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	cc811Mutex = sync.Mutex{}
+	cc811Mutex = &sync.Mutex{}
 )
 
 var (
@@ -29,7 +29,7 @@ type CCS811 struct {
 
 func NewCCS811(addr uint16, bus int) sensor.Sensor {
 	return &CCS811{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(cc811Mutex)),
 	}
 }
 

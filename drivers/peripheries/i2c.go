@@ -14,22 +14,27 @@ import (
 // I2C provides wrapper for I2C peripheral
 type I2C struct {
 	i2c.Dev
+	*sync.Mutex
 	name   string
 	bus    i2c.BusCloser
 	active bool
-
-	mutex *sync.Mutex
 }
 
 // NewI2C creates new I2C driver instance.
 func NewI2C(addr uint16, bus int, options ...I2COption) *I2C {
-	return &I2C{
+	d := &I2C{
 		Dev: i2c.Dev{
 			Addr: addr,
 		},
+		Mutex: &sync.Mutex{},
 		name: shared.NtoI2cBusName(bus),
-		mutex: &sync.Mutex{},
 	}
+
+	for i := range options {
+		options[i].Apply(d)
+	}
+
+	return d
 }
 
 // Init performs I2C device initialization.
@@ -66,6 +71,9 @@ func (i *I2C) ReadBytes(n int) ([]byte, error) {
 
 // ReadReg reads a single byte from a specified `reg` register.
 func (i *I2C) ReadReg(reg byte) (byte, error) {
+	i.Lock()
+	defer i.Unlock()
+
 	b := make([]byte, 1)
 	if err := i.Tx([]byte{reg}, b); err != nil {
 		return 0, err
@@ -76,6 +84,9 @@ func (i *I2C) ReadReg(reg byte) (byte, error) {
 
 // ReadRegBytes reads `n` bytes from a specified `reg` register.
 func (i *I2C) ReadRegBytes(reg byte, n int) ([]byte, error) {
+	i.Lock()
+	defer i.Unlock()
+
 	b := make([]byte, n)
 	if err := i.Tx([]byte{reg}, b); err != nil {
 		return nil, err
@@ -143,6 +154,9 @@ func (i *I2C) WriteBytes(data ...byte) error {
 
 // WriteRegBytes writes `data` bytes to a specified `reg` register.
 func (i *I2C) WriteRegBytes(reg byte, data ...byte) error {
+	i.Lock()
+	defer i.Unlock()
+
 	n, err := i.Write(append([]byte{reg}, data...))
 	if err != nil {
 		return err

@@ -1,5 +1,7 @@
 package peripheries
 
+import "sync"
+
 // An ADCOption configures a ADC driver.
 type ADCOption interface {
 	Apply(adc *ADS1115)
@@ -26,5 +28,13 @@ func WithConversion(convertor func(v float64) float64) ADCOption {
 func WithBias(bias float64) ADCOption {
 	return ADCOptionFunc(func(d *ADS1115) {
 		d.bias = bias
+	})
+}
+
+// WithI2CMutex can be used to specify mutex for I2C bus driver.
+// Default is a new sync.Mutex instance.
+func WithI2CMutex(mutex *sync.Mutex) ADCOption {
+	return ADCOptionFunc(func(d *ADS1115) {
+		d.Mutex = mutex
 	})
 }
