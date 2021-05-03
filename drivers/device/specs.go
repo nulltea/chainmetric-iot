@@ -21,15 +21,13 @@ func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {
 	}
 
 	if rescan || d.detectedI2Cs == nil {
-		d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
+		d.detectedI2Cs = periphery.ScanI2C(sensors.I2CAddressesRange(), sensors.LocateI2CSensor)
 	}
 
-	for bus, addrs := range d.detectedI2Cs {
-		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
-				for _, metric := range sf.Build(bus).Metrics() {
-					availableMetrics[metric] = true
-				}
+	for _, devices := range d.detectedI2Cs {
+		for _, sensor := range devices {
+			for _, metric := range sensor.Metrics() {
+				availableMetrics[metric] = true
 			}
 		}
 	}
@@ -62,13 +60,12 @@ func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {
 func (d *Device) SupportedSensors() []sensor.Sensor {
 	var supports = make([]sensor.Sensor, 0)
 
-	d.DiscoverSpecs(d.detectedI2Cs == nil)
-
-	for bus, addrs := range d.detectedI2Cs {
-		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
-				supports = append(supports, sf.Build(bus))
-			}
+	if d.detectedI2Cs == nil {
+		d.detectedI2Cs = periphery.ScanI2C(sensors.I2CAddressesRange(), sensors.LocateI2CSensor)
+	}
+	for _, devices := range d.detectedI2Cs {
+		for _, sensor := range devices {
+			supports = append(supports, sensor)
 		}
 	}
 

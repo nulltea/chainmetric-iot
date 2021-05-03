@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"math"
+	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -10,6 +11,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+)
+
+var (
+	adxl345Mutex = &sync.Mutex{}
 )
 
 const (
@@ -24,7 +29,7 @@ type ADXL345 struct {
 
 func NewADXL345(addr uint16, bus int) sensor.Sensor {
 	return &ADXL345{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(adxl345Mutex)),
 	}
 }
 

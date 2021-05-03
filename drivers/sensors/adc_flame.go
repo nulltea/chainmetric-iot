@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -8,6 +10,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	adcFlameMutex = &sync.Mutex{}
 )
 
 type ADCFlame struct {
@@ -20,7 +26,7 @@ func NewADCFlame(addr uint16, bus int) sensor.Sensor {
 		ADC: peripheries.NewADC(addr, bus, peripheries.WithConversion(func(raw float64) float64 {
 			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
 			return volts
-		}), peripheries.WithBias(ADC_FLAME_BIAS)),
+		}), peripheries.WithBias(ADC_FLAME_BIAS), peripheries.WithI2CMutex(adcFlameMutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }

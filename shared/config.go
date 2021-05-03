@@ -16,6 +16,7 @@ func initConfig() {
 
 	viper.SetDefault("device.id_file_path", "../device.id")
 	viper.SetDefault("device.register_timeout_duration", "1m")
+	viper.SetDefault("device.i2c_scan_timeout", "100ms")
 	viper.SetDefault("device.hotswap_detect_interval", "3s")
 	viper.SetDefault("device.local_cache_path", "/var/cache")
 	viper.SetDefault("device.ping_timer_interval", "1m")
