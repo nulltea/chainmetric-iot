@@ -18,12 +18,12 @@ var i2cSensorsLocatorMap = map[uint16][]sensor.Factory {
 	},
 	0x4B: {
 		sensor.I2CFactory(NewMAX44009, MAX44009_ALT_ADDRESS),
-		sensor.I2CFactory(NewADCFlame, ADC_FLAME_ADDRESS),
+		sensor.I2CFactory(NewADCPiezo, ADC_FLAME_ADDRESS),
 	},
 	0x53: { sensor.I2CFactory(NewADXL345, ADXL345_ADDRESS) },
 	0x57: { sensor.I2CFactory(NewMAX30102, MAX30102_ADDRESS) },
 	0x5A: { sensor.I2CFactory(NewCCS811, CCS811_ADDRESS) },
-	0x60: { sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS) },
+	0x60: { sensor.I2CFactory(NewSI1145, SI1145_ADDRESS) },
 	0x76: { sensor.I2CFactory(NewBMXX80, BMP280_ADDRESS) },
 	0x88: { sensor.I2CFactory(NewI2CSensorMock, MOCK_ADDRESS) },
 }

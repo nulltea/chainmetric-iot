@@ -28,7 +28,7 @@ const (
 
 // ADCHall sensor constants
 const (
-	ADC_HALL_BIAS        = 400
+	ADC_HALL_BIAS        = 800
 	ADC_HALL_SENSITIVITY = 1.9 // mV / Gauss
 )
 
@@ -184,11 +184,10 @@ const(
 
 // MAX44009 luminosity sensor constants
 const(
-	// Commands
-	MAX44009_APP_START = 0x03
-
 	// Registers
 	MAX44009_DEVICE_ID_REGISTER = 0x0F
+	MAX44009_LUX_READING_REGISTER = 0x03
+
 
 	// Constants
 	MAX44009_DEVICE_ID = 0x3F
