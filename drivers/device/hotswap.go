@@ -55,13 +55,10 @@ func (d *Device) handleHotswap() error {
 		isChanges bool
 	)
 
-	d.detectedI2Cs = periphery.DetectI2C(sensors.I2CAddressesRange())
-	for bus, addrs := range d.detectedI2Cs {
-		for _, addr := range addrs {
-			if sf, ok := sensors.LocateI2CSensor(addr, bus); ok {
-				s := sf.Build(bus)
-				detectedSensors[s.ID()] = s
-			}
+	d.detectedI2Cs = periphery.ScanI2C(sensors.I2CAddressesRange(), sensors.LocateI2CSensor)
+	for _, devices := range d.detectedI2Cs {
+		for _, s := range devices {
+			detectedSensors[s.ID()] = s
 		}
 	}
 
@@ -69,7 +66,7 @@ func (d *Device) handleHotswap() error {
 		if _, ok := detectedSensors[id]; !ok && !d.isStaticSensor(id) {
 			d.reader.UnregisterSensor(id)
 			isChanges = true
-			shared.Logger.Debugf("hotswap: %s sensor was detached from the device", id)
+			shared.Logger.Debugf("Hotswap: %s sensor was detached from the device", id)
 		}
 	}
 
@@ -77,7 +74,7 @@ func (d *Device) handleHotswap() error {
 		if _, ok := registeredSensors[id]; !ok {
 			d.reader.RegisterSensors(detectedSensors[id])
 			isChanges = true
-			shared.Logger.Debugf("hotswap: %s sensor was attached to the device", id)
+			shared.Logger.Debugf("Hotswap: %s sensor was attached to the device", id)
 		}
 	}
 

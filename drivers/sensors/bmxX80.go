@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"math"
+	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
 	"periph.io/x/periph/conn/physic"
@@ -13,6 +14,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
+var (
+	bmp280Mutex = &sync.Mutex{}
+)
+
 type BMP280 struct {
 	*peripheries.I2C
 	bmp  *bmxx80.Dev
@@ -20,7 +25,7 @@ type BMP280 struct {
 
 func NewBMXX80(addr uint16, bus int) sensor.Sensor {
 	return &BMP280{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(bmp280Mutex)),
 	}
 }
 
@@ -41,6 +46,9 @@ func (s *BMP280) Init() (err error) {
 }
 
 func (s *BMP280) Harvest(ctx *sensor.Context) {
+	s.Lock()
+	defer s.Unlock()
+
 	var env = physic.Env{}
 
 	if err := s.bmp.Sense(&env); err != nil {

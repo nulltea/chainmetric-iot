@@ -1,7 +1,7 @@
 package sensors
 
 import (
-	"sort"
+	"github.com/spf13/viper"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
@@ -18,12 +18,12 @@ var i2cSensorsLocatorMap = map[uint16][]sensor.Factory {
 	},
 	0x4B: {
 		sensor.I2CFactory(NewMAX44009, MAX44009_ALT_ADDRESS),
-		sensor.I2CFactory(NewADCFlame, ADC_FLAME_ADDRESS),
+		sensor.I2CFactory(NewADCPiezo, ADC_PIEZO_ADDRESS),
 	},
 	0x53: { sensor.I2CFactory(NewADXL345, ADXL345_ADDRESS) },
 	0x57: { sensor.I2CFactory(NewMAX30102, MAX30102_ADDRESS) },
 	0x5A: { sensor.I2CFactory(NewCCS811, CCS811_ADDRESS) },
-	0x60: { sensor.I2CFactory(NewMAX44009, MAX44009_ADDRESS) },
+	0x60: { sensor.I2CFactory(NewSI1145, SI1145_ADDRESS) },
 	0x76: { sensor.I2CFactory(NewBMXX80, BMP280_ADDRESS) },
 	0x88: { sensor.I2CFactory(NewI2CSensorMock, MOCK_ADDRESS) },
 }
@@ -42,14 +42,16 @@ func LocateI2CSensor(addr uint16, bus int) (sensor.Factory, bool) {
 }
 
 // I2CAddressesRange determines diapason of I2C addresses to detect from.
-func I2CAddressesRange() (from uint16, to uint16) {
-	var addresses []int
+func I2CAddressesRange() []uint16 {
+	var addresses []uint16
 
 	for addr := range i2cSensorsLocatorMap {
-		addresses = append(addresses, int(addr))
+		if addr == MOCK_ADDRESS && !viper.GetBool("mocks.debug_env") {
+			continue
+		}
+
+		addresses = append(addresses, addr)
 	}
 
-	sort.Ints(addresses)
-
-	return uint16(addresses[0]), uint16(addresses[len(addresses) - 1])
+	return addresses
 }

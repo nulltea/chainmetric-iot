@@ -72,7 +72,8 @@ $ make crypto-sync
 - [x] Caching on network connection absence [(#3)](https://github.com/timoth-y/chainmetric-sensorsys/pull/3)
 - [x] Sensor modules hot-swap support [(#1)](https://github.com/timoth-y/chainmetric-sensorsys/pull/1)
 - [x] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115] [(#4)]( https://github.com/timoth-y/chainmetric-sensorsys/pull/4)
-- [ ] [E-Ink display][e-ink display] support
+- [x] [E-Ink display][e-ink display] support [(#5)](https://github.com/timoth-y/chainmetric-sensorsys/pull/5)
+- [ ] GUI for displaying statistics data and emergency warnings
 - [ ] A device as a blockchain node
 - [ ] Location tracking (GPS) support
 - [ ] Video-camera driver
