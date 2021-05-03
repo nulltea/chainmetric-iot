@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -8,6 +10,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	adcMQ9Mutex = sync.Mutex{}
 )
 
 type ADCMQ9 struct {

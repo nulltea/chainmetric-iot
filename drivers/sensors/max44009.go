@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"math"
+	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -9,6 +10,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	max44009Mutex = &sync.Mutex{}
 )
 
 type MAX44009 struct {

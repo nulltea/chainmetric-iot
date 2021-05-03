@@ -19,7 +19,7 @@ const (
 	MOCK_ADDRESS           = 0x88
 )
 
-// ADCMicrophone sensor constants
+// ADCMic sensor constants
 const (
 	ADC_MICROPHONE_BIAS          = 2500
 	ADC_MICROPHONE_REGRESSION_C1 = 0.001276

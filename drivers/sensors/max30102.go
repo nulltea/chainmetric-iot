@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -9,6 +11,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
+)
+
+var (
+	max30102Mutex = &sync.Mutex{}
 )
 
 type MAX30102 struct {
@@ -20,7 +26,7 @@ type MAX30102 struct {
 
 func NewMAX30102(addr uint16, bus int) sensor.Sensor {
 	return &MAX30102{
-		i2c:  peripheries.NewI2C(addr, bus),
+		i2c:  peripheries.NewI2C(addr, bus, peripheries.WithMutex(max30102Mutex)),
 		addr: addr,
 		bus:  bus,
 	}

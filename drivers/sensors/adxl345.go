@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"math"
+	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -10,6 +11,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+)
+
+var (
+	adxl345Mutex = sync.Mutex{}
 )
 
 const (

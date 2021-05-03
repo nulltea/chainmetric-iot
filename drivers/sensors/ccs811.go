@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/timoth-y/chainmetric-core/models"
@@ -10,6 +11,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	cc811Mutex = sync.Mutex{}
 )
 
 var (

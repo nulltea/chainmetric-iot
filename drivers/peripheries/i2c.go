@@ -2,6 +2,7 @@ package peripheries
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/pkg/errors"
 	"periph.io/x/periph/conn/i2c"
@@ -16,15 +17,18 @@ type I2C struct {
 	name   string
 	bus    i2c.BusCloser
 	active bool
+
+	mutex *sync.Mutex
 }
 
 // NewI2C creates new I2C driver instance.
-func NewI2C(addr uint16, bus int) *I2C {
+func NewI2C(addr uint16, bus int, options ...I2COption) *I2C {
 	return &I2C{
 		Dev: i2c.Dev{
 			Addr: addr,
 		},
 		name: shared.NtoI2cBusName(bus),
+		mutex: &sync.Mutex{},
 	}
 }
 

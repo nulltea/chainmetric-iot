@@ -1,12 +1,18 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	si1145Mutex = sync.Mutex{}
 )
 
 type SI1145 struct {
@@ -112,6 +118,9 @@ func (s *SI1145) ReadProximity() (float64, error) {
 }
 
 func (s *SI1145) Harvest(ctx *sensor.Context) {
+	max44009Mutex.Lock()
+	defer max44009Mutex.Unlock()
+
 	ctx.For(metrics.UVLight).WriteWithError(s.ReadUV())
 	ctx.For(metrics.VisibleLight).WriteWithError(s.ReadVisible())
 	ctx.For(metrics.IRLight).WriteWithError(s.ReadIR())

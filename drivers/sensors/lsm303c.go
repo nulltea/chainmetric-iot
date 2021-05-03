@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -11,6 +13,11 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
+
+var (
+	lsm303cAccelerometerMutex = sync.Mutex{}
+	lsm303cMagnetometerMutex  = sync.Mutex
+)
 
 type (
 	// LSM303Accelerometer defines accelerometer sensor device

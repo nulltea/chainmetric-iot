@@ -6,7 +6,7 @@ type ADCOption interface {
 }
 
 // ADCOptionFunc is a function that configures a ADC driver.
-type ADCOptionFunc func(adc *ADS1115)
+type ADCOptionFunc func(d *ADS1115)
 
 // Apply calls ADCOptionFunc on the driver instance.
 func (f ADCOptionFunc) Apply(adc *ADS1115) {

@@ -13,6 +13,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 )
 
+var (
+	hdc1080Mutex = sync.Mutex{}
+)
+
 type HDC1080 struct {
 	*peripheries.I2C
 	attempts int
