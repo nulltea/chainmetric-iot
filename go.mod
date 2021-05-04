@@ -21,6 +21,7 @@ require (
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/yaml.v2 v2.3.0
 	periph.io/x/periph v3.6.7+incompatible
+	tinygo.org/x/bluetooth v0.3.0
 )
 
 replace github.com/cgxeiji/max3010x v0.0.0-20200914015011-b05e3d2950ea => github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3
