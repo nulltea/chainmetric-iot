@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/timoth-y/chainmetric-core/models"
@@ -10,6 +11,10 @@ import (
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+)
+
+var (
+	cc811Mutex = &sync.Mutex{}
 )
 
 var (
@@ -24,7 +29,7 @@ type CCS811 struct {
 
 func NewCCS811(addr uint16, bus int) sensor.Sensor {
 	return &CCS811{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(cc811Mutex)),
 	}
 }
 

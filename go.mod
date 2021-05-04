@@ -10,7 +10,7 @@ require (
 	github.com/d2r2/go-logger v0.0.0-20181221090742-9998a510495e
 	github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f // indirect
 	github.com/fogleman/gg v1.3.0
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/pkg/errors v0.9.1
@@ -18,7 +18,7 @@ require (
 	github.com/spf13/viper v1.3.2
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/timoth-y/chainmetric-core v0.0.0-20210425175834-f63fbab3cdc7
-	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb // indirect
+	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/yaml.v2 v2.3.0
 	periph.io/x/periph v3.6.7+incompatible
 )

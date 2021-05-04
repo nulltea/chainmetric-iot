@@ -1,6 +1,7 @@
 device:
   id_file_path: ../device.id
   register_timeout_duration: 1m
+  i2c_scan_timeout: 150ms
   hotswap_detect_interval: 3s
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
@@ -30,9 +31,8 @@ display:
   enabled: true
   width: 128
   height: 250
-  image_size: 128
   bus: SPI0.0
   dc_pin: 25
   cs_pin: 8
   reset_pin: 4
-  busy_pin: 16
+  busy_pin: 22

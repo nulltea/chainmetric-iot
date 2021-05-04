@@ -44,9 +44,9 @@ type ADC interface {
 // ADS1115 implements ADC driver for ADS1115 device.
 type ADS1115 struct {
 	*ads.ADS
+	*I2C
 	Addr   uint16
 	Bus    string
-	i2c *I2C
 	active bool
 
 	bias float64
@@ -58,7 +58,7 @@ func NewADC(addr uint16, bus int, options ...ADCOption) *ADS1115 {
 	d := &ADS1115{
 		Bus: shared.NtoI2cBusName(bus),
 		Addr: addr,
-		i2c: NewI2C(addr, bus),
+		I2C: NewI2C(addr, bus),
 
 		convertor: func(v float64) float64 {
 			return v
@@ -84,6 +84,9 @@ func (d *ADS1115) Init() (err error) {
 }
 
 func (d *ADS1115) Read() float64 {
+	d.Lock()
+	defer d.Unlock()
+
 	if v, err := d.ADS.ReadRetry(5); err != nil {
 		return 0
 	} else {
@@ -154,11 +157,11 @@ func (d ADS1115) rawSequence(n int, t *time.Duration) []int {
 }
 
 func (d *ADS1115) Verify() bool {
-	if !d.i2c.Verify() {
+	if !d.I2C.Verify() {
 		return false
 	}
 
-	if devID, err := d.i2c.ReadReg(ADS1115_DEVICE_ID_REGISTER); err == nil {
+	if devID, err := d.ReadReg(ADS1115_DEVICE_ID_REGISTER); err == nil {
 		return devID == ADS1115_DEVICE_ID
 	}
 

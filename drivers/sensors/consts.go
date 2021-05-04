@@ -14,13 +14,13 @@ const (
 	ADC_HALL_ADDRESS       = 0x48
 	ADC_MICROPHONE_ADDRESS = 0x49
 	ADC_MQ9_ADDRESS        = 0x4A
-	ADC_FLAME_ADDRESS      = 0x4B
-	ADC_PIEZO_ADDRESS      = 0x4E
+	ADC_PIEZO_ADDRESS      = 0x4B
+	ADC_FLAME_ADDRESS      = 0x4E
 	INA219_ADDRESS         = 0x44
 	MOCK_ADDRESS           = 0x88
 )
 
-// ADCMicrophone sensor constants
+// ADCMic sensor constants
 const (
 	ADC_MICROPHONE_BIAS          = 2500
 	ADC_MICROPHONE_REGRESSION_C1 = 0.001276
@@ -29,7 +29,7 @@ const (
 
 // ADCHall sensor constants
 const (
-	ADC_HALL_BIAS        = 400
+	ADC_HALL_BIAS        = 800
 	ADC_HALL_SENSITIVITY = 1.9 // mV / Gauss
 )
 
@@ -185,11 +185,10 @@ const(
 
 // MAX44009 luminosity sensor constants
 const(
-	// Commands
-	MAX44009_APP_START = 0x03
-
 	// Registers
 	MAX44009_DEVICE_ID_REGISTER = 0x0F
+	MAX44009_LUX_READING_REGISTER = 0x03
+
 
 	// Constants
 	MAX44009_DEVICE_ID = 0x3F

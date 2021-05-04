@@ -16,6 +16,7 @@ func initConfig() {
 
 	viper.SetDefault("device.id_file_path", "../device.id")
 	viper.SetDefault("device.register_timeout_duration", "1m")
+	viper.SetDefault("device.i2c_scan_timeout", "100ms")
 	viper.SetDefault("device.hotswap_detect_interval", "3s")
 	viper.SetDefault("device.local_cache_path", "/var/cache")
 	viper.SetDefault("device.ping_timer_interval", "1m")
@@ -33,7 +34,6 @@ func initConfig() {
 	viper.SetDefault("display.enabled", true)
 	viper.SetDefault("display.width", 240)
 	viper.SetDefault("display.height", 240)
-	viper.SetDefault("display.image_size", 150)
 	viper.SetDefault("display.bus", "SPI0.0")
 	viper.SetDefault("display.dc_pin", 25)
 	viper.SetDefault("display.backlight_pin", 18)
@@ -59,8 +59,7 @@ func UnmarshalFromConfig(key string, v interface{}) error {
 }
 
 func MustUnmarshalFromConfig(key string, v interface{}) {
-	bindEnvs(key, v)
-	if err := viper.UnmarshalKey(key, v); err != nil {
+	if err := UnmarshalFromConfig(key, v); err != nil {
 		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))
 	}
 }

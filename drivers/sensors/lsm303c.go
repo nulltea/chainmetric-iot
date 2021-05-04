@@ -1,6 +1,8 @@
 package sensors
 
 import (
+	"sync"
+
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/chainmetric-core/models"
 
@@ -11,6 +13,11 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
+
+var (
+	lsm303cAccelerometerMutex = &sync.Mutex{}
+	lsm303cMagnetometerMutex  = &sync.Mutex{}
+)
 
 type (
 	// LSM303Accelerometer defines accelerometer sensor device
@@ -28,13 +35,13 @@ type (
 
 func NewAccelerometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Accelerometer{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(lsm303cAccelerometerMutex)),
 	}
 }
 
 func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Magnetometer{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(lsm303cMagnetometerMutex)),
 	}
 }
 
@@ -56,6 +63,9 @@ func (s *LSM303Accelerometer) Init() (err error) {
 
 // ReadAxes retrieves axes acceleration data as multiplications of G
 func (s *LSM303Accelerometer) ReadAxes() (model.Vector, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	x, y, z, err := s.dev.SenseRaw(); if err != nil {
 		return model.Vector{}, err
 	}
@@ -110,6 +120,9 @@ func (s *LSM303Magnetometer) Init() (err error) {
 
 // ReadAxes parses data returned as magnetic force vector
 func (s *LSM303Magnetometer) ReadAxes() (model.Vector, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	x, y, z, err := s.dev.SenseRaw(); if err != nil {
 		return model.Vector{}, err
 	}
