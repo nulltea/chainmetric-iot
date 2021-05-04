@@ -45,7 +45,7 @@ func (d *Device) Init() error {
 	}
 
 	if gui.Available() {
-		gui.QR(d.specs.Encode())
+		gui.RenderQRCode(d.specs.Encode())
 	}
 
 	ctx, cancel := context.WithTimeout(d.ctx, viper.GetDuration("device.register_timeout_duration"))
