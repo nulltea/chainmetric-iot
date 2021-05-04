@@ -8,7 +8,7 @@ import (
 	"periph.io/x/periph/conn/spi/spireg"
 )
 
-// SPI provides wrapper for SPI peripheral
+// SPI provides wrapper for SPI peripheral.
 type SPI struct {
 	conn.Conn
 	name string
