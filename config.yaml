@@ -29,7 +29,6 @@ sensors:
 
 display:
   enabled: true
-  hardware: e_ink
   width: 128
   height: 250
   bus: SPI0.0

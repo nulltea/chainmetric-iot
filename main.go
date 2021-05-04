@@ -36,7 +36,7 @@ func init() {
 
 	client = blockchain.NewClient(bcf)
 	reader = engine.NewSensorsReader()
-	display = displays.New(dcf)
+	display = displays.NewEInk(dcf)
 	device = dev.New().
 		SetClient(client).
 		SetReader(reader)

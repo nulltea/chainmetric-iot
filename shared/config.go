@@ -31,7 +31,6 @@ func initConfig() {
 	viper.SetDefault("sensors.analog.samples_per_read", 100)
 
 	viper.SetDefault("display.enabled", true)
-	viper.SetDefault("display.hardware", "e_ink")
 	viper.SetDefault("display.width", 240)
 	viper.SetDefault("display.height", 240)
 	viper.SetDefault("display.bus", "SPI0.0")

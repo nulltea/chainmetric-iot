@@ -2,7 +2,6 @@ package config
 
 type DisplayConfig struct {
 	Enabled   bool   `yaml:"enabled" mapstructure:"enabled"`
-	Hardware  string `yaml:"hardware" mapstructure:"hardware"`
 	Width     int    `yaml:"width" mapstructure:"width"`
 	Height    int    `yaml:"height" mapstructure:"height"`
 	Rotation  uint8  `yaml:"rotation" mapstructure:"rotation"`
