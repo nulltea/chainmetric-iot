@@ -31,9 +31,8 @@ display:
   enabled: true
   width: 128
   height: 250
-  image_size: 128
   bus: SPI0.0
   dc_pin: 25
   cs_pin: 8
-  reset_pin: 22
-  busy_pin: 16
+  reset_pin: 4
+  busy_pin: 22

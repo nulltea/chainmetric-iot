@@ -8,6 +8,7 @@ import (
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	displays "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -38,8 +39,9 @@ func init() {
 	display = displays.NewEInk(dcf)
 	device = dev.New().
 		SetClient(client).
-		SetReader(reader).
-		SetDisplay(display)
+		SetReader(reader)
+
+	gui.Init(display)
 }
 
 func main() {
