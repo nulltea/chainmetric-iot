@@ -31,9 +31,9 @@ func initConfig() {
 	viper.SetDefault("sensors.analog.samples_per_read", 100)
 
 	viper.SetDefault("display.enabled", true)
+	viper.SetDefault("display.hardware", "e_ink")
 	viper.SetDefault("display.width", 240)
 	viper.SetDefault("display.height", 240)
-	viper.SetDefault("display.image_size", 150)
 	viper.SetDefault("display.bus", "SPI0.0")
 	viper.SetDefault("display.dc_pin", 25)
 	viper.SetDefault("display.backlight_pin", 18)
@@ -59,8 +59,7 @@ func UnmarshalFromConfig(key string, v interface{}) error {
 }
 
 func MustUnmarshalFromConfig(key string, v interface{}) {
-	bindEnvs(key, v)
-	if err := viper.UnmarshalKey(key, v); err != nil {
+	if err := UnmarshalFromConfig(key, v); err != nil {
 		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))
 	}
 }

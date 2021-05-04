@@ -15,6 +15,7 @@ import (
 // I2CDetectResults stores I2C identified I2C-based peripheral devices.
 type I2CDetectResults map[int][]sensor.Sensor
 
+// ScanI2C detects I2C-based devices connected to I2C buses.
 func ScanI2C(addrs []uint16, detector func(addr uint16, bus int) (sensor.Factory, bool)) I2CDetectResults {
 	var (
 		detected = make(map[int][]sensor.Sensor)
