@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/spf13/viper"
 
@@ -13,8 +12,8 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
-	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -50,7 +49,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
-	go debugBattery()
+	go startup()
 	go shutdown(quit, done)
 
 	<-done
@@ -90,24 +89,4 @@ func shutdown(quit chan os.Signal, done chan struct{}) {
 	shared.CloseCore()
 
 	close(done)
-}
-
-func debugBattery() {
-	var (
-		dev = sensors.NewINA219(0x44, 5)
-	)
-
-	shared.MustExecute(dev.Init, "")
-
-	for {
-		if v, err := dev.ReadVoltage(); err == nil {
-			shared.Logger.Debug("Battery voltage:", v)
-		}
-
-		if v, err := dev.ReadCurrent(); err == nil {
-			shared.Logger.Debug("Battery current:", v)
-		}
-
-		time.Sleep(1 * time.Second)
-	}
 }
