@@ -2,6 +2,8 @@ package display
 
 import (
 	"image"
+
+	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
 // Display defines base methods for controlling display device.
@@ -28,4 +30,14 @@ type Display interface {
 	Active() bool
 	// Close closes connection to Display device and clears allocated resources.
 	Close() error
+}
+
+
+func New(config config.DisplayConfig) Display {
+	switch config.Hardware {
+	case EInkDisplayDriverCode:
+		return NewEInk(config)
+	default:
+		return nil
+	}
 }

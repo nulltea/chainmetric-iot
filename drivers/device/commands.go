@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/model/state"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -44,16 +44,8 @@ func (d *Device) Init() error {
 		shared.Logger.Warning("Device was removed from network, must re-initialize now")
 	}
 
-	if d.DisplayAvailable() {
-		qr, err := qrcode.New(d.specs.Encode(), qrcode.Medium); if err != nil {
-			return err
-		}
-
-		defer d.display.ClearAndRefresh()
-
-		d.display.DrawAndRefresh(qr.Image(viper.GetInt("display.image_size")))
-	} else {
-		qrcode.WriteFile(d.specs.Encode(), qrcode.Medium, 280, "local/qr.png")
+	if gui.Available() {
+		gui.QR(d.specs.Encode())
 	}
 
 	ctx, cancel := context.WithTimeout(d.ctx, viper.GetDuration("device.register_timeout_duration"))

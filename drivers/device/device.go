@@ -7,7 +7,6 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -25,7 +24,6 @@ type Device struct {
 
 	reader  *engine.SensorsReader
 	client  *blockchain.Client
-	display display.Display
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
@@ -59,12 +57,6 @@ func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	return d
 }
 
-
-func (d *Device) SetDisplay(dp display.Display) *Device {
-	d.display = dp
-	return d
-}
-
 func (d *Device) SetClient(client *blockchain.Client) *Device {
 	d.client = client
 	return d
@@ -73,10 +65,6 @@ func (d *Device) SetClient(client *blockchain.Client) *Device {
 func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 	d.reader = reader
 	return d
-}
-
-func (d * Device) DisplayAvailable() bool {
-	return d.display != nil && d.display.Active()
 }
 
 func (d *Device) Close() error {

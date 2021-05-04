@@ -1,5 +1,9 @@
 package display
 
+const (
+	EInkDisplayDriverCode = "e_ink"
+)
+
 // EInk display commands.
 const (
 	driverOutputControl            byte = 0x01

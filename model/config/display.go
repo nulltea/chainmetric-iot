@@ -1,12 +1,12 @@
 package config
 
 type DisplayConfig struct {
-	Enabled   bool  `yaml:"enabled" mapstructure:"enabled"`
-	Width     int   `yaml:"width" mapstructure:"width"`
-	Height    int   `yaml:"height" mapstructure:"height"`
-	ImageSize int   `yaml:"image_size" mapstructure:"image_size"`
-	Rotation  uint8 `yaml:"rotation" mapstructure:"rotation"`
-	FrameRate uint8 `yaml:"frame_rate" mapstructure:"frame_rate"`
+	Enabled   bool   `yaml:"enabled" mapstructure:"enabled"`
+	Hardware  string `yaml:"hardware" mapstructure:"hardware"`
+	Width     int    `yaml:"width" mapstructure:"width"`
+	Height    int    `yaml:"height" mapstructure:"height"`
+	Rotation  uint8  `yaml:"rotation" mapstructure:"rotation"`
+	FrameRate uint8  `yaml:"frame_rate" mapstructure:"frame_rate"`
 
 	Bus      string `yaml:"bus" mapstructure:"bus"`
 	DCPin    int    `yaml:"dc_pin" mapstructure:"dc_pin"`
