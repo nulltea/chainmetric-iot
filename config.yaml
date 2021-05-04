@@ -5,6 +5,7 @@ device:
   hotswap_detect_interval: 3s
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
+  battery_monitor_bus: 6
 
 engine:
   sensor_sleep_standby_timeout: 1m
@@ -25,7 +26,6 @@ sensors:
     samples_per_read: 100
   dht22:
     pin: 4
-    timeout: 2000
 
 display:
   enabled: true

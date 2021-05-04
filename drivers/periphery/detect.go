@@ -20,6 +20,7 @@ func ScanI2C(addrs []uint16, detector func(addr uint16, bus int) (sensor.Factory
 	var (
 		detected = make(map[int][]sensor.Sensor)
 		wg       = sync.WaitGroup{}
+		reservedBus = viper.GetInt("device.battery_monitor_bus")
 	)
 
 	if viper.GetBool("mocks.debug_env") {
@@ -27,6 +28,10 @@ func ScanI2C(addrs []uint16, detector func(addr uint16, bus int) (sensor.Factory
 	}
 
 	for _, ref := range i2creg.All() {
+		if ref.Number == reservedBus {
+			continue
+		}
+
 		ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration("device.i2c_scan_timeout"))
 		wg.Add(1)
 

@@ -20,7 +20,7 @@ var (
 
 type BMP280 struct {
 	*peripheries.I2C
-	bmp  *bmxx80.Dev
+	*bmxx80.Dev
 }
 
 func NewBMXX80(addr uint16, bus int) sensor.Sensor {
@@ -38,7 +38,7 @@ func (s *BMP280) Init() (err error) {
 		return
 	}
 
-	if s.bmp, err = bmxx80.NewI2C(s.Bus, s.Addr, &bmxx80.DefaultOpts); err != nil {
+	if s.Dev, err = bmxx80.NewI2C(s.Bus, s.Addr, &bmxx80.DefaultOpts); err != nil {
 		return
 	}
 
@@ -51,7 +51,7 @@ func (s *BMP280) Harvest(ctx *sensor.Context) {
 
 	var env = physic.Env{}
 
-	if err := s.bmp.Sense(&env); err != nil {
+	if err := s.Sense(&env); err != nil {
 		ctx.Error(err)
 
 		return

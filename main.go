@@ -12,8 +12,8 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
-	"github.com/timoth-y/chainmetric-sensorsys/gateway/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 

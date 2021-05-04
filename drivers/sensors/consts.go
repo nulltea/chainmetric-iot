@@ -16,6 +16,7 @@ const (
 	ADC_MQ9_ADDRESS        = 0x4A
 	ADC_PIEZO_ADDRESS      = 0x4B
 	ADC_FLAME_ADDRESS      = 0x4E
+	INA219_ADDRESS         = 0x44
 	MOCK_ADDRESS           = 0x88
 )
 
@@ -317,6 +318,13 @@ const(
 	SI1145_REG_CHIPSTAT    = 0x30
 )
 
+// INA219 current sensor constants
+const (
+	INA219_DEVICE_ID_REGISTER = 0x0F
+	INA219_DEVICE_ID          = 0x7C
+)
+
+// I2CSensorMock sensor constants
 const (
 	MOCK_DEVICE_ID_REGISTER = 0x0F
 	MOCK_DEVICE_ID          = 0x69
