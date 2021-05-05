@@ -22,9 +22,11 @@ gateway:
   wallet_path: ../keystore
 
 bluetooth:
-  name: ChainMetric IoT Device
+  device_name: chainimetric.device
   scan_duration: 1m
   advertise_duration: 1m
+  location:
+    service_uuid: F8AE4978-5AAB-46C3-A8CB-127F347EAA01
 
 sensors:
   analog:

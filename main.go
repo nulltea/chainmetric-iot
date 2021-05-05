@@ -7,12 +7,13 @@ import (
 	"github.com/spf13/viper"
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	displays "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
+	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/network/local"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -20,10 +21,11 @@ var (
 	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
-	client  *blockchain.Client
-	reader  *engine.SensorsReader
-	display displays.Display
-	device  *dev.Device
+	display   dsp.Display
+	client    *blockchain.Client
+	reader    *engine.SensorsReader
+	bluetooth *local.Client
+	device    *dev.Device
 
 	done = make(chan struct{}, 1)
 	quit = make(chan os.Signal, 1)
@@ -37,7 +39,8 @@ func init() {
 
 	client = blockchain.NewClient(bcf)
 	reader = engine.NewSensorsReader()
-	display = displays.NewEInk(dcf)
+	display = dsp.NewEInk(dcf)
+	bluetooth = local.NewBluetoothClient()
 	device = dev.New().
 		SetClient(client).
 		SetReader(reader)
@@ -52,7 +55,7 @@ func main() {
 	go shutdown()
 
 	<-done
-	shared.Logger.Info("Bye!")
+	shared.Logger.Info("Goodbye.")
 }
 
 func startup() {
