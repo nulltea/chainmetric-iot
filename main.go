@@ -9,7 +9,6 @@ import (
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	displays "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
@@ -25,11 +24,13 @@ var (
 	reader  *engine.SensorsReader
 	display displays.Display
 	device  *dev.Device
+
+	done = make(chan struct{}, 1)
+	quit = make(chan os.Signal, 1)
 )
 
 func init() {
 	shared.InitCore()
-	periphery.Init()
 
 	shared.MustUnmarshalFromConfig("gateway", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
@@ -45,12 +46,10 @@ func init() {
 }
 
 func main() {
-	done := make(chan struct{}, 1)
-	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
 	go startup()
-	go shutdown(quit, done)
+	go shutdown()
 
 	<-done
 	shared.Logger.Info("Bye!")
@@ -73,7 +72,7 @@ func startup() {
 	device.Operate()
 }
 
-func shutdown(quit chan os.Signal, done chan struct{}) {
+func shutdown() {
 	<-quit
 	shared.Logger.Info("Shutting down...")
 
