@@ -29,6 +29,9 @@ func initConfig() {
 	viper.SetDefault("gateway.identity.private_key", "../identity.key")
 	viper.SetDefault("gateway.wallet_path", "../keystore")
 
+	viper.SetDefault("bluetooth.scan_duration", "1m")
+	viper.SetDefault("bluetooth.advertise_duration", "1m")
+
 	viper.SetDefault("sensors.analog.samples_per_read", 100)
 
 	viper.SetDefault("display.enabled", true)
