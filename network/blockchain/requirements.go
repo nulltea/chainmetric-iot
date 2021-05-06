@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -42,8 +43,13 @@ func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requireme
 }
 
 func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, action func(*models.Requirements, string) error) error {
-	reg, notifier, err := rc.contract.RegisterEvent(eventFilter("requirements", event)); if err != nil {
-		return err
+	var (
+		eventFilter = eventFilter("requirements", event)
+		reg, notifier, err = rc.contract.RegisterEvent(eventFilter)
+	)
+
+	if err != nil {
+		return errors.Wrapf(err, "failed to subscribe to '%s' events", eventFilter)
 	}
 
 	defer rc.contract.Unregister(reg)
@@ -52,9 +58,9 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 		select {
 		case event := <-notifier:
 			req, err := models.Requirements{}.Decode(event.Payload); if err != nil {
-			shared.Logger.Errorf("failed parse device from event payload: %v", err)
-			continue
-		}
+				shared.Logger.Errorf("failed parse device from event payload: %v", err)
+				continue
+			}
 
 			go func(r *models.Requirements, e string) {
 				if err := action(r, e); err != nil {

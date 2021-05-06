@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
+	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 type Client struct {
@@ -25,6 +26,8 @@ func (c *Client) Init() error {
 }
 
 func (c *Client) Pair() error {
+	shared.Logger.Debug("Bluetooth pairing started")
+
 	if err := c.dev.Advertise(); err != nil {
 		return errors.Wrap(err, "failed to advertise device via Bluetooth")
 	}

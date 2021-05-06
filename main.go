@@ -43,7 +43,8 @@ func init() {
 	bluetooth = local.NewBluetoothClient()
 	device = dev.New().
 		SetClient(client).
-		SetReader(reader)
+		SetReader(reader).
+		SetBluetooth(bluetooth)
 
 	gui.Init(display)
 }
@@ -70,6 +71,7 @@ func startup() {
 	shared.MustExecute(client.Init, "failed initializing blockchain client")
 	shared.MustExecute(device.Init, "failed to initialize device")
 	shared.MustExecute(device.CacheBlockchainState, "failed to cache the state of blockchain")
+	shared.MustExecute(device.ListenRemoteCommands, "failed to start remote commands listener")
 
 	device.WatchForBlockchainEvents()
 	device.Operate()
