@@ -11,7 +11,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// ADS1115 ADC chip constants
+// ADS1115 ADC chip constants.
 const (
 	// Conversion constants
 	ADS1115_SAMPLES_PER_READ = 32767.0

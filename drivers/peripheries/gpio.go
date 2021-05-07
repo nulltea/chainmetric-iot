@@ -8,7 +8,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// GPIO provides wrapper for GPIO peripheral
+// GPIO provides wrapper for GPIO peripheral.
 type GPIO struct {
 	gpio.PinIO
 	pin string

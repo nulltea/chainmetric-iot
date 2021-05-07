@@ -12,6 +12,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/network/local"
 )
 
 type Device struct {
@@ -22,15 +23,16 @@ type Device struct {
 	assets   *assetsCache
 	requests *requirementsCache
 
-	reader  *engine.SensorsReader
-	client  *blockchain.Client
+	reader    *engine.SensorsReader
+	client    *blockchain.Client
+	bluetooth *local.Client
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
 
 	pingTimer *time.Timer
 
-	active bool
+	active       bool
 	cancelDevice context.CancelFunc
 }
 
@@ -64,6 +66,11 @@ func (d *Device) SetClient(client *blockchain.Client) *Device {
 
 func (d * Device) SetReader(reader *engine.SensorsReader) *Device {
 	d.reader = reader
+	return d
+}
+
+func (d * Device) SetBluetooth(ble *local.Client) *Device {
+	d.bluetooth = ble
 	return d
 }
 

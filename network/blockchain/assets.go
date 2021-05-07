@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 
@@ -43,8 +44,13 @@ func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, 
 }
 
 func (ac *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
-	reg, notifier, err := ac.contract.RegisterEvent(eventFilter("assets", event)); if err != nil {
-		return err
+	var (
+		eventFilter = eventFilter("assets", event)
+		reg, notifier, err = ac.contract.RegisterEvent(eventFilter)
+	)
+
+	if err != nil {
+		return errors.Wrapf(err, "failed to subscribe to '%s' events", eventFilter)
 	}
 
 	defer ac.contract.Unregister(reg)

@@ -117,10 +117,6 @@ func (d *Device) watchRequirements(ctx context.Context) {
 }
 
 func (d *Device) actOnDeviceUpdates(updated *models.Device) {
-	if d.model.State != updated.State {
-		// TODO: handle state changes
-	}
-
 	if d.model.Location != updated.Location {
 		d.reader.Close() // TODO: main routine must stay locked from ending
 		d.locateAssets()

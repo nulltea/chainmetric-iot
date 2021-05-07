@@ -21,6 +21,13 @@ gateway:
   channel_id: supply-channel
   wallet_path: ../keystore
 
+bluetooth:
+  device_name: chainmetric.device
+  scan_duration: 1m
+  advertise_duration: 1m
+  location:
+    service_uuid: F8AE4978-5AAB-46C3-A8CB-127F347EAA01
+
 sensors:
   analog:
     samples_per_read: 100

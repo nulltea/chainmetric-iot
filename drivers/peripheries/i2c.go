@@ -11,7 +11,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// I2C provides wrapper for I2C peripheral
+// I2C provides wrapper for I2C peripheral.
 type I2C struct {
 	i2c.Dev
 	*sync.Mutex
