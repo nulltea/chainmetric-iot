@@ -22,7 +22,7 @@ gateway:
   wallet_path: ../keystore
 
 bluetooth:
-  device_name: chainimetric.device
+  device_name: chainmetric.device
   scan_duration: 1m
   advertise_duration: 1m
   location:
