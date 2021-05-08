@@ -19,15 +19,21 @@ type Bluetooth struct {
 }
 
 // NewBluetooth creates new Bluetooth driver instance.
-func NewBluetooth() *Bluetooth {
-	return &Bluetooth{
+func NewBluetooth(options ...BluetoothOption) *Bluetooth {
+	return (&Bluetooth{
 		Device: shared.BluetoothDevice,
 		name: viper.GetString("bluetooth.device_name"),
 		scanDuration: viper.GetDuration("bluetooth.scan_duration"),
 		advDuration: viper.GetDuration("bluetooth.advertise_duration"),
-	}
+	}).applyOptions(options...)
 }
 
+// Init performs initialisation of the Bluetooth driver.
+func (b *Bluetooth) Init(options ...BluetoothOption) error {
+	b.applyOptions(options...)
+
+	return nil
+}
 
 // Scan performs scan for currently advertising bluetooth device.
 func (b *Bluetooth) Scan() {
@@ -52,4 +58,12 @@ func (b *Bluetooth) Advertise() error {
 // Close closes Bluetooth connection and clears allocated resources.
 func (b *Bluetooth) Close() error {
 	return b.Device.Stop()
+}
+
+func (b *Bluetooth) applyOptions(options ...BluetoothOption) *Bluetooth {
+	for i := range options {
+		options[i].Apply(b)
+	}
+
+	return b
 }
