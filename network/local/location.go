@@ -1,6 +1,9 @@
 package local
 
 import (
+	"encoding/binary"
+	"math"
+
 	"github.com/go-ble/ble"
 	"github.com/spf13/viper"
 
@@ -45,14 +48,19 @@ func (ls *LocationService) locationName() (char *ble.Characteristic) {
 }
 
 func (ls *LocationService) handleWriteEast(req ble.Request, rsp ble.ResponseWriter) {
-	shared.Logger.Debugf("East Coordinate: Wrote %s", string(req.Data()))
+	shared.Logger.Debugf("East Coordinate: Wrote %v", bytesToFloat64(req.Data()))
 }
 
 func (ls *LocationService) handleWriteNorth(req ble.Request, rsp ble.ResponseWriter) {
-	shared.Logger.Debugf("North Coordinate: Wrote %s", string(req.Data()))
+	shared.Logger.Debugf("North Coordinate: Wrote %v", bytesToFloat64(req.Data()))
 }
 
 func (ls *LocationService) handleWriteName(req ble.Request, rsp ble.ResponseWriter) {
 	shared.Logger.Debugf("Location name: Wrote %s", string(req.Data()))
 }
 
+func bytesToFloat64(bytes []byte) float32 {
+	bits := binary.LittleEndian.Uint32(bytes)
+	float := math.Float32frombits(bits)
+	return float
+}
