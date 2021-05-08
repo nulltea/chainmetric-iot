@@ -74,7 +74,7 @@ $ make crypto-sync
 - [x] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115] [(#4)]( https://github.com/timoth-y/chainmetric-sensorsys/pull/4)
 - [x] [E-Ink display][e-ink display] support [(#5)](https://github.com/timoth-y/chainmetric-sensorsys/pull/5)
 - [x] GUI for displaying statistics data and emergency warnings [(#9)](https://github.com/timoth-y/chainmetric-sensorsys/pull/9)
-- [ ] Location tracking via bluetooth pairing with mobile app [(#10)](https://github.com/timoth-y/chainmetric-sensorsys/pull/10)
+- [ ] Location tracking via bluetooth pairing with [mobile app][chainmetric app repo] [(#10)](https://github.com/timoth-y/chainmetric-sensorsys/pull/10)
 - [ ] A device as a blockchain node
 - [ ] Video-camera driver
 
