@@ -1,61 +1,91 @@
 package local
 
 import (
+	"context"
 	"encoding/binary"
 	"math"
 
 	"github.com/go-ble/ble"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-type LocationService struct {
+// LocationTopic defines Bluetooth service for tethering geo-location data.
+type LocationTopic struct {
 	*ble.Service
+
+	ready chan models.Location
 }
 
-func NewLocationService() *LocationService {
-	ls := &LocationService{
+// NewLocationTopic creates instance of the LocationTopic.
+func NewLocationTopic() *LocationTopic {
+	lt := &LocationTopic{
 		Service: ble.NewService(ble.MustParse(viper.GetString("bluetooth.location.service_uuid"))),
+		ready: make(chan models.Location, 1),
 	}
 
-	ls.AddCharacteristic(ls.eastCoordinate())
-	ls.AddCharacteristic(ls.northCoordinate())
-	ls.AddCharacteristic(ls.locationName())
+	lt.AddCharacteristic(lt.eastCoordinate())
+	lt.AddCharacteristic(lt.northCoordinate())
+	lt.AddCharacteristic(lt.locationName())
 
-	return ls
+	return lt
 }
 
-func (ls *LocationService) eastCoordinate() (char *ble.Characteristic) {
+// Subscribe subscribes to the messages on local network related to "location" topic.
+func (lt *LocationTopic) Subscribe(ctx context.Context, handler func(location models.Location) error) error {
+	for {
+		select {
+		case location := <-lt.ready:
+			go func(l models.Location) {
+				if err := handler(l); err != nil {
+					shared.Logger.Error(err)
+				}
+			}(location)
+		case <- ctx.Done():
+			switch ctx.Err() {
+			case context.DeadlineExceeded:
+				return errors.New("timeout waiting for location message")
+			default:
+				shared.Logger.Debug("Local network 'location' topic listener ended.")
+				return nil
+			}
+		}
+	}
+}
+
+func (lt *LocationTopic) eastCoordinate() (char *ble.Characteristic) {
 	char = ble.NewCharacteristic(ble.UUID16(0x2AB1))
-	char.HandleWrite(ble.WriteHandlerFunc(ls.handleWriteEast))
+	char.HandleWrite(ble.WriteHandlerFunc(lt.handleWriteEast))
 
 	return
 }
 
-func (ls *LocationService) northCoordinate() (char *ble.Characteristic) {
+func (lt *LocationTopic) northCoordinate() (char *ble.Characteristic) {
 	char = ble.NewCharacteristic(ble.UUID16(0x2AB0))
-	char.HandleWrite(ble.WriteHandlerFunc(ls.handleWriteNorth))
+	char.HandleWrite(ble.WriteHandlerFunc(lt.handleWriteNorth))
 
 	return
 }
 
-func (ls *LocationService) locationName() (char *ble.Characteristic) {
+func (lt *LocationTopic) locationName() (char *ble.Characteristic) {
 	char = ble.NewCharacteristic(ble.UUID16(0x2AB5))
-	char.HandleWrite(ble.WriteHandlerFunc(ls.handleWriteName))
+	char.HandleWrite(ble.WriteHandlerFunc(lt.handleWriteName))
 
 	return
 }
 
-func (ls *LocationService) handleWriteEast(req ble.Request, rsp ble.ResponseWriter) {
+func (lt *LocationTopic) handleWriteEast(req ble.Request, rsp ble.ResponseWriter) {
 	shared.Logger.Debugf("East Coordinate: Wrote %v", bytesToFloat64(req.Data()))
 }
 
-func (ls *LocationService) handleWriteNorth(req ble.Request, rsp ble.ResponseWriter) {
+func (lt *LocationTopic) handleWriteNorth(req ble.Request, rsp ble.ResponseWriter) {
 	shared.Logger.Debugf("North Coordinate: Wrote %v", bytesToFloat64(req.Data()))
 }
 
-func (ls *LocationService) handleWriteName(req ble.Request, rsp ble.ResponseWriter) {
+func (lt *LocationTopic) handleWriteName(req ble.Request, rsp ble.ResponseWriter) {
 	shared.Logger.Debugf("Location name: Wrote %s", string(req.Data()))
 }
 

@@ -21,7 +21,7 @@ require (
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/syndtr/goleveldb v1.0.0
-	github.com/timoth-y/chainmetric-core v0.0.0-20210507165628-5fe5ef08aa84
+	github.com/timoth-y/chainmetric-core v0.0.0-20210508131058-1fc1f657f942
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
 	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect

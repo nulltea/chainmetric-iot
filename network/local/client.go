@@ -7,24 +7,38 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
+// Client defines the interface for low range network communication.
 type Client struct {
 	dev *peripheries.Bluetooth
+
+	Topics topics
 }
 
-func NewBluetoothClient() *Client {
+type topics struct {
+	Location LocationTopic
+}
+
+// NewClient create new low range network communication client.
+func NewClient() *Client {
 	return &Client{
 		dev: peripheries.NewBluetooth(),
 	}
 }
 
-func (c *Client) Init() error {
-	if err := c.dev.AddService(NewLocationService().Service); err != nil {
+// Init performs initialisation of the Bluetooth Client.
+func (c *Client) Init(name string) error {
+	if err := c.dev.Init(peripheries.WithDeviceName(name)); err != nil {
+		return errors.Wrap(err, "failed to prepare Bluetooth driver")
+	}
+
+	if err := c.dev.AddService(NewLocationTopic().Service); err != nil {
 		return errors.Wrap(err, "failed to add location service to Bluetooth device")
 	}
 
 	return nil
 }
 
+// Pair performs bluetooth pairing.
 func (c *Client) Pair() error {
 	shared.Logger.Debug("Bluetooth pairing started")
 
@@ -33,4 +47,9 @@ func (c *Client) Pair() error {
 	}
 
 	return nil
+}
+
+// Close closes local network connection and clears allocated resources.
+func (c *Client) Close() error {
+	return c.dev.Close()
 }
