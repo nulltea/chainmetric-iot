@@ -20,7 +20,6 @@ import (
 func (d *Device) Init() error {
 	var (
 		err error
-		contract = d.client.Contracts.Devices
 	)
 
 	d.specs, err = d.DiscoverSpecs(true); if err != nil {
@@ -37,39 +36,12 @@ func (d *Device) Init() error {
 		d.active = err == nil && d.model != nil
 	}()
 
-	if id, is := isRegistered(); is {
-		if d.model, _ = contract.Retrieve(id); d.model != nil {
-			shared.Logger.Infof("Device specs has being updated in blockchain with id: %s", id)
-
-			return contract.UpdateSpecs(id, d.specs)
-		}
-
-		shared.Logger.Warning("Device was removed from network, must re-initialize now")
-	}
-
-	if gui.Available() {
-		gui.RenderQRCode(d.specs.Encode())
-	}
-
-	ctx, cancel := context.WithTimeout(d.ctx, viper.GetDuration("device.register_timeout_duration"))
-
-	if err := contract.Subscribe(ctx, "inserted", func(device *models.Device, _ string) error {
-		if device.Hostname == d.specs.Hostname {
-			defer cancel()
-
-			if err := storeIdentity(device.ID); err != nil {
-				shared.Logger.Fatal(errors.Wrap(err, "failed to store device's identity file"))
-			}
-
-			shared.Logger.Infof("Device has being registered with id: %s", device.ID)
-			d.model = device
-
-			return contract.UpdateSpecs(device.ID, d.specs)
-		}
-
-		return nil
-	}); err != nil {
+	if err = d.handleDeviceRegistration(); err != nil {
 		return err
+	}
+
+	if err = d.localnet.Init(d.model.Name); err != nil {
+		return errors.Wrap(err, "failed to initialise local network client")
 	}
 
 	return nil
@@ -132,6 +104,49 @@ func (d *Device) NotifyOff() error {
 	return d.client.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }
 
+func (d *Device) handleDeviceRegistration() error {
+	var (
+		contract = d.client.Contracts.Devices
+	)
+
+	if id, is := isRegistered(); is {
+		if d.model, _ = contract.Retrieve(id); d.model != nil {
+			shared.Logger.Infof("Device specs has being updated in blockchain with id: %s", id)
+
+			return contract.UpdateSpecs(id, d.specs)
+		}
+
+		shared.Logger.Warning("Device was removed from network, must re-initialize now")
+	}
+
+	if gui.Available() {
+		gui.RenderQRCode(d.specs.Encode())
+	}
+
+	ctx, cancel := context.WithTimeout(d.ctx, viper.GetDuration("device.register_timeout_duration"))
+
+	if err := contract.Subscribe(ctx, "inserted", func(device *models.Device, _ string) error {
+		if device.Hostname == d.specs.Hostname {
+			defer cancel()
+
+			if err := storeIdentity(device.ID); err != nil {
+				shared.Logger.Fatal(errors.Wrap(err, "failed to store device's identity file"))
+			}
+
+			shared.Logger.Infof("Device has being registered with id: %s", device.ID)
+			d.model = device
+
+			return contract.UpdateSpecs(device.ID, d.specs)
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 
 func (d *Device) handleBluetoothPairingCmd(cmdID string) {
 	var (
@@ -141,7 +156,7 @@ func (d *Device) handleBluetoothPairingCmd(cmdID string) {
 		}
 	)
 
-	if err := d.bluetooth.Pair(); err != nil {
+	if err := d.localnet.Pair(); err != nil {
 		results.Status = models.DeviceCmdFailed
 		results.Error = utils.StringPointer(err.Error())
 		shared.Logger.Error(err)

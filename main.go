@@ -21,11 +21,11 @@ var (
 	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
-	display   dsp.Display
-	client    *blockchain.Client
-	reader    *engine.SensorsReader
-	bluetooth *local.Client
-	device    *dev.Device
+	display  dsp.Display
+	client   *blockchain.Client
+	reader   *engine.SensorsReader
+	localnet *local.Client
+	device   *dev.Device
 
 	done = make(chan struct{}, 1)
 	quit = make(chan os.Signal, 1)
@@ -40,11 +40,11 @@ func init() {
 	client = blockchain.NewClient(bcf)
 	reader = engine.NewSensorsReader()
 	display = dsp.NewEInk(dcf)
-	bluetooth = local.NewBluetoothClient()
+	localnet = local.NewClient()
 	device = dev.New().
 		SetClient(client).
-		SetReader(reader).
-		SetBluetooth(bluetooth)
+		SetEngine(reader).
+		SetLocalNet(localnet)
 
 	gui.Init(display)
 }
@@ -70,7 +70,6 @@ func startup() {
 
 	shared.MustExecute(client.Init, "failed initializing blockchain client")
 	shared.MustExecute(device.Init, "failed to initialize device")
-	shared.MustExecute(bluetooth.Init, "failed to initialize bluetooth")
 	shared.MustExecute(device.CacheBlockchainState, "failed to cache the state of blockchain")
 	shared.MustExecute(device.ListenRemoteCommands, "failed to start remote commands listener")
 
@@ -86,6 +85,8 @@ func shutdown() {
 		shared.Execute(display.ClearAndRefresh, "error during clearing display")
 		shared.Execute(display.Close, "error during closing connection to display")
 	}
+
+	shared.Execute(device.Close, "error during closing local network")
 
 	shared.Execute(device.NotifyOff, "error during emitting 'off' event")
 	shared.Execute(device.Close, "error during device shutdown")
