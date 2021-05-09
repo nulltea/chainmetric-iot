@@ -55,7 +55,7 @@ func (d *Device) locateAssets() error {
 	d.assets.data = make(map[string]bool)
 
 	assets, err := contract.Receive(requests.AssetsQuery{
-		Location: &d.model.Location,
+		Location: &d.model.Location.Name,
 	}); if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (d *Device) locateAssets() error {
 		d.assets.data[asset.ID] = true
 	}
 
-	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location)
+	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location.Name)
 
 	return nil
 }

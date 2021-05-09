@@ -12,22 +12,24 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
-type Client struct {
-	wallet  *gateway.Wallet
-	gateway *gateway.Gateway
-	network *gateway.Network
+type (
+	Client struct {
+		wallet  *gateway.Wallet
+		gateway *gateway.Gateway
+		network *gateway.Network
 
-	config config.BlockchainConfig
+		config config.BlockchainConfig
 
-	Contracts contracts
-}
+		Contracts contracts
+	}
 
-type contracts struct {
-	Devices      *DevicesContract
-	Assets       *AssetsContract
-	Requirements *RequirementsContract
-	Readings     *ReadingsContract
-}
+	contracts struct {
+		Devices      *DevicesContract
+		Assets       *AssetsContract
+		Requirements *RequirementsContract
+		Readings     *ReadingsContract
+	}
+)
 
 func NewClient(config config.BlockchainConfig) *Client {
 	bc := &Client{

@@ -82,6 +82,20 @@ func (dc *DevicesContract) UpdateState(id string, state models.DeviceState) erro
 	return nil
 }
 
+// UpdateLocation updates device location on the blockchain ledger.
+func (dc *DevicesContract) UpdateLocation(id string, location models.Location) error {
+	data, err := json.Marshal(requests.DeviceUpdateRequest{Location: &location})
+	if err != nil {
+		return err
+	}
+
+	if _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Unbind removes device from the blockchain ledger.
 func (dc *DevicesContract) Unbind(id string) error {
 	if _, err := dc.contract.SubmitTransaction("Unbind", id); err != nil {

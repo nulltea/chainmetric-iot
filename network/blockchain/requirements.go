@@ -3,7 +3,6 @@ package blockchain
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
@@ -70,7 +69,7 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 		case <- ctx.Done():
 			switch ctx.Err() {
 			case context.DeadlineExceeded:
-				return fmt.Errorf("timeout waiting for event devices.%s", event)
+				return errors.Errorf("timeout waiting for event devices.%s", event)
 			default:
 				shared.Logger.Debug("Requirements blockchain event listener ended.")
 				return nil

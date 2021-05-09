@@ -34,7 +34,7 @@ var (
 func init() {
 	shared.InitCore()
 
-	shared.MustUnmarshalFromConfig("gateway", &bcf)
+	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
 	client = blockchain.NewClient(bcf)

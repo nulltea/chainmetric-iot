@@ -34,8 +34,8 @@ func NewLocationTopic() *LocationTopic {
 	return lt
 }
 
-// Subscribe subscribes to the messages on local network related to "location" topic.
-func (lt *LocationTopic) Subscribe(ctx context.Context, handler func(location models.Location) error) error {
+// Join subscribes to the messages on local network related to "location" topic.
+func (lt *LocationTopic) Join(ctx context.Context, handler func(location models.Location) error) error {
 	for {
 		select {
 		case location := <-lt.ready:

@@ -7,6 +7,7 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models"
 
+	"github.com/timoth-y/chainmetric-sensorsys/model/state"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -39,7 +40,7 @@ func (d *Device) watchAssets(ctx context.Context) {
 		case "inserted":
 			fallthrough
 		case "updated":
-			if asset.Location == d.model.Location {
+			if asset.Location == d.model.Location.Name {
 				d.assets.data[asset.ID] = true
 				break
 			}
@@ -60,6 +61,10 @@ func (d *Device) watchDevice(ctx context.Context) {
 	)
 
 	contract.Subscribe(ctx, "*", func(dev *models.Device, e string) error {
+		if dev.ID != d.model.ID {
+			return nil
+		}
+
 		switch e {
 		case "updated":
 			d.actOnDeviceUpdates(dev)
@@ -118,9 +123,16 @@ func (d *Device) watchRequirements(ctx context.Context) {
 
 func (d *Device) actOnDeviceUpdates(updated *models.Device) {
 	if d.model.Location != updated.Location {
-		d.reader.Close() // TODO: main routine must stay locked from ending
+		// d.reader.Close() // TODO: main routine must stay locked from ending
 		d.locateAssets()
 		d.receiveRequirements()
-		go d.Operate()
+		// go d.Operate()
 	}
+}
+
+func (d *Device) NotifyOff() error {
+	if d.client == nil || d.model == nil {
+		return nil
+	}
+	return d.client.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }

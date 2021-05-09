@@ -42,7 +42,7 @@ func (b *Bluetooth) Scan() {
 	)
 
 	b.Device.Scan(ctx, false, func(adv ble.Advertisement) {
-
+		// TODO: add filter and return all satisfying devices
 	})
 }
 

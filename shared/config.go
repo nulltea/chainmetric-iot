@@ -24,11 +24,12 @@ func initConfig() {
 
 	viper.SetDefault("engine.sensor_sleep_standby_timeout", "1m")
 
-	viper.SetDefault("gateway.connection_config", "connection.yaml")
-	viper.SetDefault("gateway.identity.certificate", "../identity.pem")
-	viper.SetDefault("gateway.identity.private_key", "../identity.key")
-	viper.SetDefault("gateway.wallet_path", "../keystore")
+	viper.SetDefault("blockchain.connection_config", "connection.yaml")
+	viper.SetDefault("blockchain.identity.certificate", "../identity.pem")
+	viper.SetDefault("blockchain.identity.private_key", "../identity.key")
+	viper.SetDefault("blockchain.wallet_path", "../keystore")
 
+	viper.SetDefault("bluetooth.enabled", true)
 	viper.SetDefault("bluetooth.scan_duration", "1m")
 	viper.SetDefault("bluetooth.advertise_duration", "1m")
 
