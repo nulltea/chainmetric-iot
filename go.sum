@@ -210,8 +210,10 @@ github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
-github.com/timoth-y/chainmetric-core v0.0.0-20210508131058-1fc1f657f942 h1:rJmhbfcJLKlXRWcuvRKVJXf7qJFXDsEKOBuStFDvcRY=
-github.com/timoth-y/chainmetric-core v0.0.0-20210508131058-1fc1f657f942/go.mod h1:7Xhj5phFaJfR7PrxlPkGzl3ImxUAszyyzHGgkj4X3l0=
+github.com/timoth-y/chainmetric-core v0.0.0-20210508235635-b52bece06238 h1:hcZl4318mfcuX1w4t/SrI0D67+VtuUDIy5vsOaBZlBo=
+github.com/timoth-y/chainmetric-core v0.0.0-20210508235635-b52bece06238/go.mod h1:7Xhj5phFaJfR7PrxlPkGzl3ImxUAszyyzHGgkj4X3l0=
+github.com/timoth-y/chainmetric-core v0.0.0-20210509005421-a9e07a24fdec h1:qTjRyReFi9cIgQ2AXTx3Ujdtb8lKoQw/rIygJ9xFiAA=
+github.com/timoth-y/chainmetric-core v0.0.0-20210509005421-a9e07a24fdec/go.mod h1:7Xhj5phFaJfR7PrxlPkGzl3ImxUAszyyzHGgkj4X3l0=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae h1:ePgxzI5zYM/fuRQclwMK4NWVw1eH4a7AUPVNqJJV3ps=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=
