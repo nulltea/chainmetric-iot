@@ -38,7 +38,10 @@ func (c *Client) Init(name string) error {
 		return nil
 	}
 
-	if err := c.dev.Init(peripheries.WithDeviceName(name)); err != nil {
+	if err := c.dev.Init(
+		peripheries.WithDeviceName(name),
+		peripheries.WithAdvertisementServices(c.Channels.Geo.uuid),
+	); err != nil {
 		return errors.Wrap(err, "failed to prepare Bluetooth driver")
 	}
 

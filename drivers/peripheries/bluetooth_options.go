@@ -1,6 +1,10 @@
 package peripheries
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-ble/ble"
+)
 
 // An BluetoothOption configures a Bluetooth driver.
 type BluetoothOption interface {
@@ -36,5 +40,13 @@ func WithScanDuration(du time.Duration) BluetoothOption {
 func WithAdvertisementDuration(du time.Duration) BluetoothOption {
 	return BluetoothOptionFunc(func(d *Bluetooth) {
 		d.advDuration = du
+	})
+}
+
+// WithAdvertisementServices can be used to specify service to expose during Bluetooth advertisement.
+// Default is no service being exposed.
+func WithAdvertisementServices(uuids ...ble.UUID) BluetoothOption {
+	return BluetoothOptionFunc(func(d *Bluetooth) {
+		d.advServices = append(d.advServices, uuids...)
 	})
 }

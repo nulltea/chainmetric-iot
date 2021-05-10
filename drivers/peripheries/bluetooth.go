@@ -16,6 +16,7 @@ type Bluetooth struct {
 	name         string
 	scanDuration time.Duration
 	advDuration  time.Duration
+	advServices  []ble.UUID
 }
 
 // NewBluetooth creates new Bluetooth driver instance.
@@ -25,6 +26,7 @@ func NewBluetooth(options ...BluetoothOption) *Bluetooth {
 		name: viper.GetString("bluetooth.device_name"),
 		scanDuration: viper.GetDuration("bluetooth.scan_duration"),
 		advDuration: viper.GetDuration("bluetooth.advertise_duration"),
+		advServices: []ble.UUID{},
 	}).applyOptions(options...)
 }
 
@@ -52,7 +54,7 @@ func (b *Bluetooth) Advertise() error {
 		ctx = ble.WithSigHandler(context.WithTimeout(context.Background(), b.advDuration))
 	)
 
-	return b.Device.AdvertiseNameAndServices(ctx, b.name)
+	return b.Device.AdvertiseNameAndServices(ctx, b.name, b.advServices...)
 }
 
 // Close closes Bluetooth connection and clears allocated resources.
