@@ -72,8 +72,8 @@ func (d *EInk) Init() (err error) {
 	return
 }
 
-// DrawRaw implements display.Drawer.
-func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error {
+// Draw implements display.Drawer.
+func (d *EInk) Draw(r image.Rectangle, src image.Image, sp image.Point) error {
 	var (
 		xStart = sp.X
 		yStart = sp.Y
@@ -127,16 +127,10 @@ func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error
 	return nil
 }
 
-// Draw sends `src` image binary representation to EInk display buffer.
-// Use Refresh() or DrawAndRefresh() to display image.
-func (d *EInk) Draw(src image.Image) error {
-	return d.DrawRaw(d.Bounds(), src, image.Point{})
-}
-
 // DrawAndRefresh sends `src` image binary representation to EInk display buffer
 // and triggers update of the frame.
-func (d *EInk) DrawAndRefresh(src image.Image) error {
-	if err := d.Draw(src); err != nil {
+func (d *EInk) DrawImage(src image.Image) error {
+	if err := d.Draw(d.Bounds(), src, image.Point{}); err != nil {
 		return err
 	}
 
@@ -189,14 +183,9 @@ func (d *EInk) Refresh() error {
 	return nil
 }
 
-// Clear clears the EInk display.
-func (d *EInk) Clear() error {
-	return d.ResetFrameMemory(0xFF)
-}
-
 // Clear clears the EInk display and triggers update of the frame.
-func (d *EInk) ClearAndRefresh() error {
-	if err := d.Clear(); err != nil {
+func (d *EInk) Clear() error {
+	if err := d.ResetFrameMemory(0xFF); err != nil {
 		return err
 	}
 
@@ -214,19 +203,19 @@ func (d *EInk) Sleep() error {
 	return nil
 }
 
-// Reset performs hardware reset of the EInk display.
+// Reset performs hardware Reset of the EInk display.
 func (d *EInk) Reset() (err error) {
-	if err = d.rst.Out(gpio.High); err != nil {
+	if err = d.rst.High(); err != nil {
 		return
 	}
 	time.Sleep(200 * time.Millisecond)
 
-	if err = d.rst.Out(gpio.Low); err != nil {
+	if err = d.rst.Low(); err != nil {
 		return
 	}
 	time.Sleep(200 * time.Millisecond)
 
-	if err = d.rst.Out(gpio.High); err != nil {
+	if err = d.rst.High(); err != nil {
 		return
 	}
 	time.Sleep(200 * time.Millisecond)

@@ -125,7 +125,7 @@ func RenderQRCode(data string) {
 // ShowFrame displays frame with rendered context.
 func ShowFrame() {
 	ctx.Fill()
-	dev.DrawAndRefresh(ctx.Image())
+	dev.DrawImage(ctx.Image())
 }
 
 // Available checks whether the GUI is available.
