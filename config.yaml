@@ -6,6 +6,7 @@ device:
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
   battery_monitor_bus: 6
+  assets_locate_distance: 50.0
 
 engine:
   sensor_sleep_standby_timeout: 1m

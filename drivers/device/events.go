@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model/state"
@@ -40,7 +41,7 @@ func (d *Device) watchAssets(ctx context.Context) {
 		case "inserted":
 			fallthrough
 		case "updated":
-			if asset.Location == d.model.Location.Name {
+			if asset.Location.IsNearBy(d.model.Location, viper.GetFloat64("assets_locate_distance")) {
 				d.assets.data[asset.ID] = true
 				break
 			}
@@ -122,7 +123,7 @@ func (d *Device) watchRequirements(ctx context.Context) {
 }
 
 func (d *Device) actOnDeviceUpdates(updated *models.Device) {
-	if d.model.Location != updated.Location {
+	if d.model.Location.Name != updated.Location.Name {
 		// d.reader.Close() // TODO: main routine must stay locked from ending
 		d.locateAssets()
 		d.receiveRequirements()
