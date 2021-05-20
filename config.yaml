@@ -6,11 +6,12 @@ device:
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
   battery_monitor_bus: 6
+  assets_locate_distance: 50.0
 
 engine:
   sensor_sleep_standby_timeout: 1m
 
-gateway:
+blockchain:
   connection_config: connection.yaml
   identity:
     certificate: ../identity.pem
@@ -22,6 +23,7 @@ gateway:
   wallet_path: ../keystore
 
 bluetooth:
+  enabled: true
   device_name: chainmetric.device
   scan_duration: 1m
   advertise_duration: 1m
@@ -31,8 +33,6 @@ bluetooth:
 sensors:
   analog:
     samples_per_read: 100
-  dht22:
-    pin: 4
 
 display:
   enabled: true

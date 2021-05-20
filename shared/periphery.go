@@ -17,6 +17,10 @@ var(
 func initPeriphery() {
 	var err error
 
+	if !viper.GetBool("bluetooth.enabled") {
+		return
+	}
+
 	if _, err = host.Init(); err != nil {
 		Logger.Fatal(errors.Wrap(err, "failed to initialise peripheral host"))
 	}

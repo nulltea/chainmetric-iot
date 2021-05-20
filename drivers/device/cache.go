@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 
@@ -55,7 +56,10 @@ func (d *Device) locateAssets() error {
 	d.assets.data = make(map[string]bool)
 
 	assets, err := contract.Receive(requests.AssetsQuery{
-		Location: &d.model.Location,
+		Location: &requests.LocationQuery{
+			GeoPoint: d.model.Location,
+			Distance: viper.GetFloat64("assets_locate_distance"),
+		},
 	}); if err != nil {
 		return err
 	}
@@ -64,7 +68,7 @@ func (d *Device) locateAssets() error {
 		d.assets.data[asset.ID] = true
 	}
 
-	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location)
+	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location.Name)
 
 	return nil
 }

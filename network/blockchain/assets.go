@@ -30,14 +30,16 @@ func (ac *AssetsContract) Init() {
 }
 
 func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, error) {
+	var assets []*models.Asset
+
 	data, err := ac.contract.EvaluateTransaction("QueryRaw", string(query.Encode())); if err != nil {
 		return nil, err
 	}
 
-	var assets []*models.Asset
-
-	if err = json.Unmarshal(data, &assets); err != nil {
-		return nil, err
+	if data != nil {
+		if err = json.Unmarshal(data, &assets); err != nil {
+			return nil, err
+		}
 	}
 
 	return assets, nil
