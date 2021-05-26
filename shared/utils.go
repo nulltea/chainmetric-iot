@@ -24,7 +24,7 @@ func MustExecute(fn func() error, msg string) {
 	}
 }
 
-// MustExecute executes `fn` function and in case of error logs it.
+// Execute executes `fn` function and in case of error logs it.
 // Use `msg` to specify details of error to wrap by.
 func Execute(fn func() error, msg string) {
 	if err := fn(); err != nil {

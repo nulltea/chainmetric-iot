@@ -57,11 +57,14 @@ func initConfig() {
 	}
 }
 
+// UnmarshalFromConfig retrieves config block by given `key` and decodes it into given structure `v`.
 func UnmarshalFromConfig(key string, v interface{}) error {
 	bindEnvs(key, v)
 	return viper.UnmarshalKey(key, v)
 }
 
+// MustUnmarshalFromConfig retrieves config block by given `key` and decodes it into given structure `v`.
+// In case of unmarshalling error occurrence it will log fatal error.
 func MustUnmarshalFromConfig(key string, v interface{}) {
 	if err := UnmarshalFromConfig(key, v); err != nil {
 		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))
