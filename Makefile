@@ -3,7 +3,6 @@ export
 
 OUTPUT=bin/sensor
 REMOTE_DIR=/home/pi/sensorsys
-CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
 
 
 build:
@@ -20,8 +19,8 @@ sync:
 	. pi@${REMOTE_IP}:$(REMOTE_DIR)
 
 crypto-sync:
-	scp $(CRYPTO_DIR)/signcerts/User1@supplier.iotchain.network-cert.pem pi@$REMOTE_IP:identity.pem
-	scp $(CRYPTO_DIR)/keystore/priv_sk pi@${REMOTE_IP}:identity.key
+	scp ${CRYPTO_DIR}/signcerts/User1@supplier.iotchain.network-cert.pem pi@${REMOTE_IP}:identity.pem
+	scp ${CRYPTO_DIR}/keystore/priv_sk pi@${REMOTE_IP}:identity.key
 
 run:
 	sudo ./$(OUTPUT)
