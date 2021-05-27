@@ -5,8 +5,8 @@ device:
   hotswap_detect_interval: 3s
   local_cache_path: /var/sensorsys/cache
   ping_timer_interval: 10s
-  battery_monitor_bus: 6
   assets_locate_distance: 50.0
+  battery_check_interval: 1m
 
 engine:
   sensor_sleep_standby_timeout: 1m

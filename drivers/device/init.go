@@ -26,7 +26,7 @@ func (d *Device) Init() error {
 	}
 
 	defer func() {
-		d.active = err == nil && d.model != nil
+		d.active = err == nil && d.Device != nil
 	}()
 
 	if err = d.handleDeviceRegistration(); err != nil {
@@ -37,7 +37,7 @@ func (d *Device) Init() error {
 		return nil
 	}
 
-	if err = localnet.Init(d.model.Name); err != nil {
+	if err = localnet.Init(d.Name); err != nil {
 		return errors.Wrap(err, "failed to initialise local network client")
 	}
 

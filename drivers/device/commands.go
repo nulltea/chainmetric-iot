@@ -18,13 +18,13 @@ func (d *Device) ListenRemoteCommands() error {
 		return nil
 	}
 
-	if d.model == nil || len(d.model.ID) == 0 {
+	if d.state == nil || len(d.ID()) == 0 {
 		return errors.New("cannot listen to commands before device registration")
 	}
 
 	go func() {
 		if err := blockchain.Contracts.Devices.ListenCommands(
-			d.ctx, d.model.ID, func(id string, cmd models.DeviceCommand, args ...interface{}) error {
+			d.ctx, d.state.ID, func(id string, cmd models.DeviceCommand, args ...interface{}) error {
 			switch cmd {
 			case models.DevicePauseCmd:
 			case models.DeviceResumeCmd:

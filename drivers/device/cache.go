@@ -57,7 +57,7 @@ func (d *Device) locateAssets() error {
 	d.assets.data = make(map[string]bool)
 	assets, err := contract.Receive(requests.AssetsQuery{
 		Location: &requests.LocationQuery{
-			GeoPoint: d.model.Location,
+			GeoPoint: d.Location(),
 			Distance: viper.GetFloat64("assets_locate_distance"),
 		},
 	}); if err != nil {
@@ -68,7 +68,7 @@ func (d *Device) locateAssets() error {
 		d.assets.data[asset.ID] = true
 	}
 
-	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.model.Location.Name)
+	shared.Logger.Debugf("Located %d assets on location: %s", len(assets), d.Location().Name)
 
 	return nil
 }

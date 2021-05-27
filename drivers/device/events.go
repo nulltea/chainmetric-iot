@@ -39,7 +39,7 @@ func (d *Device) watchAssets(ctx context.Context) {
 		case "inserted":
 			fallthrough
 		case "updated":
-			if asset.Location.IsNearBy(d.model.Location, viper.GetFloat64("assets_locate_distance")) {
+			if asset.Location.IsNearBy(d.Location(), viper.GetFloat64("assets_locate_distance")) {
 				d.assets.data[asset.ID] = true
 				break
 			}
@@ -56,7 +56,7 @@ func (d *Device) watchAssets(ctx context.Context) {
 
 func (d *Device) watchDevice(ctx context.Context) {
 	if err := blockchain.Contracts.Devices.Subscribe(ctx, "*", func(dev *models.Device, e string) error {
-		if dev.ID != d.model.ID {
+		if dev.ID != d.state.ID {
 			return nil
 		}
 
