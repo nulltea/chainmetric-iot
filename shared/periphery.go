@@ -31,3 +31,9 @@ func initPeriphery() {
 
 	ble.SetDefaultDevice(BluetoothDevice)
 }
+
+func closePeriphery() {
+	if BluetoothDevice != nil {
+		Execute(BluetoothDevice.Stop, "failed to close bluetooth periphery")
+	}
+}

@@ -10,9 +10,6 @@ func InitCore() {
 
 // CloseCore performs core dependencies close sequence.
 func CloseCore() {
-	LevelDB.Close()
-
-	if BluetoothDevice != nil {
-		BluetoothDevice.Stop()
-	}
+	closeLevelDB()
+	closePeriphery()
 }

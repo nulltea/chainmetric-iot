@@ -23,3 +23,9 @@ func initLevelDB() {
 		Logger.Fatal(errors.Wrap(err, "failed to initialise LevelDB"))
 	}
 }
+
+func closeLevelDB() {
+	if err := LevelDB.Close(); err != nil {
+		Logger.Error(errors.Wrap(err, "failed to close connection to LevelDB"))
+	}
+}
