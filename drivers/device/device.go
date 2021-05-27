@@ -11,8 +11,6 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/network/local"
 )
 
 // Device defines driver for the IoT device itself.
@@ -25,8 +23,6 @@ type Device struct {
 	requests *requirementsCache
 
 	reader   *engine.SensorsReader
-	client   *blockchain.Client
-	localnet *local.Client
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
@@ -56,21 +52,10 @@ func New() *Device {
 	}
 }
 
-// SetClient assigns the blockchain.Client to the device.
-func (d *Device) SetClient(client *blockchain.Client) *Device {
-	d.client = client
-	return d
-}
 
 // SetEngine assigns the engine.SensorsReader engine to the device.
 func (d * Device) SetEngine(reader *engine.SensorsReader) *Device {
 	d.reader = reader
-	return d
-}
-
-// SetLocalNet assigns the local.Client for low range communications to the device.
-func (d * Device) SetLocalNet(localnet *local.Client) *Device {
-	d.localnet = localnet
 	return d
 }
 

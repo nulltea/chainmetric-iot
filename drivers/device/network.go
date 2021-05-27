@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/storage"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -44,12 +45,8 @@ func (d *Device) pingNetworkConnection() {
 
 // tryRepostCachedReadings makes attempt to repost cached during network absence sensor readings data.
 func (d *Device) tryRepostCachedReadings() {
-	var (
-		contract = d.client.Contracts.Readings
-	)
-
 	storage.IterateOverCachedReadings(d.ctx, func(key string, record models.MetricReadings) (toBreak bool, err error) {
-		if err = contract.Post(record); err != nil {
+		if err = blockchain.Contracts.Readings.Post(record); err != nil {
 			if detectNetworkAbsence(err) {
 				d.pingNetworkConnection()
 				shared.Logger.Debug("Network connection is still down - stop iterating sequence")

@@ -1,4 +1,4 @@
-package local
+package localnet
 
 import (
 	"github.com/pkg/errors"
@@ -9,43 +9,37 @@ import (
 )
 
 // Client defines the interface for low range network communication.
-type (
-	Client struct {
-		dev *peripheries.Bluetooth
+type Client struct {
+	dev *peripheries.Bluetooth
+}
 
-		Channels channels
+var (
+	client = &Client{
+		dev: peripheries.NewBluetooth(),
 	}
 
-	channels struct {
+	// Channels exposes available channel for local network communication.
+	Channels = struct {
 		Geo *GeoLocationChannel
+	} {
+		Geo: NewGeoLocationChannel(),
 	}
 )
 
-// NewClient create new low range network communication Client.
-func NewClient() *Client {
-	return &Client{
-		dev: peripheries.NewBluetooth(),
-
-		Channels: channels{
-			Geo: NewGeoLocationChannel(),
-		},
-	}
-}
-
 // Init performs initialisation of the Client.
-func (c *Client) Init(name string) error {
+func Init(name string) error {
 	if !viper.GetBool("bluetooth.enabled") {
 		return nil
 	}
 
-	if err := c.dev.Init(
+	if err := client.dev.Init(
 		peripheries.WithDeviceName(name),
-		peripheries.WithAdvertisementServices(c.Channels.Geo.uuid),
+		peripheries.WithAdvertisementServices(Channels.Geo.uuid),
 	); err != nil {
 		return errors.Wrap(err, "failed to prepare Bluetooth driver")
 	}
 
-	if err := c.Channels.Geo.expose(c.dev); err != nil {
+	if err := Channels.Geo.expose(client.dev); err != nil {
 		return errors.Wrap(err, "failed to expose client to geo channel")
 	}
 
@@ -53,10 +47,10 @@ func (c *Client) Init(name string) error {
 }
 
 // Pair performs pairing via Bluetooth.
-func (c *Client) Pair() error {
+func Pair() error {
 	shared.Logger.Debug("Bluetooth pairing started")
 
-	if err := c.dev.Advertise(); err != nil {
+	if err := client.dev.Advertise(); err != nil {
 		return errors.Wrap(err, "failed to advertise device via Bluetooth")
 	}
 
@@ -64,6 +58,6 @@ func (c *Client) Pair() error {
 }
 
 // Close closes local network connection and clears allocated resources.
-func (c *Client) Close() error {
-	return c.dev.Close()
+func Close() error {
+	return client.dev.Close()
 }

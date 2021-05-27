@@ -5,8 +5,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model/state"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -29,11 +31,7 @@ func (d *Device) WatchForBlockchainEvents() {
 }
 
 func (d *Device) watchAssets(ctx context.Context) {
-	var (
-		contract = d.client.Contracts.Assets
-	)
-
-	contract.Subscribe(ctx, "*", func(asset *models.Asset, e string) error {
+	blockchain.Contracts.Assets.Subscribe(ctx, "*", func(asset *models.Asset, e string) error {
 		d.assets.mutex.Lock()
 		defer d.assets.mutex.Unlock()
 
@@ -57,11 +55,7 @@ func (d *Device) watchAssets(ctx context.Context) {
 }
 
 func (d *Device) watchDevice(ctx context.Context) {
-	var (
-		contract = d.client.Contracts.Devices
-	)
-
-	contract.Subscribe(ctx, "*", func(dev *models.Device, e string) error {
+	if err := blockchain.Contracts.Devices.Subscribe(ctx, "*", func(dev *models.Device, e string) error {
 		if dev.ID != d.model.ID {
 			return nil
 		}
@@ -81,15 +75,13 @@ func (d *Device) watchDevice(ctx context.Context) {
 		shared.Logger.Debugf("Device was %s", e)
 
 		return nil
-	})
+	}); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed to subscribe to device changes on network"))
+	}
 }
 
 func (d *Device) watchRequirements(ctx context.Context) {
-	var (
-		contract = d.client.Contracts.Requirements
-	)
-
-	contract.Subscribe(ctx, "*", func(req *models.Requirements, e string) error {
+	blockchain.Contracts.Requirements.Subscribe(ctx, "*", func(req *models.Requirements, e string) error {
 		d.requests.mutex.Lock()
 		defer d.requests.mutex.Unlock()
 
@@ -132,8 +124,9 @@ func (d *Device) actOnDeviceUpdates(updated *models.Device) {
 }
 
 func (d *Device) NotifyOff() error {
-	if d.client == nil || d.model == nil {
+	if d.model == nil {
 		return nil
 	}
-	return d.client.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
+
+	return blockchain.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }

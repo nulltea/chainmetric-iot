@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -48,13 +49,12 @@ func (d *Device) CacheBlockchainState() error {
 
 func (d *Device) locateAssets() error {
 	var (
-		contract = d.client.Contracts.Assets
+		contract = blockchain.Contracts.Assets
 	)
 	d.assets.mutex.Lock()
 	defer d.assets.mutex.Unlock()
 
 	d.assets.data = make(map[string]bool)
-
 	assets, err := contract.Receive(requests.AssetsQuery{
 		Location: &requests.LocationQuery{
 			GeoPoint: d.model.Location,
@@ -75,7 +75,7 @@ func (d *Device) locateAssets() error {
 
 func (d *Device) receiveRequirements() error {
 	var (
-		contract = d.client.Contracts.Requirements
+		contract = blockchain.Contracts.Requirements
 	)
 	d.requests.mutex.Lock()
 	defer d.requests.mutex.Unlock()

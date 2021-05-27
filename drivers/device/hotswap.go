@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
@@ -51,7 +52,6 @@ func (d *Device) handleHotswap() error {
 	var (
 		detectedSensors = make(map[string]sensor.Sensor)
 		registeredSensors = d.reader.RegisteredSensors()
-		contract = d.client.Contracts.Devices
 		isChanges bool
 	)
 
@@ -83,7 +83,7 @@ func (d *Device) handleHotswap() error {
 			return err
 		}
 
-		return contract.UpdateSpecs(d.model.ID, d.specs)
+		return blockchain.Contracts.Devices.UpdateSpecs(d.model.ID, d.specs)
 	}
 
 	return nil

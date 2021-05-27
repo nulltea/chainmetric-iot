@@ -5,21 +5,17 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 )
 
+// ReadingsContract defines access to blockchain Smart Contract for managing metric readings.
 type ReadingsContract struct {
-	client   *Client
 	contract *gateway.Contract
 }
 
-func NewReadingsContract(client *Client) *ReadingsContract {
-	return &ReadingsContract{
-		client: client,
-	}
+// init performs initialization of the ReadingsContract instance.
+func (rc *ReadingsContract) init() {
+	rc.contract = client.network.GetContract("readings")
 }
 
-func (rc *ReadingsContract) Init() {
-	rc.contract = rc.client.network.GetContract("readings")
-}
-
+// Post sends models.MetricReadings record to blockchain network for processing.
 func (rc *ReadingsContract) Post(readings models.MetricReadings) error {
 	_, err := rc.contract.SubmitTransaction("Post", string(readings.Encode()))
 	return err

@@ -18,20 +18,12 @@ import (
 
 // DevicesContract defines access to blockchain Smart Contract for managing device.
 type DevicesContract struct {
-	client   *Client
 	contract *gateway.Contract
 }
 
-// NewDevicesContract constructs new DevicesContract instance.
-func NewDevicesContract(client *Client) *DevicesContract {
-	return &DevicesContract{
-		client: client,
-	}
-}
-
-// Init performs initialization of DevicesContract.
-func (dc *DevicesContract) Init() {
-	dc.contract = dc.client.network.GetContract("devices")
+// init performs initialization of the DevicesContract instance.
+func (dc *DevicesContract) init() {
+	dc.contract = client.network.GetContract("devices")
 }
 
 // Retrieve fetches models.Device from the blockchain ledger.
@@ -68,7 +60,7 @@ func (dc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) erro
 	return nil
 }
 
-// UpdateSpecs updates device state on the blockchain ledger.
+// UpdateState updates device state on the blockchain ledger.
 func (dc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
 	data, err := json.Marshal(requests.DeviceUpdateRequest{State: &state})
 	if err != nil {
@@ -105,7 +97,7 @@ func (dc *DevicesContract) Unbind(id string) error {
 	return nil
 }
 
-// Subscribe subscribes and starts listening for device related events on the blockchain network.
+// Subscribe listens to blockchain events related to device and triggers `action` on each event occurrence.
 func (dc *DevicesContract) Subscribe(
 	ctx context.Context, event string,
 	action func(*models.Device, string) error,
@@ -145,8 +137,6 @@ func (dc *DevicesContract) Subscribe(
 			}
 		}
 	}
-
-	return nil
 }
 
 // ListenCommands subscribes and starts listening for device commands from the blockchain network.
@@ -189,8 +179,6 @@ func (dc *DevicesContract) ListenCommands(
 			}
 		}
 	}
-
-	return nil
 }
 
 // SubmitCommandResults submits command execution results to log them in the blockchain ledger.

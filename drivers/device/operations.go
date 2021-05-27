@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -44,7 +45,6 @@ func (d *Device) actOnRequest(request *readingsRequest) {
 
 func (d *Device) postReadings(assetID string, readings model.SensorsReadingResults) {
 	var (
-		contract = d.client.Contracts.Readings
 		record = models.MetricReadings{
 			AssetID: assetID,
 			DeviceID: d.model.ID,
@@ -58,7 +58,7 @@ func (d *Device) postReadings(assetID string, readings model.SensorsReadingResul
 		return
 	}
 
-	if err := contract.Post(record); err != nil {
+	if err := blockchain.Contracts.Readings.Post(record); err != nil {
 		if detectNetworkAbsence(err) {
 			d.handleNetworkDisconnection(record)
 		} else {

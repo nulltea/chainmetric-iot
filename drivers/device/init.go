@@ -9,6 +9,8 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -35,7 +37,7 @@ func (d *Device) Init() error {
 		return nil
 	}
 
-	if err = d.localnet.Init(d.model.Name); err != nil {
+	if err = localnet.Init(d.model.Name); err != nil {
 		return errors.Wrap(err, "failed to initialise local network client")
 	}
 
@@ -50,7 +52,7 @@ func (d *Device) Init() error {
 
 func (d *Device) handleDeviceRegistration() error {
 	var (
-		contract = d.client.Contracts.Devices
+		contract = blockchain.Contracts.Devices
 	)
 
 	if id, is := isRegistered(); is {
@@ -122,7 +124,7 @@ func (d *Device) Reset() error {
 		return nil
 	}
 
-	if err := d.client.Contracts.Devices.Unbind(id); err != nil {
+	if err := blockchain.Contracts.Devices.Unbind(id); err != nil {
 		return err
 	}
 

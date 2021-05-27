@@ -12,21 +12,17 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
+// RequirementsContract defines access to blockchain Smart Contract for managing requirements.
 type RequirementsContract struct {
-	client   *Client
 	contract *gateway.Contract
 }
 
-func NewRequirementsContract(client *Client) *RequirementsContract {
-	return &RequirementsContract{
-		client: client,
-	}
+// init performs initialization of the RequirementsContract instance.
+func (rc *RequirementsContract) init() {
+	rc.contract = client.network.GetContract("requirements")
 }
 
-func (rc *RequirementsContract) Init() {
-	rc.contract = rc.client.network.GetContract("requirements")
-}
-
+// ReceiveFor retrieves models.Requirements records from blockchain ledger for a given `assets`.
 func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requirements, error) {
 	request, _ := json.Marshal(assets)
 
@@ -41,6 +37,8 @@ func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requireme
 	return requirements, nil
 }
 
+// Subscribe starts listening to blockchain events related to requirements
+// and triggers `action` on each event occurrence.
 func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, action func(*models.Requirements, string) error) error {
 	var (
 		eventFilter = eventFilter("requirements", event)
@@ -76,6 +74,4 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 			}
 		}
 	}
-
-	return nil
 }

@@ -7,15 +7,13 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 	"github.com/timoth-y/chainmetric-core/utils"
+	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 func (d *Device) ListenRemoteCommands() error {
-	var (
-		contract = d.client.Contracts.Devices
-	)
-
 	if !d.active {
 		return nil
 	}
@@ -25,7 +23,8 @@ func (d *Device) ListenRemoteCommands() error {
 	}
 
 	go func() {
-		if err := contract.ListenCommands(d.ctx, d.model.ID, func(id string, cmd models.DeviceCommand, args ...interface{}) error {
+		if err := blockchain.Contracts.Devices.ListenCommands(
+			d.ctx, d.model.ID, func(id string, cmd models.DeviceCommand, args ...interface{}) error {
 			switch cmd {
 			case models.DevicePauseCmd:
 			case models.DeviceResumeCmd:
@@ -36,7 +35,7 @@ func (d *Device) ListenRemoteCommands() error {
 			}
 			return nil
 		}); err != nil {
-			shared.Logger.Error(err)
+			shared.Logger.Error(errors.Wrap(err, "failed to subscribe to device remote commands"))
 		}
 	}()
 
@@ -45,13 +44,12 @@ func (d *Device) ListenRemoteCommands() error {
 
 func (d *Device) handleBluetoothPairingCmd(cmdID string) {
 	var (
-		contract = d.client.Contracts.Devices
 		results = requests.DeviceCommandResultsSubmitRequest{
 			Status: models.DeviceCmdCompleted,
 		}
 	)
 
-	if err := d.localnet.Pair(); err != nil {
+	if err := localnet.Pair(); err != nil {
 		results.Status = models.DeviceCmdFailed
 		results.Error = utils.StringPointer(err.Error())
 		shared.Logger.Error(err)
@@ -59,7 +57,7 @@ func (d *Device) handleBluetoothPairingCmd(cmdID string) {
 
 	results.Timestamp = time.Now().UTC()
 
-	if err := contract.SubmitCommandResults(cmdID, results); err != nil {
+	if err := blockchain.Contracts.Devices.SubmitCommandResults(cmdID, results); err != nil {
 		shared.Logger.Error(err)
 	}
 }

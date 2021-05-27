@@ -22,7 +22,7 @@ const (
 	scaleMultiplier = 0.0039
 )
 
-// Represents ADXL345 sensor device
+// ADXL345 sensor device.
 type ADXL345 struct {
 	*peripheries.I2C
 }
@@ -37,26 +37,26 @@ func (s *ADXL345) ID() string {
 	return "ADXL345"
 }
 
-func (s *ADXL345) Init() (err error) {
-	if err = s.I2C.Init(); err != nil {
-		return
+func (s *ADXL345) Init() error {
+	if err := s.I2C.Init(); err != nil {
+		return err
 	}
 
 	// changes the device bandwidth and output data rate
-	if err = s.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
-		return
+	if err := s.WriteRegBytes(ADXL345_BW_RATE, ADXL345_Rate100HZ); err != nil {
+		return err
 	}
 
-	if err = s.setRange(ADXL345_RANGE2G); err != nil {
-		return
+	if err := s.setRange(ADXL345_RANGE2G); err != nil {
+		return err
 	}
 
 	// enables measurement on sensor
-	if err = s.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
-		return
+	if err := s.WriteRegBytes(ADXL345_POWER_CTL, ADXL345_MEASURE); err != nil {
+		return err
 	}
 
-	return
+	return nil
 }
 
 // ReadAxes retrieves axes acceleration data as multiplications of G
