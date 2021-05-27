@@ -19,12 +19,11 @@ type Client struct {
 	network *gateway.Network
 }
 
-
 var (
 	client = &Client{}
 	config cnf.BlockchainConfig
 
-	// Contracts exposes blockchain network Smart Contracts pool.
+	// Contracts exposes blockchain network SmartContracts pool.
 	Contracts = struct {
 		Devices      *DevicesContract
 		Assets       *AssetsContract

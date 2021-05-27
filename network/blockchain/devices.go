@@ -12,7 +12,6 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 
-	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -46,42 +45,14 @@ func (dc *DevicesContract) Exists(id string) (bool, error) {
 	return strconv.ParseBool(string(resp))
 }
 
-// UpdateSpecs updates device specification on the blockchain ledger.
-func (dc *DevicesContract) UpdateSpecs(id string, specs *model.DeviceSpecs) error {
-	data, err := json.Marshal(specs)
+// Update updates device on the blockchain ledger.
+func (dc *DevicesContract) Update(id string, req requests.DeviceUpdateRequest) error {
+	payload, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	if _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// UpdateState updates device state on the blockchain ledger.
-func (dc *DevicesContract) UpdateState(id string, state models.DeviceState) error {
-	data, err := json.Marshal(requests.DeviceUpdateRequest{State: &state})
-	if err != nil {
-		return err
-	}
-
-	if _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// UpdateLocation updates device location on the blockchain ledger.
-func (dc *DevicesContract) UpdateLocation(id string, location models.Location) error {
-	data, err := json.Marshal(requests.DeviceUpdateRequest{Location: &location})
-	if err != nil {
-		return err
-	}
-
-	if _, err = dc.contract.SubmitTransaction("Update", id, string(data)); err != nil {
+	if _, err = dc.contract.SubmitTransaction("Update", id, string(payload)); err != nil {
 		return err
 	}
 
