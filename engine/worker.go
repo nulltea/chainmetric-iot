@@ -49,7 +49,7 @@ func (r *SensorsReader) UnregisterSensor(id string) {
 	}
 }
 
-func (r *SensorsReader) RegisteredSensors() map[string]sensor.Sensor {
+func (r *SensorsReader) RegisteredSensors() sensor.SensorsRegister {
 	sMap := make(map[string]sensor.Sensor)
 
 	for i, sensor := range r.sensors {

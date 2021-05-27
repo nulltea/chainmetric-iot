@@ -11,7 +11,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
+	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -53,7 +53,7 @@ func (m *HotswapDetector) Start(ctx context.Context) {
 				}
 
 				select {
-				case <-time.After(interval - time.Since(startTime)):
+				case <- time.After(interval - time.Since(startTime)):
 				case <- ctx.Done():
 					shared.Logger.Debug("Hotswap detector module routine ended.")
 					break LOOP
@@ -66,7 +66,8 @@ func (m *HotswapDetector) Start(ctx context.Context) {
 func (m *HotswapDetector) handleHotswap() error {
 	var (
 		detectedSensors = make(map[string]sensor.Sensor)
-		registeredSensors = m.reader.RegisteredSensors()
+		registeredSensors = m.dev.RegisteredSensors()
+		staticSensors = m.dev.StaticSensors()
 		isChanges bool
 	)
 
@@ -78,8 +79,8 @@ func (m *HotswapDetector) handleHotswap() error {
 	}
 
 	for id := range registeredSensors {
-		if _, ok := detectedSensors[id]; !ok && !m.isStaticSensor(id) {
-			m.reader.UnregisterSensor(id)
+		if _, ok := detectedSensors[id]; !ok && !m.contains(staticSensors, id) {
+			m.dev.UnregisterSensor(id)
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was detached from the device", id)
 		}
@@ -87,29 +88,24 @@ func (m *HotswapDetector) handleHotswap() error {
 
 	for id := range detectedSensors {
 		if _, ok := registeredSensors[id]; !ok {
-			m.reader.RegisterSensors(detectedSensors[id])
+			m.dev.RegisterSensors(detectedSensors[id])
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was attached to the device", id)
 		}
 	}
 
 	if isChanges {
-		if _, err := m.DiscoverSpecs(false); err != nil {
+		if err := m.dev.SetSpecs(func(specs *model.DeviceSpecs) {
+			specs.Supports = m.dev.RegisteredSensors().Union(staticSensors).SupportedMetrics()
+		}); err != nil {
 			return err
 		}
-
-		return blockchain.Contracts.Devices.UpdateSpecs(m.model.ID, m.specs)
 	}
 
 	return nil
 }
 
-func (m *HotswapDetector) isStaticSensor(id string) bool {
-	for i := range m.staticSensors {
-		if m.staticSensors[i].ID() == id {
-			return true
-		}
-	}
-
-	return false
+func (m *HotswapDetector) contains(register map[string]sensor.Sensor, id string) bool {
+	_, contains := register[id]
+	return contains
 }

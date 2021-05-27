@@ -70,11 +70,15 @@ func (d *Device) SetState(state models.DeviceState) error {
 		return errors.Errorf("conflict setting state: device state is already '%s'", d.state.State)
 	}
 
-	if err := blockchain.Contracts.Devices.Update(d.state.ID, requests.DeviceUpdateRequest{
+	req := requests.DeviceUpdateRequest{
 		State: &state,
-	}); err != nil {
+	}
+
+	if err := blockchain.Contracts.Devices.Update(d.state.ID, req); err != nil {
 		return errors.Wrap(err,"failed to update device state")
 	}
+
+	req.Update(d.state)
 
 	return nil
 }
@@ -97,11 +101,15 @@ func (d *Device) SetLocation(location models.Location) error {
 		return errors.New("conflict setting state: new location must contains both coordinates")
 	}
 
-	if err := blockchain.Contracts.Devices.Update(d.state.ID, requests.DeviceUpdateRequest{
+	req := requests.DeviceUpdateRequest{
 		Location: &location,
-	}); err != nil {
+	}
+
+	if err := blockchain.Contracts.Devices.Update(d.state.ID, req); err != nil {
 		return errors.Wrap(err,"failed to update device location")
 	}
+
+	req.Update(d.state)
 
 	return nil
 }
@@ -112,7 +120,11 @@ func (d *Device) Specs() model.DeviceSpecs {
 }
 
 // SetSpecs updates Device current specification in blockchain network.
-func (d *Device) SetSpecs(specs model.DeviceSpecs) error {
+func (d *Device) SetSpecs(setter func(specs *model.DeviceSpecs)) error {
+	specs := &model.DeviceSpecs{}
+	*specs = d.specs
+	setter(specs)
+
 	if len(specs.Supports) == 0 {
 		return errors.New("conflict setting state: device must support at least one metric")
 	}
@@ -125,13 +137,17 @@ func (d *Device) SetSpecs(specs model.DeviceSpecs) error {
 		return errors.New("conflict setting state: IP address must be defines for the device")
 	}
 
-	if err := blockchain.Contracts.Devices.Update(d.state.ID, requests.DeviceUpdateRequest{
+	req := requests.DeviceUpdateRequest{
 		Hostname: &specs.Hostname,
 		IP: &specs.IPAddress,
 		Supports: specs.Supports,
-	}); err != nil {
+	}
+
+	if err := blockchain.Contracts.Devices.Update(d.state.ID, req); err != nil {
 		return errors.Wrap(err,"failed to update device specs")
 	}
+
+	req.Update(d.state)
 
 	return nil
 }
@@ -142,20 +158,50 @@ func (d *Device) Battery() models.DeviceBattery {
 }
 
 // SetBattery updates Device current battery stats in blockchain network.
-func (d *Device) SetBattery(battery models.DeviceBattery) error {
-	if err := blockchain.Contracts.Devices.Update(d.state.ID, requests.DeviceUpdateRequest{
+func (d *Device) SetBattery(battery models.DeviceBattery) error {1
+	req := requests.DeviceUpdateRequest{
 		Battery: &battery,
-	}); err != nil {
+	}
+
+	if err := blockchain.Contracts.Devices.Update(d.state.ID, req); err != nil {
 		return errors.Wrap(err,"failed to update device specs")
 	}
+
+	req.Update(d.state)
 
 	return nil
 }
 
+// RegisteredSensors returns map with sensors registered on the Device.
+func (d *Device) RegisteredSensors() sensor.SensorsRegister {
+	return d.reader.RegisteredSensors()
+}
+
+// RegisterSensors adds given `sensors` on the Device sensors pool.
+func (d *Device) RegisterSensors(sensors ...sensor.Sensor) {
+	d.reader.RegisterSensors()
+}
+
+// UnregisterSensor removes sensor by given `id` from the Device sensors pool.
+func (d *Device) UnregisterSensor(id string) {
+	d.reader.UnregisterSensor(id)
+}
+
 // SetEngine assigns the engine.SensorsReader engine to the device.
-func (d * Device) SetEngine(reader *engine.SensorsReader) *Device {
+func (d *Device) SetEngine(reader *engine.SensorsReader) *Device {
 	d.reader = reader
 	return d
+}
+
+// StaticSensors returns map with sensors statically registered on the Device.
+func (d *Device) StaticSensors() sensor.SensorsRegister {
+	sMap := make(map[string]sensor.Sensor)
+
+	for i, sensor := range d.staticSensors {
+		sMap[sensor.ID()] = d.staticSensors[i]
+	}
+
+	return sMap
 }
 
 // RegisterStaticSensors allows to registrant static (not auto-detectable) sensors.
@@ -163,6 +209,7 @@ func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	d.staticSensors = append(d.staticSensors, sensors...)
 	return d
 }
+
 
 func (d *Device) Close() error {
 	d.active = false

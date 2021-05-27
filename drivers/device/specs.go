@@ -8,7 +8,6 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/model/state"
 )
 
 func (d *Device) DiscoverSpecs(rescan bool) (*model.DeviceSpecs, error) {
