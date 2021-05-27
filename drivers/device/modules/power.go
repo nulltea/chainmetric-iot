@@ -13,22 +13,22 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// PowerManagement defines device.Device module for battery management.
-type PowerManagement struct {
+// PowerManager defines device.Device module for battery management.
+type PowerManager struct {
 	dev  *dev.Device
 	ups  *power.UPSController
 	once *sync.Once
 }
 
-// WithPowerManagement can be used to setup PowerManagement for the device.Device.
-func WithPowerManagement() Module {
-	return &PowerManagement{
+// WithPowerManager can be used to setup PowerManager for the device.Device.
+func WithPowerManager() Module {
+	return &PowerManager{
 		ups: power.NewUPSController(),
 		once: &sync.Once{},
 	}
 }
 
-func (m *PowerManagement) Setup(device *dev.Device) error {
+func (m *PowerManager) Setup(device *dev.Device) error {
 	if err := m.ups.Init(); err != nil {
 		return errors.Wrap(err, "failed to initialize ups controller driver")
 	}
@@ -38,7 +38,7 @@ func (m *PowerManagement) Setup(device *dev.Device) error {
 	return nil
 }
 
-func (m *PowerManagement) Start(ctx context.Context) {
+func (m *PowerManager) Start(ctx context.Context) {
 	m.once.Do(func() {
 		var (
 			startTime  time.Time

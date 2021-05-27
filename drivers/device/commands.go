@@ -42,22 +42,4 @@ func (d *Device) ListenRemoteCommands() error {
 	return nil
 }
 
-func (d *Device) handleBluetoothPairingCmd(cmdID string) {
-	var (
-		results = requests.DeviceCommandResultsSubmitRequest{
-			Status: models.DeviceCmdCompleted,
-		}
-	)
 
-	if err := localnet.Pair(); err != nil {
-		results.Status = models.DeviceCmdFailed
-		results.Error = utils.StringPointer(err.Error())
-		shared.Logger.Error(err)
-	}
-
-	results.Timestamp = time.Now().UTC()
-
-	if err := blockchain.Contracts.Devices.SubmitCommandResults(cmdID, results); err != nil {
-		shared.Logger.Error(err)
-	}
-}
