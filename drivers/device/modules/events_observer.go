@@ -71,8 +71,7 @@ func (m *EventsObserver) watchDevice(ctx context.Context) {
 
 		switch e {
 		case "updated":
-			m.UpdateDeviceModel(dev)
-			m.actOnDeviceUpdates(dev)
+			m.actOnDeviceUpdates(ctx, dev)
 			fallthrough
 		case "inserted":
 			m.UpdateDeviceModel(dev)
@@ -124,7 +123,8 @@ func (m *EventsObserver) watchRequirements(ctx context.Context) {
 func (m *EventsObserver) actOnDeviceUpdates(ctx context.Context, updated *models.Device) {
 	if m.Location().IsNearBy(updated.Location, viper.GetFloat64("assets_locate_distance")) {
 		eventdriver.EmitEvent(ctx, events.DeviceLocationChanged, events.DeviceLocationChangedPayload{
-
+			Old: m.Location(),
+			New: updated.Location,
 		})
 	}
 }

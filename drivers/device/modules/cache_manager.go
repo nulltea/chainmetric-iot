@@ -33,18 +33,10 @@ func (m *CacheManager) Setup(device *dev.Device) error {
 	return nil
 }
 
-func (m *CacheManager) Start(ctx context.Context) {
+func (m *CacheManager) Start(_ context.Context) {
 	m.once.Do(func() {
 		m.cacheBlockchainData()
-
-		eventdriver.SubscribeHandler(events.DeviceLocationChanged, func(ctx context.Context, v interface{}) error {
-			if _, ok := v.(events.DeviceLocationChangedPayload); ok {
-				m.cacheBlockchainData()
-				return nil
-			}
-
-			return eventdriver.ErrIncorrectPayload
-		})
+		eventdriver.SubscribeHandler(events.DeviceLocationChanged, m.handleReCachingEvents)
 	})
 }
 
@@ -101,5 +93,11 @@ func (m *CacheManager) receiveRequirements() error {
 	return nil
 }
 
+func (m *CacheManager) handleReCachingEvents(_ context.Context, v interface{}) error {
+	if _, ok := v.(events.DeviceLocationChangedPayload); ok {
+		m.cacheBlockchainData()
+		return nil
+	}
 
-
+	return eventdriver.ErrIncorrectPayload
+}

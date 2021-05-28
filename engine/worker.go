@@ -87,16 +87,18 @@ func (r *SensorsReader) SendRequest(handler ReceiverFunc, metrics ...models.Metr
 	}
 }
 
-func (r *SensorsReader) Process() {
+func (r *SensorsReader) Process(ctx context.Context) {
 	for {
 		select {
 		case request := <- r.requests:
 			go r.handleRequest(request)
+		case <- ctx.Done():
+			return
 		case <- r.context.Done():
 			return
 		case <- r.done:
 			shared.Logger.Debug("Sensors reader process ended.")
-			return
+			return // TODO: refactor (too many contexts)
 		}
 	}
 }

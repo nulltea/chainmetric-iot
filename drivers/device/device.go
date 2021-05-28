@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/engine"
@@ -24,27 +25,31 @@ type Device struct {
 
 	cacheLayer
 
-	reader   *engine.SensorsReader
+
 
 	detectedI2Cs  periphery.I2CDetectResults
 	staticSensors []sensor.Sensor
-
-	pingTimer *time.Timer
 
 	active       bool
 	cancelDevice context.CancelFunc
 }
 
 // New constructs new IoT Device driver instance.
-func New() *Device {
+func New(modules ...modules.Module) *Device {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	return &Device{
+	dev := &Device{
 		ctx: ctx,
 		cacheLayer: newCacheLayer(),
 		staticSensors: make([]sensor.Sensor, 0),
 		cancelDevice: cancel,
 	}
+
+	for i := range modules {
+		modules[i].Setup(dev)
+	}
+
+	return dev
 }
 
 // ID returns Device unique identifier key in blockchain network.
@@ -189,12 +194,6 @@ func (d *Device) RegisterSensors(sensors ...sensor.Sensor) {
 // UnregisterSensor removes sensor by given `id` from the Device sensors pool.
 func (d *Device) UnregisterSensor(id string) {
 	d.reader.UnregisterSensor(id)
-}
-
-// SetEngine assigns the engine.SensorsReader engine to the device.
-func (d *Device) SetEngine(reader *engine.SensorsReader) *Device {
-	d.reader = reader
-	return d
 }
 
 // StaticSensors returns map with sensors statically registered on the Device.
