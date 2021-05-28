@@ -30,17 +30,17 @@ func (d *Device) Operate() {
 func (d *Device) actOnRequest(request *readingsRequest) {
 	var (
 		handler = func(readings model.SensorsReadingResults) {
-			d.postReadings(request.assetID, readings)
+			d.postReadings(request.AssetID, readings)
 		}
 	)
 
-	if request.period.Seconds() == 0 {
-		d.reader.SendRequest(handler, request.metrics...)
-		delete(d.requests.data, request.id)
+	if request.Period.Seconds() == 0 {
+		d.reader.SendRequest(handler, request.Metrics...)
+		delete(d.requests.data, request.ID)
 		return
 	}
 
-	request.cancel = d.reader.SubscribeReceiver(handler, request.period, request.metrics...)
+	request.Cancel = d.reader.SubscribeReceiver(handler, request.Period, request.Metrics...)
 }
 
 func (d *Device) postReadings(assetID string, readings model.SensorsReadingResults) {

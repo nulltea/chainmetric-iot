@@ -47,6 +47,8 @@ func initConfig() {
 	viper.SetDefault("mocks.sensor_duration", "250ms")
 
 
+	viper.SetDefault("local_events_buffer_size", 100)
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")

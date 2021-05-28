@@ -17,7 +17,7 @@ import (
 
 // HotswapDetector defines device.Device module for detecting changes in connected sensors.
 type HotswapDetector struct {
-	dev  *dev.Device
+	*dev.Device
 	once *sync.Once
 
 	detectedI2Cs  periphery.I2CDetectResults
@@ -31,7 +31,7 @@ func WithHotswapDetector() Module {
 }
 
 func (m *HotswapDetector) Setup(device *dev.Device) error {
-	m.dev = device
+	m.Device = device
 
 	return nil
 }
@@ -66,8 +66,8 @@ func (m *HotswapDetector) Start(ctx context.Context) {
 func (m *HotswapDetector) handleHotswap() error {
 	var (
 		detectedSensors = make(map[string]sensor.Sensor)
-		registeredSensors = m.dev.RegisteredSensors()
-		staticSensors = m.dev.StaticSensors()
+		registeredSensors = m.RegisteredSensors()
+		staticSensors = m.StaticSensors()
 		isChanges bool
 	)
 
@@ -80,7 +80,7 @@ func (m *HotswapDetector) handleHotswap() error {
 
 	for id := range registeredSensors {
 		if _, ok := detectedSensors[id]; !ok && !m.contains(staticSensors, id) {
-			m.dev.UnregisterSensor(id)
+			m.UnregisterSensor(id)
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was detached from the device", id)
 		}
@@ -88,15 +88,15 @@ func (m *HotswapDetector) handleHotswap() error {
 
 	for id := range detectedSensors {
 		if _, ok := registeredSensors[id]; !ok {
-			m.dev.RegisterSensors(detectedSensors[id])
+			m.RegisterSensors(detectedSensors[id])
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was attached to the device", id)
 		}
 	}
 
 	if isChanges {
-		if err := m.dev.SetSpecs(func(specs *model.DeviceSpecs) {
-			specs.Supports = m.dev.RegisteredSensors().Union(staticSensors).SupportedMetrics()
+		if err := m.SetSpecs(func(specs *model.DeviceSpecs) {
+			specs.Supports = m.RegisteredSensors().Union(staticSensors).SupportedMetrics()
 		}); err != nil {
 			return err
 		}

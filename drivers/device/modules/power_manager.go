@@ -15,7 +15,7 @@ import (
 
 // PowerManager defines device.Device module for battery management.
 type PowerManager struct {
-	dev  *dev.Device
+	*dev.Device
 	ups  *power.UPSController
 	once *sync.Once
 }
@@ -33,7 +33,7 @@ func (m *PowerManager) Setup(device *dev.Device) error {
 		return errors.Wrap(err, "failed to initialize ups controller driver")
 	}
 
-	m.dev = device
+	m.Device = device
 
 	return nil
 }
@@ -57,7 +57,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 
 				plugged := m.ups.IsPlugged()
 
-				if err = m.dev.SetBattery(models.DeviceBattery{
+				if err = m.SetBattery(models.DeviceBattery{
 					Level: &level,
 					PluggedIn: plugged,
 				}); err != nil {

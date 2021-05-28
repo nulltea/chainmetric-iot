@@ -22,6 +22,7 @@ require (
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/timoth-y/chainmetric-core v0.0.0-20210527010945-3e138854cc30
+	github.com/timoth-y/go-eventdriver v0.0.0-20210528002841-99ab48c1c154
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
 	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect

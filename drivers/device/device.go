@@ -17,12 +17,12 @@ import (
 
 // Device defines driver for the IoT device itself.
 type Device struct {
-	ctx context.Context
+	ctx        context.Context
+	state      *models.Device
+	stateMutex sync.Mutex
+	specs      model.DeviceSpecs
 
-	state    *models.Device
-	specs    model.DeviceSpecs
-	assets   *assetsCache
-	requests *requirementsCache
+	cacheLayer
 
 	reader   *engine.SensorsReader
 
@@ -41,14 +41,7 @@ func New() *Device {
 
 	return &Device{
 		ctx: ctx,
-		assets: &assetsCache{
-			mutex: sync.Mutex{},
-			data:  make(map[string]bool),
-		},
-		requests: &requirementsCache{
-			mutex: sync.Mutex{},
-			data:  make(map[string]*readingsRequest),
-		},
+		cacheLayer: newCacheLayer(),
 		staticSensors: make([]sensor.Sensor, 0),
 		cancelDevice: cancel,
 	}
@@ -57,6 +50,17 @@ func New() *Device {
 // ID returns Device unique identifier key in blockchain network.
 func (d *Device) ID() string {
 	return d.state.ID
+}
+
+// UpdateDeviceModel updates Device data model (models.Device).
+//
+// This method won't change state of the Device in blockchain ledger,
+// it just updates device locally saved properties.
+func (d *Device) UpdateDeviceModel(model *models.Device) {
+	d.stateMutex.Lock()
+	defer d.stateMutex.Unlock()
+
+	d.state = model
 }
 
 // State returns Device current state.
@@ -216,4 +220,12 @@ func (d *Device) Close() error {
 	d.cancelDevice()
 
 	return nil
+}
+
+func (d *Device) NotifyOff() error {
+	if d.model == nil {
+		return nil
+	}
+
+	return blockchain.Contracts.Devices.UpdateState(d.model.ID, state.Offline)
 }

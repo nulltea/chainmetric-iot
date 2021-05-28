@@ -17,7 +17,7 @@ import (
 
 // RemoteCommandsHandler defines device.Device module for remote commands handling.
 type RemoteCommandsHandler struct {
-	dev  *dev.Device
+	*dev.Device
 	once *sync.Once
 }
 
@@ -29,31 +29,34 @@ func WithRemoteCommandsHandler() Module {
 }
 
 func (m *RemoteCommandsHandler) Setup(device *dev.Device) error {
-	m.dev = device
+	m.Device = device
 
 	return nil
 }
 
 func (m *RemoteCommandsHandler) Start(ctx context.Context) {
-	go func() {
-		if err := blockchain.Contracts.Devices.ListenCommands(ctx,
-			m.dev.ID(), func(id string, cmd models.DeviceCommand, args ...interface{}) error {
-				switch cmd {
-				case models.DevicePauseCmd:
-				case models.DeviceResumeCmd:
-				case models.DevicePairingCmd:
-					m.handleBluetoothPairingCmd(id)
-				default:
-					shared.Logger.Error(errors.Errorf("command '%s' is not supported", cmd))
-				}
-				return nil
-			}); err != nil {
-			shared.Logger.Error(errors.Wrap(err, "failed to subscribe to device remote commands"))
-		}
-	}()
+	m.once.Do(func() {
+		go func() {
+			if err := blockchain.Contracts.Devices.ListenCommands(ctx, m.dev.ID(),
+				func(id string, cmd models.DeviceCommand, args ...interface{}) error {
+					switch cmd {
+					case models.DevicePauseCmd:
+					case models.DeviceResumeCmd:
+					case models.DevicePairingCmd:
+						m.handleBluetoothPairingCmd(id)
+					default:
+						shared.Logger.Error(errors.Errorf("command '%s' is not supported", cmd))
+					}
+					return nil
+				},
+			); err != nil {
+				shared.Logger.Error(errors.Wrap(err, "failed to subscribe to device remote commands"))
+			}
+		}()
+	})
 }
 
-func (d *RemoteCommandsHandler) handleBluetoothPairingCmd(cmdID string) {
+func (m *RemoteCommandsHandler) handleBluetoothPairingCmd(cmdID string) {
 	var (
 		results = requests.DeviceCommandResultsSubmitRequest{
 			Status: models.DeviceCmdCompleted,

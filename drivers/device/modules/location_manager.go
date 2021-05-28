@@ -12,7 +12,7 @@ import (
 
 // LocationManager defines device.Device module for location management.
 type LocationManager struct {
-	dev  *dev.Device
+	*dev.Device
 	once *sync.Once
 }
 
@@ -24,7 +24,7 @@ func WithLocationManager() Module {
 }
 
 func (m *LocationManager) Setup(device *dev.Device) error {
-	m.dev = device
+	m.Device = device
 
 	return nil
 }
@@ -32,7 +32,7 @@ func (m *LocationManager) Setup(device *dev.Device) error {
 func (m *LocationManager) Start(ctx context.Context) {
 	m.once.Do(func() {
 		localnet.Channels.Geo.Subscribe(ctx, func(location models.Location) error {
-			if err := m.dev.SetLocation(location); err != nil {
+			if err := m.SetLocation(location); err != nil {
 				return err
 			}
 

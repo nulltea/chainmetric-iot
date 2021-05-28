@@ -43,3 +43,5 @@ display:
   cs_pin: 8
   reset_pin: 4
   busy_pin: 22
+
+local_events_buffer_size: 25
