@@ -41,12 +41,28 @@ func (m *EngineOperator) Setup(device *dev.Device) error {
 
 func (m *EngineOperator) Start(ctx context.Context) {
 	m.once.Do(func() {
+		// TODO
 		m.engine.RegisterSensors(d.SupportedSensors()...)
 
+		// Act on already cached requirements.
 		for _, request := range m.GetCachedRequirements() {
 			m.actOnRequest(request)
 		}
 
+		// Listen and act on newly submitted or changed requirements.
+		eventdriver.SubscribeHandler(events.RequirementsSubmitted, func(_ context.Context, v interface{}) error {
+			if payload, ok := v.(events.RequirementsSubmittedPayload); ok {
+				for i := range payload.Requests {
+					m.actOnRequest(payload.Requests[i])
+				}
+
+				return nil
+			}
+
+			return eventdriver.ErrIncorrectPayload
+		})
+
+		// Finally start working on requests
 		go m.engine.Process(ctx)
 	})
 }

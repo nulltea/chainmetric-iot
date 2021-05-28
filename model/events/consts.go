@@ -6,4 +6,7 @@ const (
 
 	// MetricReadingsPostFailed identifies event for failure of models.MetricReadings post.
 	MetricReadingsPostFailed = "readings.post.failed"
+
+	// RequirementsSubmitted identifies event for submitting or changing models.Requirements request.
+	RequirementsSubmitted = "requirements.submitted"
 )

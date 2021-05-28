@@ -22,19 +22,20 @@ type EventsObserver struct {
 	once *sync.Once
 }
 
+// WithEventsObserver can be used to setup EventsObserver module for the device.Device.
 func WithEventsObserver() Module {
 	return &EventsObserver{
 		once: &sync.Once{},
 	}
 }
 
-func (m EventsObserver) Setup(device *dev.Device) error {
+func (m *EventsObserver) Setup(device *dev.Device) error {
 	m.Device = device
 
 	return nil
 }
 
-func (m EventsObserver) Start(ctx context.Context) {
+func (m *EventsObserver) Start(ctx context.Context) {
 	m.once.Do(func() {
 		go m.watchAssets(ctx)
 		go m.watchDevice(ctx)
@@ -101,8 +102,9 @@ func (m *EventsObserver) watchRequirements(ctx context.Context) {
 			}
 			fallthrough
 		case "inserted":
-			m.PutRequirementsToCache(req)
-			// m.actOnRequest(request)
+			eventdriver.EmitEvent(ctx, events.RequirementsSubmitted, events.RequirementsSubmittedPayload{
+				Requests: m.PutRequirementsToCache(req),
+			})
 			shared.Logger.Debugf(
 				"Requirements (id: %s) with %d metrics was %s", req.ID, len(req.Metrics), e,
 			)

@@ -37,7 +37,7 @@ func (m *RemoteCommandsHandler) Setup(device *dev.Device) error {
 func (m *RemoteCommandsHandler) Start(ctx context.Context) {
 	m.once.Do(func() {
 		go func() {
-			if err := blockchain.Contracts.Devices.ListenCommands(ctx, m.dev.ID(),
+			if err := blockchain.Contracts.Devices.ListenCommands(ctx, m.ID(),
 				func(id string, cmd models.DeviceCommand, args ...interface{}) error {
 					switch cmd {
 					case models.DevicePauseCmd:

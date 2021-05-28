@@ -124,18 +124,24 @@ func (c *cacheLayer) GetRequirementsFromCache(id string) (model.SensorsReadingRe
 	return req, exists
 }
 
-// PutRequirementsToCache puts models.Requirements records to local cache.
-func (c *cacheLayer) PutRequirementsToCache(reqs ...*models.Requirements) {
+// PutRequirementsToCache puts models.Requirements records to local cache
+// and return requests as they are stored.
+func (c *cacheLayer) PutRequirementsToCache(reqs ...*models.Requirements) (requests []model.SensorsReadingRequest) {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
 	for _, req := range reqs {
-		c.requests.data[req.ID] = model.SensorsReadingRequest{
+		request := model.SensorsReadingRequest{
 			AssetID: req.AssetID,
 			Metrics: req.Metrics.Metrics(),
 			Period:  time.Second * time.Duration(req.Period),
 		}
+
+		c.requests.data[req.ID] = request
+		requests = append(requests, request)
 	}
+
+	return requests
 }
 
 // RemoveRequirementsFromCache removes models.Requirements record to local cache by given `id`.
