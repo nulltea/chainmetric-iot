@@ -8,7 +8,7 @@ import (
 type SensorsRegister map[string]Sensor
 
 // SupportedMetrics aggregates all supported by sensors models.Metric devices.
-func (sr SensorsRegister) SupportedMetrics() []models.Metric {
+func (sr SensorsRegister) SupportedMetrics() models.Metrics {
 	var (
 		availableMetrics = make(map[models.Metric]int)
 	)
@@ -45,4 +45,30 @@ func (sr SensorsRegister) Union(sr2 SensorsRegister) SensorsRegister {
 	}
 
 	return sr
+}
+
+// ToList returns slice of all Sensor devices presented in SensorsRegister.
+func (sr SensorsRegister) ToList() []Sensor {
+	var (
+		l = make([]Sensor, len(sr))
+		i = 0
+	)
+
+	for id := range sr {
+		l[i] = sr[id]
+		i++
+	}
+
+	return l
+}
+
+// NotEmpty determines whether SensorsRegister contains at least one Sensor.
+func (sr SensorsRegister) NotEmpty() bool {
+	return len(sr) > 0
+}
+
+// Exists determines whether the Sensor exists in SensorsRegister by given `id`.
+func (sr SensorsRegister) Exists(id string) bool {
+	_, is := sr[id]
+	return is
 }

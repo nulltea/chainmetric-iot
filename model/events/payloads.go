@@ -2,6 +2,7 @@ package events
 
 import (
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
@@ -20,4 +21,10 @@ type MetricReadingsPostFailedPayload struct {
 // RequirementsSubmittedPayload defines payload for RequirementsSubmitted event.
 type RequirementsSubmittedPayload struct {
 	Requests []model.SensorsReadingRequest
+}
+
+// SensorsRegisterChangedPayload defines payload for SensorsRegisterChanged event.
+type SensorsRegisterChangedPayload struct {
+	Added   []sensor.Sensor
+	Removed []string
 }

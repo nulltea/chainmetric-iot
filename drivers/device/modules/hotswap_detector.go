@@ -11,23 +11,28 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/go-eventdriver"
 )
 
-// HotswapDetector defines device.Device module for detecting changes in connected sensors.
+// HotswapDetector implements Module ofr detecting changes in connected to device.Device sensors.
 type HotswapDetector struct {
 	*dev.Device
-	once *sync.Once
+	*sync.Once
 
 	detectedI2Cs  periphery.I2CDetectResults
 }
 
-// WithHotswapDetector can be used to setup HotswapDetector module for the device.Device.
+// WithHotswapDetector can be used to setup HotswapDetector logical Module onto the device.Device.
 func WithHotswapDetector() Module {
 	return &HotswapDetector{
-		once: &sync.Once{},
+		Once: &sync.Once{},
 	}
+}
+
+func (m *HotswapDetector) MID() string {
+	return "hotswap_detector"
 }
 
 func (m *HotswapDetector) Setup(device *dev.Device) error {
@@ -37,37 +42,36 @@ func (m *HotswapDetector) Setup(device *dev.Device) error {
 }
 
 func (m *HotswapDetector) Start(ctx context.Context) {
-	m.once.Do(func() {
+	go m.Do(func() {
 		var (
-			startTime  time.Time
 			interval = viper.GetDuration("device.hotswap_detect_interval")
+			startTime  time.Time
 		)
 
-		go func() {
-		LOOP:
-			for {
-				startTime = time.Now()
+	LOOP:
+		for {
+			startTime = time.Now()
 
-				if err := m.handleHotswap(); err != nil {
-					shared.Logger.Error(errors.Wrap(err, "failed to handle hotswap"))
-				}
-
-				select {
-				case <- time.After(interval - time.Since(startTime)):
-				case <- ctx.Done():
-					shared.Logger.Debug("Hotswap detector module routine ended.")
-					break LOOP
-				}
+			if err := m.handleHotswap(ctx); err != nil {
+				shared.Logger.Error(errors.Wrap(err, "failed to handle hotswap"))
 			}
-		}()
+
+			select {
+			case <- time.After(interval - time.Since(startTime)):
+			case <- ctx.Done():
+				shared.Logger.Debug("Hotswap detector module routine ended.")
+				break LOOP
+			}
+		}
 	})
 }
 
-func (m *HotswapDetector) handleHotswap() error {
+func (m *HotswapDetector) handleHotswap(ctx context.Context) error {
 	var (
-		detectedSensors = make(map[string]sensor.Sensor)
+		detectedSensors = make(sensor.SensorsRegister)
 		registeredSensors = m.RegisteredSensors()
 		staticSensors = m.StaticSensors()
+		payload = events.SensorsRegisterChangedPayload{}
 		isChanges bool
 	)
 
@@ -79,27 +83,24 @@ func (m *HotswapDetector) handleHotswap() error {
 	}
 
 	for id := range registeredSensors {
-		if _, ok := detectedSensors[id]; !ok && !m.contains(staticSensors, id) {
-			m.UnregisterSensor(id)
+		if !detectedSensors.Exists(id) && !m.contains(staticSensors, id) {
+			payload.Removed = append(payload.Removed, id)
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was detached from the device", id)
 		}
 	}
 
 	for id := range detectedSensors {
-		if _, ok := registeredSensors[id]; !ok {
-			m.RegisterSensors(detectedSensors[id])
+		if !registeredSensors.Exists(id) {
+			payload.Added = append(payload.Added, detectedSensors[id])
 			isChanges = true
 			shared.Logger.Debugf("Hotswap: %s sensor was attached to the device", id)
 		}
 	}
 
 	if isChanges {
-		if err := m.SetSpecs(func(specs *model.DeviceSpecs) {
-			specs.Supports = m.RegisteredSensors().Union(staticSensors).SupportedMetrics()
-		}); err != nil {
-			return err
-		}
+		eventdriver.EmitEvent(ctx, events.SensorsRegisterChanged, payload)
+		m.UpdateSensorsRegister(payload.Added, payload.Removed)
 	}
 
 	return nil
@@ -108,4 +109,19 @@ func (m *HotswapDetector) handleHotswap() error {
 func (m *HotswapDetector) contains(register map[string]sensor.Sensor, id string) bool {
 	_, contains := register[id]
 	return contains
+}
+
+// waitUntilSensorsDetected checks whether the sensors detected with a specific intervals.
+func waitUntilSensorsDetected(d *dev.Device) bool {
+	var attempts = 5
+	for attempts > 0 {
+		if d.RegisteredSensors().NotEmpty() {
+			return true
+		}
+
+		time.Sleep(250 * time.Millisecond)
+		attempts--
+	}
+
+	return false
 }
