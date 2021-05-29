@@ -14,19 +14,23 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// EventsObserver defines device.Device module for listening and acting on changes in blockchain ledger data.
+// EventsObserver implements Module for listening and acting on changes in blockchain ledger data.
 //
 // This Module also capable of mutating cache layer data of the device.Device.
 type EventsObserver struct {
 	*dev.Device
-	once *sync.Once
+	*sync.Once
 }
 
-// WithEventsObserver can be used to setup EventsObserver module for the device.Device.
+// WithEventsObserver can be used to setup EventsObserver logical Module onto the device.Device.
 func WithEventsObserver() Module {
 	return &EventsObserver{
-		once: &sync.Once{},
+		Once: &sync.Once{},
 	}
+}
+
+func (m *EventsObserver) MID() string {
+	return "events_observer"
 }
 
 func (m *EventsObserver) Setup(device *dev.Device) error {
@@ -36,7 +40,18 @@ func (m *EventsObserver) Setup(device *dev.Device) error {
 }
 
 func (m *EventsObserver) Start(ctx context.Context) {
-	m.once.Do(func() {
+	go m.Do(func() {
+		if !waitUntilDeviceLogged(m.Device) {
+			m.Once = &sync.Once{}
+			eventdriver.SubscribeHandler(events.DeviceLoggedOnNetwork, func(_ context.Context, _ interface{}) error {
+				m.Start(ctx)
+				return nil
+			})
+
+			shared.Logger.Infof("Module '%s' is awaiting notification for the device login")
+			return
+		}
+
 		go m.watchAssets(ctx)
 		go m.watchDevice(ctx)
 		go m.watchRequirements(ctx)
@@ -78,7 +93,7 @@ func (m *EventsObserver) watchDevice(ctx context.Context) {
 			m.UpdateDeviceModel(dev)
 		case "removed":
 			shared.Logger.Notice("Device has been removed from blockchain, must reset it now")
-			m.Reset()
+			eventdriver.EmitEvent(ctx, events.DeviceRemovedFromNetwork, nil)
 		}
 
 		shared.Logger.Debugf("Device was %s", e)

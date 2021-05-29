@@ -13,19 +13,23 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// PowerManager defines device.Device module for battery management.
+// PowerManager implements Module for device.Device battery management.
 type PowerManager struct {
 	*dev.Device
+	*sync.Once
 	ups  *power.UPSController
-	once *sync.Once
 }
 
-// WithPowerManager can be used to setup PowerManager for the device.Device.
+// WithPowerManager can be used to setup PowerManager logical Module onto the device.Device.
 func WithPowerManager() Module {
 	return &PowerManager{
 		ups: power.NewUPSController(),
-		once: &sync.Once{},
+		Once: &sync.Once{},
 	}
+}
+
+func (m *PowerManager) MID() string {
+	return "power_manager"
 }
 
 func (m *PowerManager) Setup(device *dev.Device) error {
@@ -39,40 +43,38 @@ func (m *PowerManager) Setup(device *dev.Device) error {
 }
 
 func (m *PowerManager) Start(ctx context.Context) {
-	m.once.Do(func() {
+	go m.Do(func() {
 		var (
 			startTime  time.Time
 			interval = viper.GetDuration("device.battery_check_interval")
 		)
 
-		go func() {
-		LOOP:
-			for {
-				startTime = time.Now()
+	LOOP:
+		for {
+			startTime = time.Now()
 
-				level, err := m.ups.BatteryLevel()
-				if err != nil {
-					shared.Logger.Error(err)
-				}
-
-				plugged := m.ups.IsPlugged()
-
-				if err = m.SetBattery(models.DeviceBattery{
-					Level: &level,
-					PluggedIn: plugged,
-				}); err != nil {
-					shared.Logger.Error(err)
-				}
-
-				shared.Logger.Debugf("Device battery was updated: %d% (plugged: %s)", level, plugged)
-
-				select {
-				case <-time.After(interval - time.Since(startTime)):
-				case <- ctx.Done():
-					shared.Logger.Debug("Power management module routine ended.")
-					break LOOP
-				}
+			level, err := m.ups.BatteryLevel()
+			if err != nil {
+				shared.Logger.Error(err)
 			}
-		}()
+
+			plugged := m.ups.IsPlugged()
+
+			if err = m.SetBattery(models.DeviceBattery{
+				Level: &level,
+				PluggedIn: plugged,
+			}); err != nil {
+				shared.Logger.Error(err)
+			}
+
+			shared.Logger.Debugf("Device battery was updated: %d% (plugged: %s)", level, plugged)
+
+			select {
+			case <-time.After(interval - time.Since(startTime)):
+			case <- ctx.Done():
+				shared.Logger.Debug("Power management module routine ended.")
+				break LOOP
+			}
+		}
 	})
 }

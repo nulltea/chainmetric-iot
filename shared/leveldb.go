@@ -16,11 +16,11 @@ func initLevelDB() {
 	)
 
 	if len(path) == 0 {
-		Logger.Fatal("failed to initialise LevelDB: local path not provided")
+		Logger.Warning("failed to initialise LevelDB: local path not provided")
 	}
 
 	if LevelDB, err = leveldb.OpenFile(path, nil); err != nil {
-		Logger.Fatal(errors.Wrap(err, "failed to initialise LevelDB"))
+		Logger.Error(errors.Wrap(err, "failed to initialise LevelDB"))
 	}
 }
 

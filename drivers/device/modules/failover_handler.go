@@ -18,35 +18,39 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// FailoverHandler defines device.Device module for handling operating failures.
+// FailoverHandler implements Module for handling operational failures during device.Device work.
 type FailoverHandler struct {
 	*dev.Device
-	once      *sync.Once
+	*sync.Once
 	ctx       context.Context
 	pingTimer *time.Timer
 }
 
-// WithFailoverHandler can be used to setup FailoverHandler module for the device.Device.
+// WithFailoverHandler can be used to setup FailoverHandler logical Module onto the device.Device.
 func WithFailoverHandler() Module {
 	return &FailoverHandler{
-		once: &sync.Once{},
+		Once: &sync.Once{},
 		ctx: context.Background(),
 	}
+}
+
+func (m *FailoverHandler) MID() string {
+	return "failover_handler"
 }
 
 func (m *FailoverHandler) Setup(device *dev.Device) error {
 	m.Device = device
 
+	if shared.LevelDB == nil {
+		return errors.New("module won't work without LevelDB available")
+	}
+
 	return nil
 }
 
 func (m *FailoverHandler) Start(ctx context.Context) {
-	m.once.Do(func() {
-		m.ctx = ctx
-
-		// Try post leftover readings in cache
-		go m.tryRepostCachedReadings()
-
+	m.ctx = ctx
+	go m.Do(func() {
 		// Listen to metric readings failures
 		eventdriver.SubscribeHandler(events.MetricReadingsPostFailed, func(ctx context.Context, v interface{}) error {
 			if payload, ok := v.(events.MetricReadingsPostFailedPayload); ok {
@@ -56,6 +60,9 @@ func (m *FailoverHandler) Start(ctx context.Context) {
 
 			return eventdriver.ErrIncorrectPayload
 		})
+
+		// Try post leftover readings in cache
+		m.tryRepostCachedReadings()
 	})
 }
 
