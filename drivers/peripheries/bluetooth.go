@@ -27,14 +27,23 @@ func NewBluetooth(options ...BluetoothOption) *Bluetooth {
 		scanDuration: viper.GetDuration("bluetooth.scan_duration"),
 		advDuration: viper.GetDuration("bluetooth.advertise_duration"),
 		advServices: []ble.UUID{},
-	}).applyOptions(options...)
+	}).ApplyOptions(options...)
 }
 
 // Init performs initialisation of the Bluetooth driver.
 func (b *Bluetooth) Init(options ...BluetoothOption) error {
-	b.applyOptions(options...)
+	b.ApplyOptions(options...)
 
 	return nil
+}
+
+// ApplyOptions applies Bluetooth configuration parameters by given `options`.
+func (b *Bluetooth) ApplyOptions(options ...BluetoothOption) *Bluetooth {
+	for i := range options {
+		options[i].Apply(b)
+	}
+
+	return b
 }
 
 // Scan performs scan for currently advertising bluetooth device.
@@ -49,10 +58,8 @@ func (b *Bluetooth) Scan() {
 }
 
 // Advertise advertises device with previously configured name.
-func (b *Bluetooth) Advertise() error {
-	var (
-		ctx = ble.WithSigHandler(context.WithTimeout(context.Background(), b.advDuration))
-	)
+func (b *Bluetooth) Advertise(ctx context.Context) error {
+	ctx = ble.WithSigHandler(context.WithTimeout(ctx, b.advDuration))
 
 	return b.Device.AdvertiseNameAndServices(ctx, b.name, b.advServices...)
 }
@@ -62,10 +69,3 @@ func (b *Bluetooth) Close() error {
 	return b.Device.Stop()
 }
 
-func (b *Bluetooth) applyOptions(options ...BluetoothOption) *Bluetooth {
-	for i := range options {
-		options[i].Apply(b)
-	}
-
-	return b
-}

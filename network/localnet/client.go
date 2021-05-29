@@ -1,6 +1,8 @@
 package localnet
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
@@ -29,7 +31,7 @@ var (
 // Init performs initialisation of the Client.
 func Init(name string) error {
 	if !viper.GetBool("bluetooth.enabled") {
-		return nil
+		return errors.New("localnet unavailable since bluetooth does not enabled")
 	}
 
 	if err := client.dev.Init(
@@ -47,14 +49,23 @@ func Init(name string) error {
 }
 
 // Pair performs pairing via Bluetooth.
-func Pair() error {
+func Pair(ctx context.Context) error {
+	if !viper.GetBool("bluetooth.enabled") {
+		return errors.New("advertising unavailable since bluetooth does not enabled")
+	}
+
 	shared.Logger.Debug("Bluetooth pairing started")
 
-	if err := client.dev.Advertise(); err != nil {
+	if err := client.dev.Advertise(ctx); err != nil {
 		return errors.Wrap(err, "failed to advertise device via Bluetooth")
 	}
 
 	return nil
+}
+
+// SetDeviceName sets new `name` for identifying device on local network.
+func SetDeviceName(name string) {
+	client.dev.ApplyOptions(peripheries.WithDeviceName(name))
 }
 
 // Close closes local network connection and clears allocated resources.

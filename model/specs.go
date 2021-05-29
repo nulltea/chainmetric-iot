@@ -13,7 +13,7 @@ type DeviceSpecs struct {
 	Supports []models.Metric `json:"supports"`
 }
 
-func (ds *DeviceSpecs) Encode() string {
+func (ds DeviceSpecs) Encode() string {
 	var metrics []string
 
 	for i := range ds.Supports {
@@ -23,7 +23,7 @@ func (ds *DeviceSpecs) Encode() string {
 	return fmt.Sprintf("${%s;%s;%s}", ds.Hostname, ds.IPAddress, strings.Join(metrics, ","))
 }
 
-func (ds *DeviceSpecs) EncodeJson() string {
-	b, _ := json.Marshal(*ds)
+func (ds DeviceSpecs) EncodeJson() string {
+	b, _ := json.Marshal(ds)
 	return string(b)
 }
