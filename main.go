@@ -5,13 +5,13 @@ import (
 	"os/signal"
 
 	"github.com/spf13/viper"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -22,7 +22,6 @@ var (
 	dcf config.DisplayConfig
 
 	display  dsp.Display
-	reader   *engine.SensorsReader
 	device   *dev.Device
 
 	done = make(chan struct{}, 1)
@@ -35,9 +34,17 @@ func init() {
 	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
-	reader = engine.NewSensorsReader()
 	display = dsp.NewEInk(dcf)
-	device = dev.New().SetEngine(reader)
+	device = dev.New(
+		modules.WithCacheManager(),
+		modules.WithHotswapDetector(),
+		modules.WithEventsObserver(),
+		modules.WithRemoteCommandsHandler(),
+		modules.WithLocationManager(),
+		modules.WithPowerManager(),
+		modules.WithFailoverHandler(),
+		modules.WithEngineOperator(),
+	)
 
 	gui.Init(display)
 }
@@ -65,12 +72,7 @@ func startup() {
 		return blockchain.Init(bcf)
 	}, "failed initializing blockchain client")
 
-	shared.MustExecute(device.Init, "failed to initialize device")
-	shared.MustExecute(device.CacheBlockchainState, "failed to cache the state of blockchain")
-	shared.MustExecute(device.ListenRemoteCommands, "failed to start remote commands listener")
-
-	device.WatchForBlockchainEvents()
-	device.Operate()
+	device.Start()
 }
 
 func shutdown() {
@@ -83,7 +85,6 @@ func shutdown() {
 	}
 
 	shared.Execute(localnet.Close, "error during closing local network")
-	shared.Execute(device.NotifyOff, "error during emitting 'off' event")
 	shared.Execute(device.Close, "error during device shutdown")
 
 	blockchain.Close()
