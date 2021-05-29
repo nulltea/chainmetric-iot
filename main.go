@@ -36,14 +36,15 @@ func init() {
 
 	display = dsp.NewEInk(dcf)
 	device = dev.New(
+		modules.WithLifecycleManager(),
+		modules.WithEngineOperator(),
 		modules.WithCacheManager(),
-		modules.WithHotswapDetector(),
 		modules.WithEventsObserver(),
+		modules.WithHotswapDetector(),
 		modules.WithRemoteCommandsHandler(),
 		modules.WithLocationManager(),
 		modules.WithPowerManager(),
 		modules.WithFailoverHandler(),
-		modules.WithEngineOperator(),
 	)
 
 	gui.Init(display)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -23,29 +22,26 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// LifecycleManager defines Module for device.Device lifecycle managing.
+// LifecycleManager defines device.Module for device.Device lifecycle managing.
 type LifecycleManager struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 }
 
-// WithLifecycleManager can be used to setup LifecycleManager logical Module onto the device.Device.
-func WithLifecycleManager() Module {
+// WithLifecycleManager can be used to setup LifecycleManager logical device.Module onto the device.Device.
+func WithLifecycleManager() dev.Module {
 	return &LifecycleManager{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("lifecycle-manager"),
 	}
 }
 
-func (m *LifecycleManager) MID() string {
-	return "lifecycle-manager"
-}
-
 func (m *LifecycleManager) Setup(device *dev.Device) error {
-	m.Device = device
-
 	var (
 		deviceName = viper.GetString("bluetooth.device_name")
 	)
+
+	if err := m.moduleBase.Setup(device); err != nil {
+		return err
+	}
 
 	if len(m.Name()) != 0 {
 		deviceName = fmt.Sprintf("%s.%s", deviceName, m.Name())
@@ -72,8 +68,16 @@ func (m *LifecycleManager) Start(ctx context.Context) {
 	})
 }
 
+func (m *LifecycleManager) Close() error {
+	if err := m.notifyOff(); err != nil {
+		return errors.Wrap(err, "failed to notify network about device shutdown")
+	}
+
+	return m.moduleBase.Close()
+}
+
 func (m *LifecycleManager) logInNetwork(ctx context.Context, id string) {
-	if d, _ := blockchain.Contracts.Devices.Retrieve(m.ID()); d != nil {
+	if d, _ := blockchain.Contracts.Devices.Retrieve(id); d != nil {
 		m.UpdateDeviceModel(d)
 		eventdriver.EmitEvent(ctx, events.DeviceLoggedOnNetwork, nil)
 
@@ -85,18 +89,20 @@ func (m *LifecycleManager) logInNetwork(ctx context.Context, id string) {
 			return
 		}
 
-		if err := m.SetSpecs(func(dc *model.DeviceSpecs) {
-			dc = specs
-		}); err != nil {
-			shared.Logger.Error(err)
-			return
-		}
+		specs.State = models.DeviceOnline
+
+		defer shared.MustExecute(func() error {
+			return m.SetSpecs(func(ds *model.DeviceSpecs) {
+				*ds = *specs
+			})
+		}, "failed to update device specs")
 
 		shared.Logger.Infof("Device specs has being updated in blockchain with id: %s", id)
 		return
 	}
 
 	shared.Logger.Warning("Device was removed from network, must re-initialize now")
+	m.proceedToDeviceRegistration(ctx)
 }
 
 func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
@@ -112,23 +118,28 @@ func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
 		return
 	 }
 
+	specs.State = models.DeviceOnline
+
 	ctx, cancel := context.WithTimeout(ctx, viper.GetDuration("device.register_timeout_duration"))
 
 	// Try to start bluetooth advertisement:
-	if err := localnet.Pair(ctx); err != nil {
-		shared.Logger.Warning(errors.Wrap(err, "failed to advertise device via bluetooth"))
-	}
+	go func() {
+		if err := localnet.Pair(ctx); err != nil {
+			shared.Logger.Warning(errors.Wrap(err, "failed to advertise device via bluetooth"))
+		}
+	}()
 
 	// Display registration payload as QR code:
 	if gui.Available() {
-		gui.RenderQRCode(m.Specs().Encode())
+		shared.Logger.Debug("Rendering QR")
+		gui.RenderQRCode(specs.Encode())
 	} else {
 		// Alternative way to display registration QR code on Windows for debug purposes:
-		_ = qrcode.WriteFile(m.Specs().Encode(), qrcode.Medium, 320, "qr.png")
+		_ = qrcode.WriteFile(specs.Encode(), qrcode.Medium, 320, "qr.png")
 	}
 
 	if err := contract.Subscribe(ctx, "inserted", func(dev *models.Device, _ string) error {
-		if dev.Hostname == m.Specs().Hostname {
+		if dev.Hostname == specs.Hostname {
 			defer cancel()
 
 			if err := m.storeIdentity(dev.ID); err != nil {
@@ -139,13 +150,20 @@ func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
 			m.UpdateDeviceModel(dev)
 			eventdriver.EmitEvent(ctx, events.DeviceLoggedOnNetwork, nil)
 
-			return m.SetSpecs(func(ds *model.DeviceSpecs) {
-				ds = specs
-			})
+			defer shared.MustExecute(func() error {
+				return m.SetSpecs(func(ds *model.DeviceSpecs) {
+					*ds = *specs
+				})
+			}, "failed to update device specs")
+
+			defer gui.RenderSuccessMsg("Registration completed!")
+
+			return nil
 		}
 		return nil
 	}); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to register device"))
+		defer gui.RenderErrorMsg("Registration failed!")
 	}
 }
 
@@ -155,7 +173,7 @@ func (m *LifecycleManager) discoverDeviceSpecs() (*model.DeviceSpecs, error) {
 	}
 
 	// Attempting to get available sensor for engine to work with:
-	var attempts = 5
+	var attempts = 10
 	for attempts > 0 {
 		if m.RegisteredSensors().NotEmpty() {
 			break
@@ -217,28 +235,14 @@ func (m *LifecycleManager) resetDevice(forceful bool) error {
 	return nil
 }
 
-func (m *LifecycleManager) notifyOff() {
+func (m *LifecycleManager) notifyOff() error {
 	if !m.IsLoggedToNetwork() {
-		return
+		return nil
 	}
 
 	if err := m.SetState(models.DeviceOffline); err != nil {
-		shared.Logger.Error(err)
-	}
-}
-
-
-// waitUntilDeviceLogged checks whether the device.Device is logged on network with a specific intervals.
-func waitUntilDeviceLogged(d *dev.Device) bool {
-	var attempts = 5
-	for attempts > 0 {
-		if d.RegisteredSensors().NotEmpty() {
-			return true
-		}
-
-		time.Sleep(250 * time.Millisecond)
-		attempts--
+		return err
 	}
 
-	return false
+	return nil
 }

@@ -11,6 +11,7 @@ import (
 type DeviceSpecs struct {
 	Network
 	Supports []models.Metric `json:"supports"`
+	State models.DeviceState `json:"state"`
 }
 
 func (ds DeviceSpecs) Encode() string {

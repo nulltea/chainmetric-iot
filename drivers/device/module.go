@@ -4,12 +4,16 @@ import (
 	"context"
 )
 
-// Module defines interface for device.Device extendable logical modules.
+// Module defines interface for Device extendable logical modules.
 type Module interface {
-	// MID returns device.Module ID.
+	// MID returns Module ID.
 	MID() string
-	// Setup registers logical device.Module onto the device.Device instance.
+	// Setup registers logical Module onto the Device instance.
 	Setup(device *Device) error
-	// Start starts device.Module operational routine.
+	// IsReady determines whether the logical Module's Setup is complete and it is ready to Start.
+	IsReady() bool
+	// Start starts Module operational routine.
 	Start(ctx context.Context)
+	// Close stops Module gracefully and clears allocated resources.
+	Close() error
 }

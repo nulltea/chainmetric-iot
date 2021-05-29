@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -14,39 +13,21 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// CacheManager implements Module for device.Device cache data managing.
+// CacheManager implements device.Module for device.Device cache data managing.
 type CacheManager struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 }
 
-// WithCacheManager can be used to setup CacheManager logical Module onto the device.Device.
-func WithCacheManager() Module {
+// WithCacheManager can be used to setup CacheManager logical device.Module onto the device.Device.
+func WithCacheManager() dev.Module {
 	return &CacheManager{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("cache_manager"),
 	}
-}
-
-func (m *CacheManager) MID() string {
-	return "cache_manager"
-}
-
-func (m *CacheManager) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
 }
 
 func (m *CacheManager) Start(ctx context.Context) {
 	go m.Do(func() {
-		if !waitUntilDeviceLogged(m.Device) {
-			m.Once = &sync.Once{}
-			eventdriver.SubscribeHandler(events.DeviceLoggedOnNetwork, func(_ context.Context, _ interface{}) error {
-				m.Start(ctx)
-				return nil
-			})
-
-			shared.Logger.Infof("Module '%s' is awaiting notification for the device login")
+		if !m.trySyncWithDeviceLifecycle(ctx, m.Start) {
 			return
 		}
 
@@ -56,7 +37,6 @@ func (m *CacheManager) Start(ctx context.Context) {
 }
 
 func (m *CacheManager) cacheBlockchainData() {
-
 	if err := m.locateAssets(); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to cache assets"))
 	}

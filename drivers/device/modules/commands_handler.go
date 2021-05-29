@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -10,46 +9,26 @@ import (
 	"github.com/timoth-y/chainmetric-core/models/requests"
 	"github.com/timoth-y/chainmetric-core/utils"
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
-	"github.com/timoth-y/go-eventdriver"
 )
 
-// RemoteCommandsHandler implements Module for device.Device remote commands handling.
+// RemoteCommandsHandler implements device.Module for device.Device remote commands handling.
 type RemoteCommandsHandler struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 }
 
-// WithRemoteCommandsHandler can be used to setup RemoteCommandsHandler logical Module onto the device.Device.
-func WithRemoteCommandsHandler() Module {
+// WithRemoteCommandsHandler can be used to setup RemoteCommandsHandler logical device.Module onto the device.Device.
+func WithRemoteCommandsHandler() dev.Module {
 	return &RemoteCommandsHandler{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("remote_commands_handler"),
 	}
-}
-
-func (m *RemoteCommandsHandler) MID() string {
-	return "remote_commands_handler"
-}
-
-func (m *RemoteCommandsHandler) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
 }
 
 func (m *RemoteCommandsHandler) Start(ctx context.Context) {
 	go m.Do(func() {
-		if !waitUntilDeviceLogged(m.Device) {
-			m.Once = &sync.Once{}
-			eventdriver.SubscribeHandler(events.DeviceLoggedOnNetwork, func(_ context.Context, _ interface{}) error {
-				m.Start(ctx)
-				return nil
-			})
-
-			shared.Logger.Infof("Module '%s' is awaiting notification for the device login")
+		if !m.trySyncWithDeviceLifecycle(ctx, m.Start) {
 			return
 		}
 

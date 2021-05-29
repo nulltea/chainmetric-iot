@@ -32,12 +32,12 @@ func (ups *UPSController) Init() error {
 	}
 
 	// enable quick-start mode
-	if err := ups.WriteRegBytes(MAX17040_MOD_REG, 0x4000); err != nil {
+	if err := ups.WriteRegBytes(MAX17040_MOD_REG, 0x40, 0x00); err != nil {
 		return errors.Wrap(err, "failed to set quick-start mode for USP")
 	}
 
-	// setup power or reset config
-	if err := ups.WriteRegBytes(MAX17040_CMD_REG, 0x0054); err != nil {
+	// reset ups config
+	if err := ups.WriteRegBytes(MAX17040_CMD_REG, 0x00, 0x54); err != nil {
 		return errors.Wrap(err, "failed to set quick-start mode for USP")
 	}
 
@@ -51,7 +51,13 @@ func (ups *UPSController) BatteryLevel() (int, error) {
 		return 0, errors.Wrap(err, "failed to read battery level from UPS")
 	}
 
-	return int(math.Round(float64(payload[0]) + float64(payload[1]) / 256)), nil
+	raw := float64(payload[0]) + (float64(payload[1]) / 256)
+
+	if raw > 100 {
+		raw = 100
+	}
+
+	return int(math.Round(raw)), nil
 }
 
 // BatteryVoltage reads current battery voltage.
@@ -61,9 +67,9 @@ func (ups *UPSController) BatteryVoltage() (float64, error) {
 		return 0, errors.Wrap(err, "failed to read battery voltage from UPS")
 	}
 
-	raw := (payload[0] << 4) | (payload[1] >> 4)
+	raw := (payload[0] << 8 + payload[1]) >> 4
 
-	return float64(raw) * 0.00125, nil
+	return float64(raw), nil
 }
 
 // IsPlugged determines whether the UPS is plugged in and charging.

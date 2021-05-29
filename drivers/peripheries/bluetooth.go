@@ -66,6 +66,10 @@ func (b *Bluetooth) Advertise(ctx context.Context) error {
 
 // Close closes Bluetooth connection and clears allocated resources.
 func (b *Bluetooth) Close() error {
+	if b.Device == nil {
+		return nil
+	}
+
 	return b.Device.Stop()
 }
 

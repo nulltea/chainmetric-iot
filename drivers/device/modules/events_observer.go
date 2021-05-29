@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -14,41 +13,23 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// EventsObserver implements Module for listening and acting on changes in blockchain ledger data.
+// EventsObserver implements device.Module for listening and acting on changes in blockchain ledger data.
 //
-// This Module also capable of mutating cache layer data of the device.Device.
+// This device.Module also capable of mutating cache layer data of the device.Device.
 type EventsObserver struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 }
 
-// WithEventsObserver can be used to setup EventsObserver logical Module onto the device.Device.
-func WithEventsObserver() Module {
+// WithEventsObserver can be used to setup EventsObserver logical device.Module onto the device.Device.
+func WithEventsObserver() dev.Module {
 	return &EventsObserver{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("events_observer"),
 	}
-}
-
-func (m *EventsObserver) MID() string {
-	return "events_observer"
-}
-
-func (m *EventsObserver) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
 }
 
 func (m *EventsObserver) Start(ctx context.Context) {
 	go m.Do(func() {
-		if !waitUntilDeviceLogged(m.Device) {
-			m.Once = &sync.Once{}
-			eventdriver.SubscribeHandler(events.DeviceLoggedOnNetwork, func(_ context.Context, _ interface{}) error {
-				m.Start(ctx)
-				return nil
-			})
-
-			shared.Logger.Infof("Module '%s' is awaiting notification for the device login")
+		if !m.trySyncWithDeviceLifecycle(ctx, m.Start) {
 			return
 		}
 

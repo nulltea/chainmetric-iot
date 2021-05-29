@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -17,41 +16,23 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// EngineOperator implements Module for engine.SensorsReader operating.
+// EngineOperator implements device.Module for engine.SensorsReader operating.
 type EngineOperator struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 	engine *engine.SensorsReader
 }
 
-// WithEngineOperator can be used to setup EngineOperator logical Module onto the device.Device.
-func WithEngineOperator() Module {
+// WithEngineOperator can be used to setup EngineOperator logical device.Module onto the device.Device.
+func WithEngineOperator() dev.Module {
 	return &EngineOperator{
-		Once:   &sync.Once{},
+		moduleBase: withModuleBase("engine_operator"),
 		engine: engine.NewSensorsReader(),
 	}
 }
 
-func (m *EngineOperator) MID() string {
-	return "engine_operator"
-}
-
-func (m *EngineOperator) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
-}
-
 func (m *EngineOperator) Start(ctx context.Context) {
 	go m.Do(func() {
-		if !waitUntilDeviceLogged(m.Device) {
-			m.Once = &sync.Once{}
-			eventdriver.SubscribeHandler(events.DeviceLoggedOnNetwork, func(_ context.Context, _ interface{}) error {
-				m.Start(ctx)
-				return nil
-			})
-
-			shared.Logger.Infof("Module '%s' is awaiting notification for the device login")
+		if !m.trySyncWithDeviceLifecycle(ctx, m.Start) {
 			return
 		}
 
@@ -91,7 +72,7 @@ func (m *EngineOperator) Start(ctx context.Context) {
 			return eventdriver.ErrIncorrectPayload
 		})
 
-		if waitUntilSensorsDetected(m.Device) {
+		if m.waitUntilSensorsDetected() {
 			m.engine.RegisterSensors(m.RegisteredSensors().ToList()...)
 			m.engine.Start(ctx)
 			m.actOnCachedRequests()

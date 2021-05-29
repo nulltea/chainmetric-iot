@@ -16,20 +16,22 @@ type Client struct {
 }
 
 var (
-	client = &Client{
-		dev: peripheries.NewBluetooth(),
-	}
+	client *Client
 
 	// Channels exposes available channel for local network communication.
 	Channels = struct {
 		Geo *GeoLocationChannel
 	} {
-		Geo: NewGeoLocationChannel(),
+		Geo: newGeoLocationChannel(),
 	}
 )
 
 // Init performs initialisation of the Client.
 func Init(name string) error {
+	client = &Client{
+		dev: peripheries.NewBluetooth(),
+	}
+
 	if !viper.GetBool("bluetooth.enabled") {
 		return errors.New("localnet unavailable since bluetooth does not enabled")
 	}
@@ -40,6 +42,8 @@ func Init(name string) error {
 	); err != nil {
 		return errors.Wrap(err, "failed to prepare Bluetooth driver")
 	}
+
+	Channels.Geo.init()
 
 	if err := Channels.Geo.expose(client.dev); err != nil {
 		return errors.Wrap(err, "failed to expose client to geo channel")
@@ -70,5 +74,6 @@ func SetDeviceName(name string) {
 
 // Close closes local network connection and clears allocated resources.
 func Close() error {
-	return client.dev.Close()
+	client = nil
+	return nil
 }

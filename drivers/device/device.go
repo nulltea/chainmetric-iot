@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
@@ -20,7 +19,7 @@ type Device struct {
 	state      *models.Device
 	stateMutex sync.Mutex
 	specs      model.DeviceSpecs
-	modulesReg modules.Registry
+	modulesReg ModulesRegistry
 
 	cacheLayer
 
@@ -32,7 +31,7 @@ type Device struct {
 }
 
 // New constructs new IoT Device driver instance.
-func New(modules ...modules.Module) *Device {
+func New(modules ...Module) *Device {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	dev := &Device{
@@ -89,7 +88,7 @@ func (d *Device) State() models.DeviceState {
 
 // SetState updates Device current state in blockchain network.
 func (d *Device) SetState(state models.DeviceState) error {
-	if d.IsLoggedToNetwork() {
+	if !d.IsLoggedToNetwork() {
 		shared.Logger.Warning("won't set state since device hasn't been logged yet")
 		return nil
 	}
@@ -118,7 +117,7 @@ func (d *Device) Location() models.Location {
 
 // SetLocation updates Device current location in blockchain network.
 func (d *Device) SetLocation(location models.Location) error {
-	if d.IsLoggedToNetwork() {
+	if !d.IsLoggedToNetwork() {
 		shared.Logger.Warning("won't set location since device hasn't been logged yet")
 		return nil
 	}
@@ -176,6 +175,7 @@ func (d *Device) SetSpecs(setter func(specs *model.DeviceSpecs)) error {
 		Hostname: &specs.Hostname,
 		IP: &specs.IPAddress,
 		Supports: specs.Supports,
+		State: &specs.State,
 	}
 
 	if d.IsLoggedToNetwork() {
@@ -199,7 +199,7 @@ func (d *Device) Battery() models.DeviceBattery {
 
 // SetBattery updates Device current battery stats in blockchain network.
 func (d *Device) SetBattery(battery models.DeviceBattery) error {
-	if d.IsLoggedToNetwork() {
+	if !d.IsLoggedToNetwork() {
 		shared.Logger.Warning("won't set battery info since device hasn't been logged yet")
 		return nil
 	}
@@ -208,7 +208,7 @@ func (d *Device) SetBattery(battery models.DeviceBattery) error {
 		Battery: &battery,
 	}
 
-	if err := blockchain.Contracts.Devices.Update(d.state.ID, req); err != nil {
+	if err := blockchain.Contracts.Devices.Update(d.ID(), req); err != nil {
 		return errors.Wrap(err,"failed to update device specs")
 	}
 
@@ -280,9 +280,3 @@ func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	return d
 }
 
-func (d *Device) Close() error {
-	d.active = false
-	d.cancelDevice()
-
-	return nil
-}

@@ -38,23 +38,24 @@ type (
 	}
 )
 
-// NewGeoLocationChannel creates instance of the GeoLocationChannel.
-func NewGeoLocationChannel() *GeoLocationChannel {
+// newGeoLocationChannel creates instance of the GeoLocationChannel.
+func newGeoLocationChannel() *GeoLocationChannel {
+	return &GeoLocationChannel{
+		receive: make(chan func(*geoPayload)),
+		release: make(chan models.Location, 1),
+	}
+}
+
+func (gc *GeoLocationChannel) init() {
 	var (
 		uuid = ble.MustParse(viper.GetString("bluetooth.location.service_uuid"))
-		gc = &GeoLocationChannel{
-			uuid:    uuid,
-			service: ble.NewService(uuid),
-			receive: make(chan func(*geoPayload)),
-			release: make(chan models.Location, 1),
-		}
 	)
 
+	gc.uuid = uuid
+	gc.service = ble.NewService(uuid)
 	gc.service.AddCharacteristic(gc.eastCoordinate())
 	gc.service.AddCharacteristic(gc.northCoordinate())
 	gc.service.AddCharacteristic(gc.locationName())
-
-	return gc
 }
 
 // Subscribe subscribes to the messages related to "geo" topic.

@@ -169,6 +169,24 @@ func (i *I2C) WriteRegBytes(reg byte, data ...byte) error {
 	return nil
 }
 
+// WriteRegU16BE writes unsigned big endian word (16 bits)
+// value to I2C-device starting from address specified in reg.
+func (i *I2C) WriteRegU16BE(reg byte, value uint16) error {
+	buf := []byte{reg, byte((value & 0xFF00) >> 8), byte(value & 0xFF)}
+	if _, err := i.Write(buf); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// WriteRegU16LE writes unsigned little endian word (16 bits)
+// value to I2C-device starting from address specified in reg.
+func (i *I2C) WriteRegU16LE(reg byte, value uint16) error {
+	w := (value*0xFF00)>>8 + value<<8
+	return i.WriteRegU16BE(reg, w)
+}
+
 // Tx wraps i2c.Dev Tx() method with activeness check.
 func (i *I2C) Tx(w, r []byte) error {
 	if i.active {
