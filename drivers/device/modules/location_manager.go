@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
@@ -11,32 +10,21 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// LocationManager implements Module for device.Device location management.
+// LocationManager implements device.Module for device.Device location management.
 type LocationManager struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 }
 
 
-// WithLocationManager can be used to setup LocationManager logical Module onto the device.Device.
-func WithLocationManager() Module {
+// WithLocationManager can be used to setup LocationManager logical device.Module onto the device.Device.
+func WithLocationManager() dev.Module {
 	return &LocationManager{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("location_manager"),
 	}
 }
 
-func (m *LocationManager) MID() string {
-	return "location_manager"
-}
-
-func (m *LocationManager) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
-}
-
 func (m *LocationManager) Start(ctx context.Context) {
-	m.Do(func() {
+	go m.Do(func() {
 		if err := localnet.Channels.Geo.Subscribe(ctx, func(location models.Location) error {
 			if err := m.SetLocation(location); err != nil {
 				return err

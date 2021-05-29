@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	fabricStatus "github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
@@ -18,34 +17,27 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// FailoverHandler implements Module for handling operational failures during device.Device work.
+// FailoverHandler implements device.Module for handling operational failures during device.Device work.
 type FailoverHandler struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 	ctx       context.Context
 	pingTimer *time.Timer
 }
 
-// WithFailoverHandler can be used to setup FailoverHandler logical Module onto the device.Device.
-func WithFailoverHandler() Module {
+// WithFailoverHandler can be used to setup FailoverHandler logical device.Module onto the device.Device.
+func WithFailoverHandler() dev.Module {
 	return &FailoverHandler{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("failover_handler"),
 		ctx: context.Background(),
 	}
 }
 
-func (m *FailoverHandler) MID() string {
-	return "failover_handler"
-}
-
 func (m *FailoverHandler) Setup(device *dev.Device) error {
-	m.Device = device
-
 	if shared.LevelDB == nil {
 		return errors.New("module won't work without LevelDB available")
 	}
 
-	return nil
+	return m.moduleBase.Setup(device)
 }
 
 func (m *FailoverHandler) Start(ctx context.Context) {

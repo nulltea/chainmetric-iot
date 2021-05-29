@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -16,29 +15,18 @@ import (
 	"github.com/timoth-y/go-eventdriver"
 )
 
-// HotswapDetector implements Module ofr detecting changes in connected to device.Device sensors.
+// HotswapDetector implements device.Module ofr detecting changes in connected to device.Device sensors.
 type HotswapDetector struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
 
 	detectedI2Cs  periphery.I2CDetectResults
 }
 
-// WithHotswapDetector can be used to setup HotswapDetector logical Module onto the device.Device.
-func WithHotswapDetector() Module {
+// WithHotswapDetector can be used to setup HotswapDetector logical device.Module onto the device.Device.
+func WithHotswapDetector() dev.Module {
 	return &HotswapDetector{
-		Once: &sync.Once{},
+		moduleBase: withModuleBase("hotswap_detector"),
 	}
-}
-
-func (m *HotswapDetector) MID() string {
-	return "hotswap_detector"
-}
-
-func (m *HotswapDetector) Setup(device *dev.Device) error {
-	m.Device = device
-
-	return nil
 }
 
 func (m *HotswapDetector) Start(ctx context.Context) {
@@ -109,19 +97,4 @@ func (m *HotswapDetector) handleHotswap(ctx context.Context) error {
 func (m *HotswapDetector) contains(register map[string]sensor.Sensor, id string) bool {
 	_, contains := register[id]
 	return contains
-}
-
-// waitUntilSensorsDetected checks whether the sensors detected with a specific intervals.
-func waitUntilSensorsDetected(d *dev.Device) bool {
-	var attempts = 5
-	for attempts > 0 {
-		if d.RegisteredSensors().NotEmpty() {
-			return true
-		}
-
-		time.Sleep(250 * time.Millisecond)
-		attempts--
-	}
-
-	return false
 }

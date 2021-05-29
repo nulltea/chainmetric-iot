@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,33 +12,28 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// PowerManager implements Module for device.Device battery management.
+// PowerManager implements device.Module for device.Device battery management.
 type PowerManager struct {
-	*dev.Device
-	*sync.Once
+	moduleBase
+
 	ups  *power.UPSController
 }
 
-// WithPowerManager can be used to setup PowerManager logical Module onto the device.Device.
-func WithPowerManager() Module {
+// WithPowerManager can be used to setup PowerManager logical device.Module onto the device.Device.
+func WithPowerManager() dev.Module {
 	return &PowerManager{
+		moduleBase: withModuleBase("power_manager"),
 		ups: power.NewUPSController(),
-		Once: &sync.Once{},
 	}
 }
 
-func (m *PowerManager) MID() string {
-	return "power_manager"
-}
 
 func (m *PowerManager) Setup(device *dev.Device) error {
 	if err := m.ups.Init(); err != nil {
 		return errors.Wrap(err, "failed to initialize ups controller driver")
 	}
 
-	m.Device = device
-
-	return nil
+	return m.moduleBase.Setup(device)
 }
 
 func (m *PowerManager) Start(ctx context.Context) {
@@ -51,12 +45,24 @@ func (m *PowerManager) Start(ctx context.Context) {
 
 	LOOP:
 		for {
+			select {
+			case <-time.After(interval - time.Since(startTime)):
+			case <- ctx.Done():
+				shared.Logger.Debug("Power management module routine ended.")
+				break LOOP
+			}
+
 			startTime = time.Now()
 
 			level, err := m.ups.BatteryLevel()
 			if err != nil {
 				shared.Logger.Error(err)
+				continue
 			}
+
+			if level == 0 {
+				continue
+			} // Fuel gauge chip is not yet ready.
 
 			plugged := m.ups.IsPlugged()
 
@@ -67,14 +73,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 				shared.Logger.Error(err)
 			}
 
-			shared.Logger.Debugf("Device battery was updated: %d% (plugged: %s)", level, plugged)
-
-			select {
-			case <-time.After(interval - time.Since(startTime)):
-			case <- ctx.Done():
-				shared.Logger.Debug("Power management module routine ended.")
-				break LOOP
-			}
+			shared.Logger.Debugf("Device battery: %d%% left (plugged: %t)", level, plugged)
 		}
 	})
 }
