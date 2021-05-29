@@ -9,87 +9,81 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	cnf "github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
-type (
-	Client struct {
-		wallet  *gateway.Wallet
-		gateway *gateway.Gateway
-		network *gateway.Network
+// Client defines an interface for communicating with blockchain network.
+type Client struct {
+	wallet  *gateway.Wallet
+	gateway *gateway.Gateway
+	network *gateway.Network
+}
 
-		config config.BlockchainConfig
+var (
+	client = &Client{}
+	config cnf.BlockchainConfig
 
-		Contracts contracts
-	}
-
-	contracts struct {
+	// Contracts exposes blockchain network SmartContracts pool.
+	Contracts = struct {
 		Devices      *DevicesContract
 		Assets       *AssetsContract
 		Requirements *RequirementsContract
 		Readings     *ReadingsContract
+	} {
+		Devices: &DevicesContract{},
+		Assets: &AssetsContract{},
+		Requirements: &RequirementsContract{},
+		Readings: &ReadingsContract{},
 	}
 )
 
-func NewClient(config config.BlockchainConfig) *Client {
-	bc := &Client{
-		config: config,
+// Init performs initialization sequence of the blockchain client with given config.
+func Init(cnf cnf.BlockchainConfig) error {
+	config = cnf
+
+	var (
+		err error
+		configProvider = fabconfig.FromFile(config.ConnectionConfig)
+		identity *gateway.X509Identity
+	)
+
+	if client.wallet, err = gateway.NewFileSystemWallet(config.WalletPath); err != nil {
+		return errors.Wrapf(err, "failed to create new wallet on %s", config.WalletPath)
 	}
 
-	bc.Contracts = contracts{
-		Devices:      NewDevicesContract(bc),
-		Assets:       NewAssetsContract(bc),
-		Requirements: NewRequirementsContract(bc),
-		Readings:     NewReadingsContract(bc),
+	if identity, err = newX509Identity(config.Identity); err != nil {
+		return errors.Wrap(err, "failed to build X509 identity")
 	}
 
-	return bc
-}
-
-func (bc *Client) Init() (err error) {
-	configProvider := fabconfig.FromFile(bc.config.ConnectionConfig)
-
-	bc.wallet, err = gateway.NewFileSystemWallet(bc.config.WalletPath)
-	if err != nil {
-		err = errors.Wrapf(err, "failed to create new wallet on %s", bc.config.WalletPath)
-		return
+	if err = client.wallet.Put(config.Identity.UserID, identity); err != nil {
+		return errors.Wrap(err, "failed to put identity to wallet")
 	}
 
-	identity, err := newX509Identity(bc.config.Identity); if err != nil {
-		err = errors.Wrap(err, "failed to build X509 identity")
-		return
-	}
-
-	if err = bc.wallet.Put(bc.config.Identity.UserID, identity); err != nil {
-		err = errors.Wrap(err, "failed to put identity to wallet")
-		return
-	}
-
-	bc.gateway, err = gateway.Connect(
+	if client.gateway, err = gateway.Connect(
 		gateway.WithConfig(configProvider),
-		gateway.WithIdentity(bc.wallet, bc.config.Identity.UserID),
-	); if err != nil {
+		gateway.WithIdentity(client.wallet, config.Identity.UserID),
+	); err != nil {
 		return errors.Wrap(err, "failed to connect to blockchain gateway")
 	}
 
-	bc.network, err = bc.gateway.GetNetwork(bc.config.ChannelID); if err != nil {
-		err = errors.Wrapf(err, "failed to create new client of channel %s", bc.config.ChannelID)
-		return
+	if client.network, err = client.gateway.GetNetwork(config.ChannelID); err != nil {
+		return errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
 	}
 
-	bc.Contracts.Assets.Init()
-	bc.Contracts.Devices.Init()
-	bc.Contracts.Requirements.Init()
-	bc.Contracts.Readings.Init()
+	Contracts.Assets.init()
+	Contracts.Devices.init()
+	Contracts.Requirements.init()
+	Contracts.Readings.init()
 
-	return
+	return nil
 }
 
-func (bc *Client) Close() {
-	bc.gateway.Close()
+// Close closes connection to blockchain network and clears allocated resources.
+func Close() {
+	client.gateway.Close()
 }
 
-func newX509Identity(identity config.BlockchainIdentityConfig) (*gateway.X509Identity, error) {
+func newX509Identity(identity cnf.BlockchainIdentityConfig) (*gateway.X509Identity, error) {
 	cert, err := ioutil.ReadFile(identity.Certificate); if err != nil {
 		return nil, err
 	}

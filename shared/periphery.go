@@ -17,17 +17,21 @@ var(
 func initPeriphery() {
 	var err error
 
-	if !viper.GetBool("bluetooth.enabled") {
-		return
-	}
-
 	if _, err = host.Init(); err != nil {
 		Logger.Fatal(errors.Wrap(err, "failed to initialise peripheral host"))
 	}
 
-	if BluetoothDevice, err = linux.NewDeviceWithName(viper.GetString("bluetooth.name")); err != nil {
-		Logger.Fatal(errors.Wrap(err, "failed to create bluetooth device"))
-	}
+	if viper.GetBool("bluetooth.enabled") {
+		if BluetoothDevice, err = linux.NewDeviceWithName(viper.GetString("bluetooth.name")); err != nil {
+			Logger.Fatal(errors.Wrap(err, "failed to create bluetooth device"))
+		}
 
-	ble.SetDefaultDevice(BluetoothDevice)
+		ble.SetDefaultDevice(BluetoothDevice)
+	}
+}
+
+func closePeriphery() {
+	if BluetoothDevice != nil {
+		Execute(BluetoothDevice.Stop, "failed to close bluetooth periphery")
+	}
 }

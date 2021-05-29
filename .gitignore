@@ -27,3 +27,5 @@ vendor/
 .env
 
 connection.yaml
+
+qr.png

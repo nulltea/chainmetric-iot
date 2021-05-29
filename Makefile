@@ -1,7 +1,9 @@
+include .env
+export
+
 OUTPUT=bin/sensor
-REMOTE_IP=192.168.31.180
 REMOTE_DIR=/home/pi/sensorsys
-CRYPTO_DIR=../network/crypto-config/peerOrganizations/supplier.iotchain.network/users/User1@supplier.iotchain.network/msp
+
 
 build:
 	CGO_ENABLED=1 go mod vendor && go build -v  -o $(OUTPUT) .
@@ -14,11 +16,11 @@ build-remote:
 sync:
 	rsync -r --exclude .env \
 	 --delete --filter 'P vendor' --filter 'P bin' \
-	. pi@$(REMOTE_IP):$(REMOTE_DIR)
+	. pi@${REMOTE_IP}:$(REMOTE_DIR)
 
 crypto-sync:
-	scp $(CRYPTO_DIR)/signcerts/User1@supplier.iotchain.network-cert.pem pi@$(REMOTE_IP):identity.pem
-	scp $(CRYPTO_DIR)/keystore/priv_sk pi@$(REMOTE_IP):identity.key
+	scp ${CRYPTO_DIR}/signcerts/User1@supplier.iotchain.network-cert.pem pi@${REMOTE_IP}:identity.pem
+	scp ${CRYPTO_DIR}/keystore/priv_sk pi@${REMOTE_IP}:identity.key
 
 run:
 	sudo ./$(OUTPUT)

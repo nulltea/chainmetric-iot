@@ -18,15 +18,18 @@ import (
 
 type SensorsReader struct {
 	context       *Context
+	once          *sync.Once
 	sensors       map[string]sensor.Sensor
 	requests      chan Request
 	standbyTimers map[sensor.Sensor]*time.Timer
 	done          chan struct{}
+	active        bool
 }
 
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
 		context:       NewContext(context.Background()),
+		once:          &sync.Once{},
 		sensors:       make(map[string]sensor.Sensor),
 		requests:      make(chan Request),
 		standbyTimers: make(map[sensor.Sensor]*time.Timer),
@@ -40,16 +43,18 @@ func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
 	}
 }
 
-func (r *SensorsReader) UnregisterSensor(id string) {
-	if sensor, ok := r.sensors[id]; ok {
-		if sensor.Active() {
-			sensor.Close()
+func (r *SensorsReader) UnregisterSensors(ids ...string) {
+	for _, id := range ids{
+		if sensor, ok := r.sensors[id]; ok {
+			if sensor.Active() {
+				sensor.Close()
+			}
+			delete(r.sensors, id)
 		}
-		delete(r.sensors, id)
 	}
 }
 
-func (r *SensorsReader) RegisteredSensors() map[string]sensor.Sensor {
+func (r *SensorsReader) RegisteredSensors() sensor.SensorsRegister {
 	sMap := make(map[string]sensor.Sensor)
 
 	for i, sensor := range r.sensors {
@@ -87,18 +92,24 @@ func (r *SensorsReader) SendRequest(handler ReceiverFunc, metrics ...models.Metr
 	}
 }
 
-func (r *SensorsReader) Process() {
-	for {
-		select {
-		case request := <- r.requests:
-			go r.handleRequest(request)
-		case <- r.context.Done():
-			return
-		case <- r.done:
-			shared.Logger.Debug("Sensors reader process ended.")
-			return
+func (r *SensorsReader) Start(ctx context.Context) {
+	go r.once.Do(func() {
+		for {
+			select {
+			case request := <- r.requests:
+				go r.handleRequest(request)
+			case <- ctx.Done():
+				return
+			case <- r.context.Done():
+				return
+			case <- r.done:
+				shared.Logger.Debug("Sensors reader process ended.")
+				return // TODO: refactor (too many contexts)
+			}
 		}
-	}
+	})
+
+	r.active = true
 }
 
 func (r *SensorsReader) handleRequest(req Request) {
@@ -175,8 +186,12 @@ func aggregate(pipe model.SensorReadingsPipe) model.SensorsReadingResults {
 	return results
 }
 
+func (r *SensorsReader) Active() bool {
+	return r.active
+}
 
 func (r *SensorsReader) Close() {
+	r.active = false
 	close(r.done)
 
 	for _, sensor := range r.sensors {

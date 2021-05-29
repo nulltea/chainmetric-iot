@@ -14,21 +14,17 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
+// AssetsContract defines interface for communication with assets-managing Smart Contract.
 type AssetsContract struct {
-	client   *Client
 	contract *gateway.Contract
 }
 
-func NewAssetsContract(client *Client) *AssetsContract {
-	return &AssetsContract{
-		client: client,
-	}
+// init performs initialization of the AssetsContract instance.
+func (ac *AssetsContract) init() {
+	ac.contract = client.network.GetContract("assets")
 }
 
-func (ac *AssetsContract) Init() {
-	ac.contract = ac.client.network.GetContract("assets")
-}
-
+// Receive retrieves models.Asset records from blockchain ledger by a given `query`.
 func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, error) {
 	var assets []*models.Asset
 
@@ -45,6 +41,7 @@ func (ac *AssetsContract) Receive(query requests.AssetsQuery) ([]*models.Asset, 
 	return assets, nil
 }
 
+// Subscribe starts listening to blockchain events related to assets and triggers `action` on each event occurrence.
 func (ac *AssetsContract) Subscribe(ctx context.Context, event string, action func(*models.Asset, string) error) error {
 	var (
 		eventFilter = eventFilter("assets", event)

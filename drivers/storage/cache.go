@@ -10,6 +10,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-core/utils"
 
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -25,7 +26,7 @@ func CacheReadings(readings ...models.MetricReadings) (err error) {
 
 	for _, reading := range readings {
 		var (
-			key = shared.FormCompositeKey("reading",
+			key = utils.FormCompositeKey("reading",
 				reading.AssetID,
 				strconv.Itoa(int(reading.Timestamp.Unix())),
 			)
@@ -46,7 +47,7 @@ func CacheReadings(readings ...models.MetricReadings) (err error) {
 // allowing to `pop` them on fly.
 func IterateOverCachedReadings(ctx context.Context, fn ReadingsCacheIteratorFunc, pop bool) {
 	var (
-		prefix = []byte(shared.FormCompositeKey("reading"))
+		prefix = []byte(utils.FormCompositeKey("reading"))
 		iter = shared.LevelDB.NewIterator(util.BytesPrefix(prefix), nil)
 	)
 
@@ -59,7 +60,7 @@ func IterateOverCachedReadings(ctx context.Context, fn ReadingsCacheIteratorFunc
 
 		var (
 			key = string(iter.Key())
-			_, attrs = shared.SplitCompositeKey(key)
+			_, attrs = utils.SplitCompositeKey(key)
 			values map[models.Metric]float64
 		)
 

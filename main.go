@@ -5,15 +5,15 @@ import (
 	"os/signal"
 
 	"github.com/spf13/viper"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/device/modules"
+	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
 	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/network/local"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -22,9 +22,6 @@ var (
 	dcf config.DisplayConfig
 
 	display  dsp.Display
-	client   *blockchain.Client
-	reader   *engine.SensorsReader
-	localnet *local.Client
 	device   *dev.Device
 
 	done = make(chan struct{}, 1)
@@ -37,14 +34,18 @@ func init() {
 	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
-	client = blockchain.NewClient(bcf)
-	reader = engine.NewSensorsReader()
 	display = dsp.NewEInk(dcf)
-	localnet = local.NewClient()
-	device = dev.New().
-		SetClient(client).
-		SetEngine(reader).
-		SetLocalNet(localnet)
+	device = dev.New(
+		modules.WithLifecycleManager(),
+		modules.WithEngineOperator(),
+		modules.WithCacheManager(),
+		modules.WithEventsObserver(),
+		modules.WithHotswapDetector(),
+		modules.WithRemoteCommandsHandler(),
+		modules.WithLocationManager(),
+		modules.WithPowerManager(),
+		modules.WithFailoverHandler(),
+	)
 
 	gui.Init(display)
 }
@@ -68,13 +69,11 @@ func startup() {
 		device.RegisterStaticSensors(sensors.NewStaticSensorMock())
 	}
 
-	shared.MustExecute(client.Init, "failed initializing blockchain client")
-	shared.MustExecute(device.Init, "failed to initialize device")
-	shared.MustExecute(device.CacheBlockchainState, "failed to cache the state of blockchain")
-	shared.MustExecute(device.ListenRemoteCommands, "failed to start remote commands listener")
+	shared.MustExecute(func() error {
+		return blockchain.Init(bcf)
+	}, "failed initializing blockchain client")
 
-	device.WatchForBlockchainEvents()
-	device.Operate()
+	device.Start()
 }
 
 func shutdown() {
@@ -86,12 +85,10 @@ func shutdown() {
 		shared.Execute(display.Close, "error during closing connection to display")
 	}
 
-	shared.Execute(device.Close, "error during closing local network")
-
-	shared.Execute(device.NotifyOff, "error during emitting 'off' event")
+	shared.Execute(localnet.Close, "error during closing local network")
 	shared.Execute(device.Close, "error during device shutdown")
 
-	client.Close()
+	blockchain.Close()
 	shared.CloseCore()
 
 	close(done)

@@ -20,7 +20,7 @@ func initConfig() {
 	viper.SetDefault("device.hotswap_detect_interval", "3s")
 	viper.SetDefault("device.local_cache_path", "/var/cache")
 	viper.SetDefault("device.ping_timer_interval", "1m")
-	viper.SetDefault("device.battery_monitor_bus", 6)
+	viper.SetDefault("device.battery_check_interval", "1m")
 
 	viper.SetDefault("engine.sensor_sleep_standby_timeout", "1m")
 
@@ -47,6 +47,8 @@ func initConfig() {
 	viper.SetDefault("mocks.sensor_duration", "250ms")
 
 
+	viper.SetDefault("local_events_buffer_size", 100)
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -57,11 +59,14 @@ func initConfig() {
 	}
 }
 
+// UnmarshalFromConfig retrieves config block by given `key` and decodes it into given structure `v`.
 func UnmarshalFromConfig(key string, v interface{}) error {
 	bindEnvs(key, v)
 	return viper.UnmarshalKey(key, v)
 }
 
+// MustUnmarshalFromConfig retrieves config block by given `key` and decodes it into given structure `v`.
+// In case of unmarshalling error occurrence it will log fatal error.
 func MustUnmarshalFromConfig(key string, v interface{}) {
 	if err := UnmarshalFromConfig(key, v); err != nil {
 		Logger.Fatal(errors.Wrapf(err, "failed parse config for key '%s'", key))

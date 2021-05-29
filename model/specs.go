@@ -10,15 +10,21 @@ import (
 
 type DeviceSpecs struct {
 	Network
-	Supports []string `json:"supports"`
+	Supports []models.Metric `json:"supports"`
 	State models.DeviceState `json:"state"`
 }
 
-func (ds *DeviceSpecs) Encode() string {
-	return fmt.Sprintf("${%s;%s;%s}", ds.Hostname, ds.IPAddress, strings.Join(ds.Supports, ","))
+func (ds DeviceSpecs) Encode() string {
+	var metrics []string
+
+	for i := range ds.Supports {
+		metrics = append(metrics, string(ds.Supports[i]))
+	}
+
+	return fmt.Sprintf("${%s;%s;%s}", ds.Hostname, ds.IPAddress, strings.Join(metrics, ","))
 }
 
-func (ds *DeviceSpecs) EncodeJson() string {
-	b, _ := json.Marshal(*ds)
+func (ds DeviceSpecs) EncodeJson() string {
+	b, _ := json.Marshal(ds)
 	return string(b)
 }
