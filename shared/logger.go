@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	format = "%{color}%{time:2006.01.02 15:04:05} %{id:03x} %{level:.05s}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
+	format = "%{color}%{time:2006.01.02 15:04:05} %{id:03x} %{level:-5s}%{color:reset} [%{module}] %{color:bold}%{shortfunc}%{color:reset} -> %{message}"
 )
 
 // Logger is an instance of the shared logger tool.

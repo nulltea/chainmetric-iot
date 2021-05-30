@@ -5,11 +5,10 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
@@ -22,7 +21,7 @@ type ADCMQ9 struct {
 	samples int
 }
 
-func NewADCMQ9(addr uint16, bus int) core.Sensor {
+func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
 	return &ADCMQ9{
 		ADC: periphery.NewADC(addr, bus, periphery.WithConversion(func(raw float64) float64 {
 			volts := raw / periphery.ADS1115_SAMPLES_PER_READ * periphery.ADS1115_VOLTS_PER_SAMPLE

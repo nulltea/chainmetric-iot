@@ -59,7 +59,7 @@ func (i *I2C) Read() (byte, error) {
 	return b[0], nil
 }
 
-// ReadReg reads `n` bytes from an active register.
+// ReadBytes reads `n` bytes from an active register.
 func (i *I2C) ReadBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if err := i.Tx(nil, b); err != nil {

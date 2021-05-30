@@ -6,11 +6,10 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
@@ -28,7 +27,7 @@ type (
 	}
 )
 
-func NewI2CSensorMock(addr uint16, bus int) core.Sensor {
+func NewI2CSensorMock(addr uint16, bus int) sensor.Sensor {
 	return &I2CSensorMock{
 		I2C:      periphery.NewI2C(addr, bus),
 		duration: viper.GetDuration("mocks.sensor_duration"),
@@ -71,7 +70,7 @@ func (s *I2CSensorMock) Close() error {
 	return nil
 }
 
-func NewStaticSensorMock() core.Sensor {
+func NewStaticSensorMock() sensor.Sensor {
 	return &StaticSensorMock{
 		duration: viper.GetDuration("mocks.sensor_duration"),
 		metrics:  []models.Metric{metrics.Humidity, metrics.NoiseLevel, metrics.Vibration},

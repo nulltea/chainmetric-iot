@@ -2,11 +2,10 @@ package sensor
 
 import (
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 )
 
-// SensorsRegister represents pool of the multiply core.Sensor devices.
-type SensorsRegister map[string]core.Sensor
+// SensorsRegister represents pool of the multiply sensor.Sensor devices.
+type SensorsRegister map[string]Sensor
 
 // SupportedMetrics aggregates all supported by sensors models.Metric devices.
 func (sr SensorsRegister) SupportedMetrics() models.Metrics {
@@ -25,7 +24,7 @@ func (sr SensorsRegister) SupportedMetrics() models.Metrics {
 		i       = 0
 	)
 
-	for m, _ := range availableMetrics {
+	for m := range availableMetrics {
 		metrics[i] = m
 		i++
 	}
@@ -48,10 +47,10 @@ func (sr SensorsRegister) Union(sr2 SensorsRegister) SensorsRegister {
 	return sr
 }
 
-// ToList returns slice of all core.Sensor devices presented in SensorsRegister.
-func (sr SensorsRegister) ToList() []core.Sensor {
+// ToList returns slice of all sensor.Sensor devices presented in SensorsRegister.
+func (sr SensorsRegister) ToList() []Sensor {
 	var (
-		l = make([]core.Sensor, len(sr))
+		l = make([]Sensor, len(sr))
 		i = 0
 	)
 
@@ -63,12 +62,12 @@ func (sr SensorsRegister) ToList() []core.Sensor {
 	return l
 }
 
-// NotEmpty determines whether SensorsRegister contains at least one core.Sensor.
+// NotEmpty determines whether SensorsRegister contains at least one sensor.Sensor.
 func (sr SensorsRegister) NotEmpty() bool {
 	return len(sr) > 0
 }
 
-// Exists determines whether the core.Sensor exists in SensorsRegister by given `id`.
+// Exists determines whether the sensor.Sensor exists in SensorsRegister by given `id`.
 func (sr SensorsRegister) Exists(id string) bool {
 	_, is := sr[id]
 	return is

@@ -6,11 +6,10 @@ import (
 	"github.com/d2r2/go-dht"
 	"github.com/d2r2/go-logger"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 )
 
 var (
@@ -22,7 +21,7 @@ type DHTxx struct {
 	pin        int
 }
 
-func NewDHTxx(deviceID string, pin int) core.Sensor {
+func NewDHTxx(deviceID string, pin int) sensor.Sensor {
 	return &DHTxx{
 		sensorType: sensorTypeDHT(deviceID),
 		pin:        pin,

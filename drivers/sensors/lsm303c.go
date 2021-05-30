@@ -5,11 +5,10 @@ import (
 
 	"github.com/bskari/go-lsm303"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
@@ -34,13 +33,13 @@ type (
 	}
 )
 
-func NewAccelerometerLSM303(addr uint16, bus int) core.Sensor {
+func NewAccelerometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Accelerometer{
 		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(lsm303cAccelerometerMutex)),
 	}
 }
 
-func NewMagnetometerLSM303(addr uint16, bus int) core.Sensor {
+func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Magnetometer{
 		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(lsm303cMagnetometerMutex)),
 	}
@@ -135,7 +134,7 @@ func (s *LSM303Magnetometer) ReadAxes() (model.Vector, error) {
 	}, nil
 }
 
-// ReadAxes parses data returned as magnetic force vector
+// ReadTemperature parses data returned as magnetic force vector
 func (s *LSM303Magnetometer) ReadTemperature() (float64, error) {
 	t, err := s.dev.SenseRelativeTemperature(); if err != nil {
 		return 0, err

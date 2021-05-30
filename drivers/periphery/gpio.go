@@ -34,7 +34,7 @@ func (g *GPIO) Init() error {
 	g.PinIO = pin
 
 	if err := g.Low(); err != nil {
-		return errors.Wrapf(err, "failed initialising pin", g.pin)
+		return errors.Wrapf(err, "failed initialising %s pin", g.pin)
 	}
 
 	return nil

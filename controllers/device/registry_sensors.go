@@ -3,8 +3,7 @@ package device
 import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models/requests"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -15,7 +14,7 @@ func (d *Device) RegisteredSensors() sensor.SensorsRegister {
 }
 
 // RegisterSensors adds given `sensors` on the Device sensors pool.
-func (d *Device) RegisterSensors(sensors ...core.Sensor) {
+func (d *Device) RegisterSensors(sensors ...sensor.Sensor) {
 	for i, s := range sensors {
 		d.sensors[s.ID()] = sensors[i]
 	}
@@ -37,7 +36,7 @@ func (d *Device) UnregisterSensor(id string) {
 }
 
 // UpdateSensorsRegister applies changes in sensor.SensorsRegister of the Device.
-func (d *Device) UpdateSensorsRegister(added []core.Sensor, removed []string) {
+func (d *Device) UpdateSensorsRegister(added []sensor.Sensor, removed []string) {
 	for i, s := range added {
 		d.sensors[s.ID()] = added[i]
 	}
@@ -65,7 +64,7 @@ func (d *Device) StaticSensors() sensor.SensorsRegister {
 }
 
 // RegisterStaticSensors allows to registrant static (not auto-detectable) sensors.
-func (d *Device) RegisterStaticSensors(sensors ...core.Sensor) *Device {
+func (d *Device) RegisterStaticSensors(sensors ...sensor.Sensor) *Device {
 	for i, s := range sensors {
 		d.staticSensors[s.ID()] = sensors[i]
 	}

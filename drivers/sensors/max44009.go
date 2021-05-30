@@ -5,11 +5,10 @@ import (
 	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
@@ -21,7 +20,7 @@ type MAX44009 struct {
 	*periphery.I2C
 }
 
-func NewMAX44009(addr uint16, bus int) core.Sensor {
+func NewMAX44009(addr uint16, bus int) sensor.Sensor {
 	return &MAX44009{
 		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(max44009Mutex)),
 	}

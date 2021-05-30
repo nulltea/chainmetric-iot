@@ -39,8 +39,8 @@ func (s *SPI) Init() (err error) {
 }
 
 // SendCommandArgs sends `cmd` command with `data` as arguments on SPI device.
-func (d *SPI) SendCommandArgs(cmd byte, data ...byte) error {
-	if err := d.SendCommand(cmd); err != nil {
+func (s *SPI) SendCommandArgs(cmd byte, data ...byte) error {
+	if err := s.SendCommand(cmd); err != nil {
 		return err
 	}
 
@@ -48,12 +48,12 @@ func (d *SPI) SendCommandArgs(cmd byte, data ...byte) error {
 		return nil
 	}
 
-	return d.SendData(data...)
+	return s.SendData(data...)
 }
 
 // SendCommand sends `cmd` command on SPI device.
-func (d *SPI) SendCommand(cmd byte) error {
-	if err := d.Tx([]byte{cmd}, nil); err != nil {
+func (s *SPI) SendCommand(cmd byte) error {
+	if err := s.Tx([]byte{cmd}, nil); err != nil {
 		return errors.Wrapf(err, "error during sending command 0x%X to SPI device", uint(cmd))
 	}
 
@@ -61,12 +61,12 @@ func (d *SPI) SendCommand(cmd byte) error {
 }
 
 // SendData sends `data` on SPI device.
-func (d *SPI) SendData(data ...byte) error {
+func (s *SPI) SendData(data ...byte) error {
 	if len(data) == 0 {
 		return nil
 	}
 
-	if err := d.Tx(data, nil); err != nil {
+	if err := s.Tx(data, nil); err != nil {
 		return errors.Wrap(err, "error during sending data to SPI device")
 	}
 

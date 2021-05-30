@@ -6,14 +6,14 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 )
 
-// MetricWriter defines object capable of dumping reading results from core.Sensor
+// MetricWriter defines object capable of dumping reading results from sensor.Sensor
 // to a specific ReadingsPipe for models.Metric data.
 type MetricWriter struct {
 	metric models.Metric
 	ctx *Context
 }
 
-// Write writes reading results from core.Sensor with required type conversation.
+// Write writes reading results from sensor.Sensor with required type conversation.
 func (w *MetricWriter) Write(v interface{}) {
 	var value float64
 

@@ -5,11 +5,10 @@ import (
 
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -25,7 +24,7 @@ type MAX30102 struct {
 	bus int
 }
 
-func NewMAX30102(addr uint16, bus int) core.Sensor {
+func NewMAX30102(addr uint16, bus int) sensor.Sensor {
 	return &MAX30102{
 		i2c:  periphery.NewI2C(addr, bus, periphery.WithMutex(max30102Mutex)),
 		addr: addr,

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 
@@ -15,7 +15,7 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
-// EInk is an implementation of Display driver for E-Ink 2.13" display.
+// EInk is an implementation of dev.Display driver for E-Ink 2.13" display.
 type EInk struct {
 	*periphery.SPI
 
@@ -29,8 +29,8 @@ type EInk struct {
 	config config.DisplayConfig
 }
 
-// NewEInk creates new EInk driver instance by implementing Display interface.
-func NewEInk(config config.DisplayConfig) core.Display {
+// NewEInk creates new EInk driver instance by implementing dev.Display interface.
+func NewEInk(config config.DisplayConfig) dev.Display {
 	return &EInk{
 		SPI:    periphery.NewSPI(config.Bus),
 		dc:     periphery.NewGPIO(config.DCPin),
@@ -43,24 +43,24 @@ func NewEInk(config config.DisplayConfig) core.Display {
 }
 
 // Init performs EInk display device initialization.
-func (d *EInk) Init() (err error) {
-	if err = d.dc.Init(); err != nil {
+func (d *EInk) Init() error {
+	if err := d.dc.Init(); err != nil {
 		return errors.Wrap(err, "error during connecting to EInk display DC pin")
 	}
 
-	if err = d.cs.Init(); err != nil {
+	if err := d.cs.Init(); err != nil {
 		return errors.Wrap(err, "error during connecting to EInk display CS pin")
 	}
 
-	if err = d.rst.Init(); err != nil {
+	if err := d.rst.Init(); err != nil {
 		return errors.Wrap(err, "error during connecting to EInk display RST pin")
 	}
 
-	if err = d.busy.Init(); err != nil {
+	if err := d.busy.Init(); err != nil {
 		return errors.Wrap(err, "error during connecting to EInk display BUSY pin")
 	}
 
-	if err = d.SPI.Init(); err != nil {
+	if err := d.SPI.Init(); err != nil {
 		return errors.Wrap(err, "error during connecting to EInk display via SPI")
 	}
 
@@ -68,9 +68,7 @@ func (d *EInk) Init() (err error) {
 		return errors.Wrap(err, "error during initialising to EInk display driver")
 	}
 
-	d.Clear()
-
-	return
+	return d.Clear()
 }
 
 // DrawRaw implements display.Drawer.
@@ -195,7 +193,7 @@ func (d *EInk) Clear() error {
 	return d.ResetFrameMemory(0xFF)
 }
 
-// Clear clears the EInk display and triggers update of the frame.
+// ClearAndRefresh clears the EInk display and triggers update of the frame.
 func (d *EInk) ClearAndRefresh() error {
 	if err := d.Clear(); err != nil {
 		return err
@@ -325,10 +323,11 @@ func (d *EInk) init() error {
 	if err := d.SendCommandArgs(swReset); err != nil {
 		return err
 	}
-
 	d.waitUntilIdle()
 
-	d.SendCommandArgs(autoWriteRamBW, 0xF7)
+	if err := d.SendCommandArgs(autoWriteRamBW, 0xF7); err != nil {
+		return err
+	}
 	d.waitUntilIdle()
 
 	if err := d.SendCommandArgs(driverOutputControl,

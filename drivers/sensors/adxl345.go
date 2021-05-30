@@ -5,11 +5,10 @@ import (
 	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
@@ -28,7 +27,7 @@ type ADXL345 struct {
 	*periphery.I2C
 }
 
-func NewADXL345(addr uint16, bus int) core.Sensor {
+func NewADXL345(addr uint16, bus int) sensor.Sensor {
 	return &ADXL345{
 		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(adxl345Mutex)),
 	}

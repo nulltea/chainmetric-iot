@@ -5,11 +5,10 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -23,7 +22,7 @@ type ADCPiezo struct {
 	samples int
 }
 
-func NewADCPiezo(addr uint16, bus int) core.Sensor {
+func NewADCPiezo(addr uint16, bus int) sensor.Sensor {
 	return &ADCPiezo{
 		ADC: periphery.NewADC(addr, bus, periphery.WithConversion(func(raw float64) float64 {
 			shared.Logger.Debug("ADC_Piezo", "-> raw =", raw)

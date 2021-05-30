@@ -4,8 +4,8 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"periph.io/x/periph/experimental/devices/ina219"
 
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
 )
 
 type INA219 struct {

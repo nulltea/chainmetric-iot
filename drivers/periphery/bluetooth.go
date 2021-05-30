@@ -47,19 +47,21 @@ func (b *Bluetooth) ApplyOptions(options ...BluetoothOption) *Bluetooth {
 }
 
 // Scan performs scan for currently advertising bluetooth device.
-func (b *Bluetooth) Scan() {
-	var (
-		ctx = ble.WithSigHandler(context.WithTimeout(context.Background(), b.scanDuration))
-	)
+func (b *Bluetooth) Scan(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, b.scanDuration)
+	ctx = ble.WithSigHandler(ctx, cancel)
+	defer cancel()
 
-	b.Device.Scan(ctx, false, func(adv ble.Advertisement) {
-		// TODO: add filter and return all satisfying devices
+	return b.Device.Scan(ctx, false, func(adv ble.Advertisement) {
+
 	})
 }
 
 // Advertise advertises device with previously configured name.
 func (b *Bluetooth) Advertise(ctx context.Context) error {
-	ctx = ble.WithSigHandler(context.WithTimeout(ctx, b.advDuration))
+	ctx, cancel := context.WithTimeout(ctx, b.scanDuration)
+	ctx = ble.WithSigHandler(ctx, cancel)
+	defer cancel()
 
 	return b.Device.AdvertiseNameAndServices(ctx, b.name, b.advServices...)
 }

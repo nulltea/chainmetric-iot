@@ -6,11 +6,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
@@ -23,7 +22,7 @@ type HDC1080 struct {
 	attempts int
 }
 
-func NewHDC1080(addr uint16, bus int) core.Sensor {
+func NewHDC1080(addr uint16, bus int) sensor.Sensor {
 	return &HDC1080{
 		I2C:      periphery.NewI2C(addr, bus, periphery.WithMutex(hdc1080Mutex)),
 		attempts: 10,

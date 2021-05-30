@@ -5,13 +5,12 @@ import (
 	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 	"periph.io/x/periph/conn/physic"
 	"periph.io/x/periph/devices/bmxx80"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
@@ -24,7 +23,7 @@ type BMP280 struct {
 	*bmxx80.Dev
 }
 
-func NewBMXX80(addr uint16, bus int) core.Sensor {
+func NewBMXX80(addr uint16, bus int) sensor.Sensor {
 	return &BMP280{
 		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(bmp280Mutex)),
 	}
@@ -83,6 +82,15 @@ func (s *BMP280) Verify() bool {
 	}
 
 	return false
+}
+
+func (s *BMP280) Active() bool {
+	return s.I2C.Active() && s.Dev != nil
+}
+
+func (s *BMP280) Close() error {
+	s.Dev = nil
+	return s.I2C.Close()
 }
 
 func (s *BMP280) pressureToAltitude(p float64) float64 {
