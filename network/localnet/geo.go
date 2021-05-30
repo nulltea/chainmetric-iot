@@ -12,7 +12,7 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -60,7 +60,7 @@ func (gc *GeoLocationChannel) init() {
 
 // Subscribe subscribes to the messages related to "geo" topic.
 func (gc *GeoLocationChannel) Subscribe(ctx context.Context, handler func(location models.Location) error) error {
-	// Start aggregator goroutine
+	// Run aggregator goroutine
 	geoOnce.Do(func() {
 		go func() {
 			var payload = &geoPayload{}
@@ -97,7 +97,7 @@ func (gc *GeoLocationChannel) Subscribe(ctx context.Context, handler func(locati
 	}
 }
 
-func (gc *GeoLocationChannel) expose(dev *peripheries.Bluetooth) error {
+func (gc *GeoLocationChannel) expose(dev *periphery.Bluetooth) error {
 	if err := dev.AddService(gc.service); err != nil {
 		return errors.Wrap(err, "error adding location service to Bluetooth device")
 	}
