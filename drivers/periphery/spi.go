@@ -16,7 +16,7 @@ type SPI struct {
 	active bool
 }
 
-// NewSPI creates new SPI driver instance.
+// NewSPI constructs new SPI driver instance.
 func NewSPI(name string) *SPI {
 	return &SPI{
 		name: name,

@@ -20,7 +20,7 @@ type I2C struct {
 	active bool
 }
 
-// NewI2C creates new I2C driver instance.
+// NewI2C constructs new I2C driver instance.
 func NewI2C(addr uint16, bus int, options ...I2COption) *I2C {
 	d := &I2C{
 		Dev: i2c.Dev{

@@ -8,10 +8,10 @@ import (
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
 	"github.com/timoth-y/chainmetric-sensorsys/core"
+	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
 	dev "github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
@@ -35,7 +35,6 @@ func init() {
 	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
-	display = dsp.NewEInk(dcf)
 	device = dev.New(
 		modules.WithLifecycleManager(),
 		modules.WithEngineOperator(),
@@ -48,6 +47,7 @@ func init() {
 		modules.WithFailoverHandler(),
 	)
 
+	display = dsp.NewEInk(dcf)
 	gui.Init(display)
 }
 

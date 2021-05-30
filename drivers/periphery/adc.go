@@ -53,7 +53,7 @@ type ADS1115 struct {
 	convertor func(float64) float64
 }
 
-// NewADC returns a new ADC implementation via ADS1115 device driver.
+// NewADC constructs a new ADC implementation via ADS1115 device driver.
 func NewADC(addr uint16, bus int, options ...ADCOption) *ADS1115 {
 	d := &ADS1115{
 		Bus: shared.NtoI2cBusName(bus),

@@ -14,18 +14,14 @@ type GPIO struct {
 	pin string
 }
 
+// NewGPIO constructs new GPIO driver instance.
 func NewGPIO(pin int) *GPIO {
 	return &GPIO{
 		pin: shared.NtoPinName(pin),
 	}
 }
 
-func NewSpiCSPin(cs string) *GPIO {
-	return &GPIO{
-		pin: cs,
-	}
-}
-
+// Init performs GPIO driver initialization.
 func (g *GPIO) Init() error {
 	var (
 		pin = gpioreg.ByName(g.pin)
@@ -44,18 +40,22 @@ func (g *GPIO) Init() error {
 	return nil
 }
 
+// High sends high level signal to GPIO pin.
 func (g *GPIO) High() error {
 	return g.Out(gpio.High)
 }
 
+// Low sends low level signal to GPIO pin.
 func (g *GPIO) Low() error {
 	return g.Out(gpio.Low)
 }
 
+// IsHigh determines whether the GPIO pin is on High state.
 func (g *GPIO) IsHigh() bool {
 	return g.Read() == gpio.High
 }
 
+// IsLow determines whether the GPIO pin is on Low state.
 func (g *GPIO) IsLow() bool {
 	return g.Read() == gpio.Low
 }
