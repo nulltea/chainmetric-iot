@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -10,9 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -22,12 +22,12 @@ type (
 		once          *sync.Once
 		sensors       sensor.SensorsRegister
 		requests      chan request
-		standbyTimers map[core.Sensor]*time.Timer
+		standbyTimers map[sensor.Sensor]*time.Timer
 		active        bool
 		cancel        context.CancelFunc
 	}
 
-	// ReadingResults defines map of values collected from core.Sensor for requested models.Metrics.
+	// ReadingResults defines map of values collected from sensor.Sensor for requested models.Metrics.
 	ReadingResults map[models.Metric] float64
 
 	// ReceiverFunc defines signature for sensor readings results receiver handler function.
@@ -45,29 +45,31 @@ type (
 func NewSensorsReader() *SensorsReader {
 	return &SensorsReader{
 		once:          &sync.Once{},
-		sensors:       make(map[string]core.Sensor),
+		sensors:       make(map[string]sensor.Sensor),
 		requests:      make(chan request),
-		standbyTimers: make(map[core.Sensor]*time.Timer),
+		standbyTimers: make(map[sensor.Sensor]*time.Timer),
 	}
 }
-// RegisteredSensors returns map with sensors registered on the Device.
+// RegisteredSensors returns map with sensors registered on the engine.SensorsReader.
 func (r *SensorsReader) RegisteredSensors() sensor.SensorsRegister {
 	return r.sensors
 }
 
 // RegisterSensors adds given `sensors` on the SensorsReader sensors pool.
-func (r *SensorsReader) RegisterSensors(sensors ...core.Sensor) {
-	for i, sensor := range sensors {
-		r.sensors[sensor.ID()] = sensors[i]
+func (r *SensorsReader) RegisterSensors(sensors ...sensor.Sensor) {
+	for i, s := range sensors {
+		r.sensors[s.ID()] = sensors[i]
 	}
 }
 
 // UnregisterSensors removes sensor by given `id` from the SensorsReader sensors pool.
 func (r *SensorsReader) UnregisterSensors(ids ...string) {
 	for _, id := range ids{
-		if sensor, ok := r.sensors[id]; ok {
-			if sensor.Active() {
-				sensor.Close()
+		if s, ok := r.sensors[id]; ok {
+			if s.Active() {
+				if err := s.Close(); err != nil {
+					shared.Logger.Error(errors.Wrapf(err, "failed to close connection to '%s' sensor", s.ID()))
+				}
 			}
 			delete(r.sensors, id)
 		}
@@ -121,7 +123,7 @@ func (r *SensorsReader) Run(ctx context.Context) {
 			case request := <- r.requests:
 				go r.handleRequest(ctx, request)
 			case <- ctx.Done():
-				shared.Logger.Debug("Sensors reader process ended.")
+				shared.Logger.Debug("Sensors reader engine routine ended")
 				return
 			}
 		}
@@ -138,10 +140,10 @@ func (r *SensorsReader) Close() {
 	r.active = false
 	r.cancel()
 
-	for _, sensor := range r.sensors {
-		if sensor.Active() {
-			if err := sensor.Close(); err != nil {
-				shared.Logger.Error(errors.Wrapf(err, "failed to close connection to '%s' sensor", sensor.ID()))
+	for _, s := range r.sensors {
+		if s.Active() {
+			if err := s.Close(); err != nil {
+				shared.Logger.Error(errors.Wrapf(err, "failed to close connection to '%s' sensor", s.ID()))
 			}
 		}
 	}
@@ -153,41 +155,56 @@ func (r *SensorsReader) handleRequest(ctx context.Context, req request) {
 		pipe = make(sensor.ReadingsPipe)
 	)
 
-
+	// Init channels in request results pipe:
 	for _, metric := range req.Metrics {
 		pipe[metric] = make(chan sensor.ReadingResult, 3)
 	}
 
+	// Create single timeout context for all suitable for requested metrics sensors:
+	// TODO: each sensor may take different amount of time to be read,
+	//  thus some kind of deterministic timeout handling approach is required here.
+	//  Readings interval specified by receiver also should be taken in the account here.
+	ctx, cancel := context.WithTimeout(ctx, 3 * time.Second)
+	defer cancel()
+
+	// Go through available sensors to check is there any compatible ones for requested metrics,
+	// and if so perform reading from them:
 	for _, sn := range r.sensors {
 		for _, metric := range req.Metrics {
 			if suitable(sn, metric) {
-				ctx, cancel := context.WithTimeout(ctx, 2 * time.Second) // TODO: configure or base on request period
-				sensorCtx := sensor.NewReaderContext(ctx, sn)
-				sensorCtx.Pipe = pipe
-
-				if err := r.initSensor(sn); err != nil {
-					sensorCtx.Error(err)
-					continue
-				}
-
 				waitGroup.Add(1)
-				defer cancel()
-				go r.readSensor(sensorCtx, sn, waitGroup)
+
+				go func(sn sensor.Sensor) {
+					// Create new reading context for sensor and assign channels pipe,
+					// where reading results will be dumped into:
+					sensorCtx := sensor.NewReaderContext(ctx, sn)
+					sensorCtx.Pipe = pipe
+
+					// First time use initialization along with stand by handling:
+					if err := r.initSensor(sn); err != nil {
+						sensorCtx.Error(err)
+						return
+					}
+
+					r.readSensor(sensorCtx, sn, waitGroup)
+				}(sn)
 
 				break
 			}
 		}
 	}
 
+	// Wait until all required sensors finish being read or timed out:
 	waitGroup.Wait()
 
+	// Finally, aggregate sensor reading results and handle them by passing to receiver:
 	results := aggregate(pipe)
 	req.Handler(results)
 
 	return
 }
 
-func suitable(sensor core.Sensor, metric models.Metric) bool {
+func suitable(sensor sensor.Sensor, metric models.Metric) bool {
 	for _, m := range sensor.Metrics() {
 		if metric == m {
 			return true
@@ -197,32 +214,7 @@ func suitable(sensor core.Sensor, metric models.Metric) bool {
 	return false
 }
 
-func aggregate(pipe sensor.ReadingsPipe) ReadingResults {
-	var (
-		results = make(ReadingResults)
-	)
-
-	for metric, ch := range pipe {
-		readings := make([]sensor.ReadingResult, 0)
-
-	LOOP: for {
-			select {
-			case reading := <- ch:
-				readings = append(readings, reading)
-			default:
-				break LOOP
-			}
-		}
-
-		if len(readings) != 0 {
-			results[metric] = selectResult(readings)
-		}
-	}
-
-	return results
-}
-
-func (r *SensorsReader) initSensor(sn core.Sensor) error {
+func (r *SensorsReader) initSensor(sn sensor.Sensor) error {
 	var (
 		standby = viper.GetDuration("engine.sensor_sleep_standby_timeout")
 	)
@@ -245,7 +237,7 @@ func (r *SensorsReader) initSensor(sn core.Sensor) error {
 	return nil
 }
 
-func (r *SensorsReader) readSensor(ctx *sensor.Context, sn core.Sensor, wg *sync.WaitGroup) {
+func (r *SensorsReader) readSensor(ctx *sensor.Context, sn sensor.Sensor, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if !sn.Active() {
@@ -275,9 +267,34 @@ func (r *SensorsReader) readSensor(ctx *sensor.Context, sn core.Sensor, wg *sync
 	}
 }
 
-func handleStandby(t *time.Timer, sn core.Sensor) {
+func handleStandby(t *time.Timer, sn sensor.Sensor) {
 	<-t.C
-	sn.Close()
+	shared.Execute(sn.Close, fmt.Sprintf("failed to close connection to '%s' sensor", sn.ID()))
+}
+
+func aggregate(pipe sensor.ReadingsPipe) ReadingResults {
+	var (
+		results = make(ReadingResults)
+	)
+
+	for metric, ch := range pipe {
+		readings := make([]sensor.ReadingResult, 0)
+
+	LOOP: for {
+			select {
+			case reading := <- ch:
+				readings = append(readings, reading)
+			default:
+				break LOOP
+			}
+		}
+
+		if len(readings) != 0 {
+			results[metric] = selectResult(readings)
+		}
+	}
+
+	return results
 }
 
 func selectResult(results []sensor.ReadingResult) (result float64) {

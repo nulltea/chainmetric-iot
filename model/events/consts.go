@@ -7,8 +7,11 @@ const (
 	// MetricReadingsPostFailed identifies event for failure of models.MetricReadings post.
 	MetricReadingsPostFailed = "readings.post.failed"
 
-	// RequirementsSubmitted identifies event for submitting or changing models.Requirements request.
-	RequirementsSubmitted = "requirements.submitted"
+	// RequirementsChanged identifies event for submitting or changing models.Requirements request.
+	RequirementsChanged = "requirements.changed"
+
+	// AssetsChanged identifies event for submitting or changing models.Asset's.
+	AssetsChanged = "assets.changed"
 
 	// SensorsRegisterChanged identifies event for changes in sensor.SensorsRegister.
 	SensorsRegisterChanged = "sensors.register.changed"
@@ -18,4 +21,7 @@ const (
 
 	// DeviceRemovedFromNetwork identifies event for the removal of the models.Device from network.
 	DeviceRemovedFromNetwork = "device.removed"
+
+	// CacheChanged identifies event changes parameters cache.
+	CacheChanged = "cache.changed"
 )

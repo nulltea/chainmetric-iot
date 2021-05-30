@@ -13,5 +13,17 @@ type SensorsReadingRequest struct {
 	AssetID string
 	Period  time.Duration
 	Metrics models.Metrics
-	Cancel  context.CancelFunc
+	cancel  context.CancelFunc
+}
+
+// Cancel calls assigned cancel func to cancel request receiver routine.
+func (sr SensorsReadingRequest) Cancel() {
+	if sr.cancel != nil {
+		sr.cancel()
+	}
+}
+
+// SetCancel sets `cancel` func for canceling request receiver routine.
+func (sr SensorsReadingRequest) SetCancel(cancel context.CancelFunc) {
+	sr.cancel = cancel
 }
