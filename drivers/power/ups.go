@@ -4,20 +4,20 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 // UPSController defines driver for UPS shield device with MAX17040 chip inside.
 type UPSController struct {
-	*peripheries.I2C
-	pwrPin *peripheries.GPIO
+	*periphery.I2C
+	pwrPin *periphery.GPIO
 }
 
 // NewUPSController constructs new UPSController instance.
 func NewUPSController() *UPSController {
 	return &UPSController{
-		I2C: peripheries.NewI2C(MAX17040_ADDRESS, 1),
-		pwrPin: peripheries.NewGPIO(4),
+		I2C:    periphery.NewI2C(MAX17040_ADDRESS, 1),
+		pwrPin: periphery.NewGPIO(4),
 	}
 }
 

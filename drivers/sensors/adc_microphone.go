@@ -8,8 +8,8 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -17,13 +17,13 @@ var (
 )
 
 type ADCMic struct {
-	peripheries.ADC
+	periphery.ADC
 	samples int
 }
 
 func NewADCMicrophone(addr uint16, bus int) sensor.Sensor {
 	return &ADCMic{
-		ADC:     peripheries.NewADC(addr, bus, peripheries.WithI2CMutex(adcMicMutex)),
+		ADC:     periphery.NewADC(addr, bus, periphery.WithI2CMutex(adcMicMutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }
@@ -38,7 +38,7 @@ func (s *ADCMic) Read() float64 {
 }
 
 func (s *ADCMic) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.NoiseLevel).Write(s.Read())
+	ctx.WriterFor(metrics.NoiseLevel).Write(s.Read())
 }
 
 func (s *ADCMic) Metrics() []models.Metric {

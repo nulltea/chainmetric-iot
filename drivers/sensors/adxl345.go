@@ -8,8 +8,8 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
@@ -24,12 +24,12 @@ const (
 
 // ADXL345 sensor device.
 type ADXL345 struct {
-	*peripheries.I2C
+	*periphery.I2C
 }
 
 func NewADXL345(addr uint16, bus int) sensor.Sensor {
 	return &ADXL345{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(adxl345Mutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(adxl345Mutex)),
 	}
 }
 
@@ -77,7 +77,7 @@ func (s *ADXL345) ReadAxes() (model.Vector, error) {
 }
 
 func (s *ADXL345) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
+	ctx.WriterFor(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
 }
 
 func (s *ADXL345) Metrics() []models.Metric {

@@ -4,18 +4,18 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"periph.io/x/periph/experimental/devices/ina219"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 type INA219 struct {
-	*peripheries.I2C
+	*periphery.I2C
 	*ina219.Dev
 }
 
 func NewINA219(addr uint16, bus int) *INA219 {
 	return &INA219{
-		I2C: peripheries.NewI2C(addr, bus),
+		I2C: periphery.NewI2C(addr, bus),
 	}
 }
 
@@ -43,8 +43,8 @@ func (s *INA219) Harvest(ctx *sensor.Context) {
 	if power, err := s.Sense(); err != nil {
 		ctx.Error(err)
 	} else {
-		ctx.For("current").Write(float64(power.Current))
-		ctx.For("voltage").Write(float64(power.Voltage))
+		ctx.WriterFor("current").Write(float64(power.Current))
+		ctx.WriterFor("voltage").Write(float64(power.Voltage))
 	}
 }
 

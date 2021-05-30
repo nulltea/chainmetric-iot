@@ -9,8 +9,8 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -24,12 +24,12 @@ var (
 )
 
 type CCS811 struct {
-	*peripheries.I2C
+	*periphery.I2C
 }
 
 func NewCCS811(addr uint16, bus int) sensor.Sensor {
 	return &CCS811{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(cc811Mutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(cc811Mutex)),
 	}
 }
 
@@ -96,11 +96,11 @@ func (s *CCS811) Harvest(ctx *sensor.Context) {
 	eCO2, eTVOC, err := s.Read()
 
 	if eCO2 != 0 {
-		ctx.For(metrics.AirCO2Concentration).Write(eCO2)
+		ctx.WriterFor(metrics.AirCO2Concentration).Write(eCO2)
 	}
 
 	if eTVOC != 0 {
-		ctx.For(metrics.AirTVOCsConcentration).Write(eTVOC)
+		ctx.WriterFor(metrics.AirTVOCsConcentration).Write(eTVOC)
 	}
 
 	ctx.Error(err)

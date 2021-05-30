@@ -6,13 +6,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 // Client defines the interface for low range network communication.
 type Client struct {
-	dev *peripheries.Bluetooth
+	dev *periphery.Bluetooth
 }
 
 var (
@@ -29,7 +29,7 @@ var (
 // Init performs initialisation of the Client.
 func Init(name string) error {
 	client = &Client{
-		dev: peripheries.NewBluetooth(),
+		dev: periphery.NewBluetooth(),
 	}
 
 	if !viper.GetBool("bluetooth.enabled") {
@@ -37,8 +37,8 @@ func Init(name string) error {
 	}
 
 	if err := client.dev.Init(
-		peripheries.WithDeviceName(name),
-		peripheries.WithAdvertisementServices(Channels.Geo.uuid),
+		periphery.WithDeviceName(name),
+		periphery.WithAdvertisementServices(Channels.Geo.uuid),
 	); err != nil {
 		return errors.Wrap(err, "failed to prepare Bluetooth driver")
 	}
@@ -69,7 +69,7 @@ func Pair(ctx context.Context) error {
 
 // SetDeviceName sets new `name` for identifying device on local network.
 func SetDeviceName(name string) {
-	client.dev.ApplyOptions(peripheries.WithDeviceName(name))
+	client.dev.ApplyOptions(periphery.WithDeviceName(name))
 }
 
 // Close closes local network connection and clears allocated resources.

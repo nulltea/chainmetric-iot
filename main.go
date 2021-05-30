@@ -5,12 +5,13 @@ import (
 	"os/signal"
 
 	"github.com/spf13/viper"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/device/modules"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device/modules"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
+	dev2 "github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
+	dev "github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
@@ -21,8 +22,8 @@ var (
 	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
-	display  dsp.Display
-	device   *dev.Device
+	display dev2.Display
+	device  *dev.Device
 
 	done = make(chan struct{}, 1)
 	quit = make(chan os.Signal, 1)
@@ -34,19 +35,19 @@ func init() {
 	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
-	display = dsp.NewEInk(dcf)
 	device = dev.New(
 		modules.WithLifecycleManager(),
 		modules.WithEngineOperator(),
 		modules.WithCacheManager(),
 		modules.WithEventsObserver(),
 		modules.WithHotswapDetector(),
-		modules.WithRemoteCommandsHandler(),
+		modules.WithRemoteController(),
 		modules.WithLocationManager(),
 		modules.WithPowerManager(),
 		modules.WithFailoverHandler(),
 	)
 
+	display = dsp.NewEInk(dcf)
 	gui.Init(display)
 }
 

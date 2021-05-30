@@ -9,7 +9,7 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
 )
 
 var (
@@ -53,8 +53,8 @@ func (s *DHTxx) Init() error {
 func (s *DHTxx) Harvest(ctx *sensor.Context) {
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(s.sensorType, s.pin, false, 10)
 
-	ctx.For(metrics.Temperature).Write(temperature)
-	ctx.For(metrics.Humidity).Write(humidity)
+	ctx.WriterFor(metrics.Temperature).Write(temperature)
+	ctx.WriterFor(metrics.Humidity).Write(humidity)
 	ctx.Error(err)
 }
 

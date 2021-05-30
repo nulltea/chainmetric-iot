@@ -7,8 +7,8 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -16,12 +16,12 @@ var (
 )
 
 type SI1145 struct {
-	*peripheries.I2C
+	*periphery.I2C
 }
 
 func NewSI1145(addr uint16, bus int) sensor.Sensor {
 	return &SI1145{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(si1145Mutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(si1145Mutex)),
 	}
 }
 
@@ -121,10 +121,10 @@ func (s *SI1145) Harvest(ctx *sensor.Context) {
 	max44009Mutex.Lock()
 	defer max44009Mutex.Unlock()
 
-	ctx.For(metrics.UVLight).WriteWithError(s.ReadUV())
-	ctx.For(metrics.VisibleLight).WriteWithError(s.ReadVisible())
-	ctx.For(metrics.IRLight).WriteWithError(s.ReadIR())
-	ctx.For(metrics.Proximity).WriteWithError(s.ReadProximity())
+	ctx.WriterFor(metrics.UVLight).WriteWithError(s.ReadUV())
+	ctx.WriterFor(metrics.VisibleLight).WriteWithError(s.ReadVisible())
+	ctx.WriterFor(metrics.IRLight).WriteWithError(s.ReadIR())
+	ctx.WriterFor(metrics.Proximity).WriteWithError(s.ReadProximity())
 }
 
 func (s *SI1145) Metrics() []models.Metric {

@@ -8,8 +8,8 @@ import (
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 )
 
@@ -22,26 +22,26 @@ var (
 type (
 	// LSM303Accelerometer defines accelerometer sensor device
 	LSM303Accelerometer struct {
-		*peripheries.I2C
+		*periphery.I2C
 		dev  *lsm303.Accelerometer
 	}
 
 	// LSM303Magnetometer defines magnetometer sensor device
 	LSM303Magnetometer struct {
-		*peripheries.I2C
+		*periphery.I2C
 		dev  *lsm303.Magnetometer
 	}
 )
 
 func NewAccelerometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Accelerometer{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(lsm303cAccelerometerMutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(lsm303cAccelerometerMutex)),
 	}
 }
 
 func NewMagnetometerLSM303(addr uint16, bus int) sensor.Sensor {
 	return &LSM303Magnetometer{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(lsm303cMagnetometerMutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(lsm303cMagnetometerMutex)),
 	}
 }
 
@@ -82,7 +82,7 @@ func (s *LSM303Accelerometer) ID() string {
 }
 
 func (s *LSM303Accelerometer) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
+	ctx.WriterFor(metrics.Acceleration).WriteWithError(toMagnitude(s.ReadAxes()))
 }
 
 func (s *LSM303Accelerometer) Metrics() []models.Metric {
@@ -134,7 +134,7 @@ func (s *LSM303Magnetometer) ReadAxes() (model.Vector, error) {
 	}, nil
 }
 
-// ReadAxes parses data returned as magnetic force vector
+// ReadTemperature parses data returned as magnetic force vector
 func (s *LSM303Magnetometer) ReadTemperature() (float64, error) {
 	t, err := s.dev.SenseRelativeTemperature(); if err != nil {
 		return 0, err
@@ -148,8 +148,8 @@ func (s *LSM303Magnetometer) ID() string {
 }
 
 func (s *LSM303Magnetometer) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Magnetism).WriteWithError(toMagnitude(s.ReadAxes()))
-	ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
+	ctx.WriterFor(metrics.Magnetism).WriteWithError(toMagnitude(s.ReadAxes()))
+	ctx.WriterFor(metrics.Temperature).WriteWithError(s.ReadTemperature())
 }
 
 func (s *LSM303Magnetometer) Metrics() []models.Metric {
