@@ -7,9 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
-	periphery2 "github.com/timoth-y/chainmetric-sensorsys/core/io"
-	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/io"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -20,7 +19,7 @@ import (
 type HotswapDetector struct {
 	moduleBase
 
-	detectedI2Cs periphery2.I2CDetectResults
+	detectedI2Cs io.I2CDetectResults
 }
 
 // WithHotswapDetector can be used to setup HotswapDetector logical device.Module onto the device.Device.
@@ -48,7 +47,7 @@ func (m *HotswapDetector) Start(ctx context.Context) {
 			select {
 			case <- time.After(interval - time.Since(startTime)):
 			case <- ctx.Done():
-				shared.Logger.Debug("Hotswap detector module routine ended.")
+				shared.Logger.Debug("Hotswap detector module routine ended")
 				break LOOP
 			}
 		}
@@ -64,7 +63,7 @@ func (m *HotswapDetector) handleHotswap(ctx context.Context) error {
 		isChanges bool
 	)
 
-	m.detectedI2Cs = periphery2.ScanI2C(sensors.I2CAddressesRange(), sensors.LocateI2CSensor)
+	m.detectedI2Cs = io.ScanI2C(sensors.I2CAddressesRange(), sensors.LocateI2CSensor)
 	for _, devices := range m.detectedI2Cs {
 		for _, s := range devices {
 			detectedSensors[s.ID()] = s
@@ -95,7 +94,7 @@ func (m *HotswapDetector) handleHotswap(ctx context.Context) error {
 	return nil
 }
 
-func (m *HotswapDetector) contains(register map[string]core.Sensor, id string) bool {
+func (m *HotswapDetector) contains(register map[string]sensor.Sensor, id string) bool {
 	_, contains := register[id]
 	return contains
 }

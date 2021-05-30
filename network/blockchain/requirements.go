@@ -23,7 +23,11 @@ func (rc *RequirementsContract) init() {
 }
 
 // ReceiveFor retrieves models.Requirements records from blockchain ledger for a given `assets`.
-func (rc *RequirementsContract) ReceiveFor(assets []string) ([]*models.Requirements, error) {
+func (rc *RequirementsContract) ReceiveFor(assets ...string) ([]*models.Requirements, error) {
+	if len(assets) == 0 {
+		return nil, nil
+	}
+
 	request, _ := json.Marshal(assets)
 
 	data, err := rc.contract.EvaluateTransaction("ForAssets", string(request)); if err != nil {
@@ -69,7 +73,7 @@ func (rc *RequirementsContract) Subscribe(ctx context.Context, event string, act
 			case context.DeadlineExceeded:
 				return errors.Errorf("timeout waiting for event devices.%s", event)
 			default:
-				shared.Logger.Debug("Requirements blockchain event listener ended.")
+				shared.Logger.Debug("Requirements blockchain event listener ended")
 				return nil
 			}
 		}

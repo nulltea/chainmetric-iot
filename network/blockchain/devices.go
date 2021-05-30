@@ -103,7 +103,7 @@ func (dc *DevicesContract) Subscribe(
 			case context.DeadlineExceeded:
 				return fmt.Errorf("timeout waiting for event devices.%s", event)
 			default:
-				shared.Logger.Debug("Device blockchain event listener ended.")
+				shared.Logger.Debug("Device blockchain event listener ended")
 				return nil
 			}
 		}
@@ -145,7 +145,7 @@ func (dc *DevicesContract) ListenCommands(
 			case context.DeadlineExceeded:
 				return errors.Errorf("timeout waiting for event %s", eventKey)
 			default:
-				shared.Logger.Debug("Device blockchain event listener ended.")
+				shared.Logger.Debug("Device blockchain event listener ended")
 				return nil
 			}
 		}

@@ -90,7 +90,7 @@ func (gc *GeoLocationChannel) Subscribe(ctx context.Context, handler func(locati
 			case context.DeadlineExceeded:
 				return errors.New("timeout waiting for 'location' message")
 			default:
-				shared.Logger.Debug("Local network 'location' topic listener ended.")
+				shared.Logger.Debug("Local network 'location' topic listener ended")
 				return nil
 			}
 		}

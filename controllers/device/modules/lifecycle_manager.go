@@ -123,11 +123,11 @@ func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, viper.GetDuration("device.register_timeout_duration"))
 
 	// Try to start bluetooth advertisement:
-	go func() {
+	go func(ctx context.Context) {
 		if err := localnet.Pair(ctx); err != nil {
 			shared.Logger.Warning(errors.Wrap(err, "failed to advertise device via bluetooth"))
 		}
-	}()
+	}(ctx)
 
 	// Display registration payload as QR code:
 	if gui.Available() {
@@ -168,7 +168,7 @@ func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
 }
 
 func (m *LifecycleManager) discoverDeviceSpecs() (*model.DeviceSpecs, error) {
-	net, err := net.GetNetworkEnvironmentInfo(); if err != nil {
+	netEnv, err := net.GetNetworkEnvironmentInfo(); if err != nil {
 		return nil, errors.Wrap(err, "failed to get network info")
 	}
 
@@ -184,7 +184,7 @@ func (m *LifecycleManager) discoverDeviceSpecs() (*model.DeviceSpecs, error) {
 	}
 
 	return &model.DeviceSpecs{
-		Network: *net,
+		Network: *netEnv,
 		Supports: m.RegisteredSensors().SupportedMetrics(),
 	}, nil
 }

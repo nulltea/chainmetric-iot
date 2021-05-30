@@ -40,24 +40,38 @@ func (m *EventsObserver) Start(ctx context.Context) {
 }
 
 func (m *EventsObserver) watchAssets(ctx context.Context) {
-	blockchain.Contracts.Assets.Subscribe(ctx, "*", func(asset *models.Asset, e string) error {
+	if err := blockchain.Contracts.Assets.Subscribe(ctx, "*", func(asset *models.Asset, e string) error {
+		var (
+			changesPayload = events.AssetsChangedPayload{}
+		)
+
 		switch e {
-		case "inserted":
-			fallthrough
-		case "updated":
-			if asset.Location.IsNearBy(m.Location(), viper.GetFloat64("assets_locate_distance")) {
+		case "inserted", "updated":
+			if asset.Location.IsNearBy(m.Location(), viper.GetFloat64("device.assets_locate_distance")) {
+				if !m.ExistsAssetInCache(asset.ID) {
+					changesPayload.Assigned = append(changesPayload.Assigned, asset.ID)
+					shared.Logger.Debugf("Asset %q was assigned for the device", asset.ID)
+				} else {
+					shared.Logger.Debugf("Already assigned asset %q was changed ", asset.ID)
+				}
+
 				m.PutAssetsToCache(asset)
 				break
 			}
 			fallthrough
 		case "removed":
-			m.RemoveAssetFromCache(asset.ID)
+			if m.ExistsAssetInCache(asset.ID) {
+				m.RemoveAssetFromCache(asset.ID)
+				changesPayload.Removed = append(changesPayload.Removed, asset.ID)
+				shared.Logger.Debugf("Asset %q was unassigned from the device", asset.ID)
+			}
 		}
 
-		shared.Logger.Debugf("Asset %q was %s", asset.ID, e)
-
+		eventdriver.EmitEvent(ctx, events.AssetsChanged, changesPayload)
 		return nil
-	})
+	}); err != nil {
+		shared.Logger.Error(errors.Wrap(err, "failed to subscribe to assets changes on network"))
+	}
 }
 
 func (m *EventsObserver) watchDevice(ctx context.Context) {
@@ -86,40 +100,45 @@ func (m *EventsObserver) watchDevice(ctx context.Context) {
 }
 
 func (m *EventsObserver) watchRequirements(ctx context.Context) {
-	blockchain.Contracts.Requirements.Subscribe(ctx, "*", func(req *models.Requirements, e string) error {
-		if !m.ExistsAssetInCache(req.AssetID) {
-			return nil
-		}
+	if err := blockchain.Contracts.Requirements.Subscribe(ctx, "*",
+		func(req *models.Requirements, e string) error {
+			switch e {
+			case "inserted", "updated":
+				if !m.ExistsAssetInCache(req.AssetID) {
+					break
+				}
 
-		switch e {
-		case "updated":
-			if request, ok := m.GetRequirementsFromCache(req.ID); ok {
-				request.Cancel()
-			}
-			fallthrough
-		case "inserted":
-			eventdriver.EmitEvent(ctx, events.RequirementsSubmitted, events.RequirementsSubmittedPayload{
-				Requests: m.PutRequirementsToCache(req),
-			})
-			shared.Logger.Debugf(
-				"Requirements (id: %s) with %d metrics was %s", req.ID, len(req.Metrics), e,
-			)
-		case "removed":
-			if request, ok := m.GetRequirementsFromCache(req.ID); ok {
-				request.Cancel()
-				m.RemoveRequirementsFromCache(req.ID)
-				shared.Logger.Debugf(
-					"Requirements (id: %s) was removed and unsubscribed from reading sensors", req.ID,
+				// Canceling already existing requests since they will be handled again letter on:
+				if request, ok := m.GetRequirementsFromCache(req.ID); ok {
+					request.Cancel()
+				}
+
+				// Putting new or changed requirements to cache and notifying other modules about changes:
+				eventdriver.EmitEvent(ctx, events.RequirementsChanged, events.RequirementsChangedPayload{
+					Requests: m.PutRequirementsToCache(req),
+				})
+
+				shared.Logger.Debugf("Requirements (id: %s) with %d metrics was %s", req.ID,
+					len(req.Metrics), e,
 				)
+			case "removed":
+				if request, ok := m.GetRequirementsFromCache(req.ID); ok {
+					request.Cancel()
+					m.RemoveRequirementsFromCache(req.ID)
+					shared.Logger.Debugf(
+						"Requirements (id: %s) was removed and unsubscribed from reading sensors", req.ID,
+					)
+				}
 			}
-		}
 
-		return nil
-	})
+			return nil
+		}); err != nil {
+		shared.Logger.Fatal(errors.Wrap(err, "failed to subscribe to requirements changes on network"))
+	}
 }
 
 func (m *EventsObserver) actOnDeviceUpdates(ctx context.Context, updated *models.Device) {
-	if m.Location().IsNearBy(updated.Location, viper.GetFloat64("assets_locate_distance")) {
+	if !m.Location().IsNearBy(updated.Location, viper.GetFloat64("device.assets_locate_distance")) {
 		eventdriver.EmitEvent(ctx, events.DeviceLocationChanged, events.DeviceLocationChangedPayload{
 			Old: m.Location(),
 			New: updated.Location,

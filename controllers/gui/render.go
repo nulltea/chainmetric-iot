@@ -9,7 +9,7 @@ import (
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
-	"github.com/timoth-y/chainmetric-sensorsys/core"
+	dev2 "github.com/timoth-y/chainmetric-sensorsys/core/dev"
 	"golang.org/x/image/font/gofont/gomedium"
 	"golang.org/x/image/font/gofont/goregular"
 
@@ -17,14 +17,14 @@ import (
 )
 
 var (
-	dev         core.Display
+	dev         dev2.Display
 	frameWidth  int
 	frameHeight int
 	ctx         *gg.Context
 )
 
 // Init initialises GUI agent.
-func Init(display core.Display) {
+func Init(display dev2.Display) {
 	dev = display
 	initContext()
 }
@@ -47,7 +47,7 @@ func RenderText(msg string) {
 	ShowFrame()
 }
 
-// RenderText displays frame with `msg` text and `icon` image.
+// RenderTextWithIcon displays frame with `msg` text and `icon` image.
 func RenderTextWithIcon(text, icon string) {
 	initContext()
 
@@ -125,7 +125,9 @@ func RenderQRCode(data string) {
 // ShowFrame displays frame with rendered context.
 func ShowFrame() {
 	ctx.Fill()
-	dev.DrawAndRefresh(ctx.Image())
+	shared.MustExecute(func() error {
+		return dev.DrawAndRefresh(ctx.Image())
+	}, "failed to draw and refresh frame")
 }
 
 // Available checks whether the GUI is available.

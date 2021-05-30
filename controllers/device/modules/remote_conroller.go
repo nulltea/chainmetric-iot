@@ -57,7 +57,7 @@ func (m *RemoteController) handleBluetoothPairingCmd(ctx context.Context, cmdID 
 		}
 	)
 
-	if err := localnet.Pair(ctx); err != nil {
+	if err := localnet.Pair(ctx); err != nil && errors.Cause(err) != context.DeadlineExceeded {
 		results.Status = models.DeviceCmdFailed
 		results.Error = utils.StringPointer(err.Error())
 		shared.Logger.Error(err)

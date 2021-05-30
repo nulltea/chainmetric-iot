@@ -48,7 +48,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 			select {
 			case <-time.After(interval - time.Since(startTime)):
 			case <- ctx.Done():
-				shared.Logger.Debug("Power management module routine ended.")
+				shared.Logger.Debug("Power management module routine ended")
 				break LOOP
 			}
 
@@ -73,7 +73,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 				shared.Logger.Error(err)
 			}
 
-			shared.Logger.Debugf("Device battery: %d%% left (plugged: %t)", level, plugged)
+			shared.Logger.Debugf("Device battery: %d%% left", level)
 		}
 	})
 }

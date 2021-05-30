@@ -25,7 +25,7 @@ type EngineOperator struct {
 // WithEngineOperator can be used to setup EngineOperator logical device.Module onto the device.Device.
 func WithEngineOperator() device.Module {
 	return &EngineOperator{
-		moduleBase: withModuleBase("engine_operator"),
+		moduleBase: withModuleBase("ENGINE_OPERATOR"),
 		engine: engine.NewSensorsReader(),
 	}
 }
@@ -37,12 +37,12 @@ func (m *EngineOperator) Start(ctx context.Context) {
 		}
 
 		// Listen and act on newly submitted or changed requirements:
-		eventdriver.SubscribeHandler(events.RequirementsSubmitted, func(_ context.Context, v interface{}) error {
+		eventdriver.SubscribeHandler(events.RequirementsChanged, func(_ context.Context, v interface{}) error {
 			if !m.engine.Active() {
 				return nil
 			}  // No need to act on requests before engine isn't started
 
-			if payload, ok := v.(events.RequirementsSubmittedPayload); ok {
+			if payload, ok := v.(events.RequirementsChangedPayload); ok {
 				for i := range payload.Requests {
 					m.actOnRequest(ctx, payload.Requests[i])
 				}
@@ -72,6 +72,12 @@ func (m *EngineOperator) Start(ctx context.Context) {
 			return eventdriver.ErrIncorrectPayload
 		})
 
+		// Listen and changes in parameters cache:
+		eventdriver.SubscribeHandler(events.CacheChanged, func(_ context.Context, _ interface{}) error {
+			m.actOnCachedRequests(ctx)
+			return nil
+		})
+
 		if m.waitUntilSensorsDetected() {
 			m.engine.RegisterSensors(m.RegisteredSensors().ToList()...)
 			m.engine.Run(ctx)
@@ -95,8 +101,8 @@ func (m *EngineOperator) actOnRequest(ctx context.Context, request model.Sensors
 		return
 	}
 
-	// Otherwise subscribe receiver with given period of readings.
-	request.Cancel = m.engine.SubscribeReceiver(ctx, handler, request.Period, request.Metrics...)
+	// Otherwise subscribe receiver with given period of readings:
+	request.SetCancel(m.engine.SubscribeReceiver(ctx, handler, request.Period, request.Metrics...))
 }
 
 func (m *EngineOperator) actOnCachedRequests(ctx context.Context) {

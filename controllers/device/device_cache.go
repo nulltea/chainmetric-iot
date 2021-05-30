@@ -114,6 +114,26 @@ func (c *cacheLayer) GetCachedRequirements() []model.SensorsReadingRequest {
 	return reqs
 }
 
+// GetCachedRequirementsFor returns models.Requirements cached data for given `assetIDs` as model.SensorsReadingRequest.
+func (c *cacheLayer) GetCachedRequirementsFor(assetIDs ...string) []model.SensorsReadingRequest {
+	c.requests.mutex.Lock()
+	defer c.requests.mutex.Unlock()
+
+	var (
+		reqs = make([]model.SensorsReadingRequest, 0)
+	)
+
+	for _, req := range c.requests.data {
+		for _, assetID := range assetIDs {
+			if req.AssetID == assetID {
+				reqs = append(reqs, req)
+			}
+		}
+	}
+
+	return reqs
+}
+
 // GetRequirementsFromCache tries to retrieve single models.Requirements from cache by given `id`,
 // where it is stored as a model.SensorsReadingRequest record.
 func (c *cacheLayer) GetRequirementsFromCache(id string) (model.SensorsReadingRequest, bool) {
