@@ -5,11 +5,12 @@ import (
 
 	"github.com/cgxeiji/max3010x"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
@@ -19,14 +20,14 @@ var (
 
 type MAX30102 struct {
 	*max3010x.Device
-	i2c *peripheries.I2C
+	i2c *periphery.I2C
 	addr uint16
 	bus int
 }
 
-func NewMAX30102(addr uint16, bus int) sensor.Sensor {
+func NewMAX30102(addr uint16, bus int) core.Sensor {
 	return &MAX30102{
-		i2c:  peripheries.NewI2C(addr, bus, peripheries.WithMutex(max30102Mutex)),
+		i2c:  periphery.NewI2C(addr, bus, periphery.WithMutex(max30102Mutex)),
 		addr: addr,
 		bus:  bus,
 	}
@@ -52,8 +53,8 @@ func (s *MAX30102) Init() (err error) {
 }
 
 func (s *MAX30102) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.HeartRate).WriteWithError(s.HeartRate())
-	ctx.For(metrics.BloodOxidation).WriteWithError(s.SpO2())
+	ctx.WriterFor(metrics.HeartRate).WriteWithError(s.HeartRate())
+	ctx.WriterFor(metrics.BloodOxidation).WriteWithError(s.SpO2())
 }
 
 func (s *MAX30102) Metrics() []models.Metric {

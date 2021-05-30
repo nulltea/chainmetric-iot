@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/engine"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/engine"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
@@ -23,7 +23,7 @@ type EngineOperator struct {
 }
 
 // WithEngineOperator can be used to setup EngineOperator logical device.Module onto the device.Device.
-func WithEngineOperator() dev.Module {
+func WithEngineOperator() device.Module {
 	return &EngineOperator{
 		moduleBase: withModuleBase("engine_operator"),
 		engine: engine.NewSensorsReader(),
@@ -44,7 +44,7 @@ func (m *EngineOperator) Start(ctx context.Context) {
 
 			if payload, ok := v.(events.RequirementsSubmittedPayload); ok {
 				for i := range payload.Requests {
-					m.actOnRequest(payload.Requests[i])
+					m.actOnRequest(ctx, payload.Requests[i])
 				}
 
 				return nil
@@ -62,8 +62,8 @@ func (m *EngineOperator) Start(ctx context.Context) {
 				// If engine wasn't started yet it is because there weren't any available sensors before.
 				// If there is ones now, engine could start processing requests.
 				if !m.engine.Active() && m.RegisteredSensors().NotEmpty() {
-					m.engine.Start(ctx)
-					m.actOnCachedRequests()
+					m.engine.Run(ctx)
+					m.actOnCachedRequests(ctx)
 				}
 
 				return nil
@@ -74,16 +74,16 @@ func (m *EngineOperator) Start(ctx context.Context) {
 
 		if m.waitUntilSensorsDetected() {
 			m.engine.RegisterSensors(m.RegisteredSensors().ToList()...)
-			m.engine.Start(ctx)
-			m.actOnCachedRequests()
+			m.engine.Run(ctx)
+			m.actOnCachedRequests(ctx)
 		}
 	})
 }
 
 
-func (m *EngineOperator) actOnRequest(request model.SensorsReadingRequest) {
+func (m *EngineOperator) actOnRequest(ctx context.Context, request model.SensorsReadingRequest) {
 	var (
-		handler = func(readings model.SensorsReadingResults) {
+		handler = func(readings engine.ReadingResults) {
 			m.postReadings(request.AssetID, readings)
 		}
 	)
@@ -96,16 +96,16 @@ func (m *EngineOperator) actOnRequest(request model.SensorsReadingRequest) {
 	}
 
 	// Otherwise subscribe receiver with given period of readings.
-	request.Cancel = m.engine.SubscribeReceiver(handler, request.Period, request.Metrics...)
+	request.Cancel = m.engine.SubscribeReceiver(ctx, handler, request.Period, request.Metrics...)
 }
 
-func (m *EngineOperator) actOnCachedRequests() {
+func (m *EngineOperator) actOnCachedRequests(ctx context.Context) {
 	for _, request := range m.GetCachedRequirements() {
-		m.actOnRequest(request)
+		m.actOnRequest(ctx, request)
 	}
 }
 
-func (m *EngineOperator) postReadings(assetID string, readings model.SensorsReadingResults) {
+func (m *EngineOperator) postReadings(assetID string, readings engine.ReadingResults) {
 	var (
 		ctx = context.Background()
 		record = models.MetricReadings{

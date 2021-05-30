@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/drivers/power"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -20,15 +20,15 @@ type PowerManager struct {
 }
 
 // WithPowerManager can be used to setup PowerManager logical device.Module onto the device.Device.
-func WithPowerManager() dev.Module {
+func WithPowerManager() device.Module {
 	return &PowerManager{
-		moduleBase: withModuleBase("power_manager"),
+		moduleBase: withModuleBase("POWER_MANAGER"),
 		ups: power.NewUPSController(),
 	}
 }
 
 
-func (m *PowerManager) Setup(device *dev.Device) error {
+func (m *PowerManager) Setup(device *device.Device) error {
 	if err := m.ups.Init(); err != nil {
 		return errors.Wrap(err, "failed to initialize ups controller driver")
 	}

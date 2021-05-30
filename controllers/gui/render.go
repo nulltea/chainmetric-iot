@@ -9,22 +9,22 @@ import (
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 	"golang.org/x/image/font/gofont/gomedium"
 	"golang.org/x/image/font/gofont/goregular"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
 var (
-	dev         display.Display
+	dev         core.Display
 	frameWidth  int
 	frameHeight int
 	ctx         *gg.Context
 )
 
 // Init initialises GUI agent.
-func Init(display display.Display) {
+func Init(display core.Display) {
 	dev = display
 	initContext()
 }

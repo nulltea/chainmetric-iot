@@ -7,21 +7,22 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 	"github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
 // EInk is an implementation of Display driver for E-Ink 2.13" display.
 type EInk struct {
-	*peripheries.SPI
+	*periphery.SPI
 
-	dc   *peripheries.GPIO
-	cs   *peripheries.GPIO
-	rst  *peripheries.GPIO
-	busy *peripheries.GPIO
+	dc   *periphery.GPIO
+	cs   *periphery.GPIO
+	rst  *periphery.GPIO
+	busy *periphery.GPIO
 
 	rect image.Rectangle
 
@@ -29,13 +30,13 @@ type EInk struct {
 }
 
 // NewEInk creates new EInk driver instance by implementing Display interface.
-func NewEInk(config config.DisplayConfig) Display {
+func NewEInk(config config.DisplayConfig) core.Display {
 	return &EInk{
-		SPI:    peripheries.NewSPI(config.Bus),
-		dc:     peripheries.NewGPIO(config.DCPin),
-		cs:     peripheries.NewGPIO(config.CSPin),
-		rst:    peripheries.NewGPIO(config.ResetPin),
-		busy:   peripheries.NewGPIO(config.BusyPin),
+		SPI:    periphery.NewSPI(config.Bus),
+		dc:     periphery.NewGPIO(config.DCPin),
+		cs:     periphery.NewGPIO(config.CSPin),
+		rst:    periphery.NewGPIO(config.ResetPin),
+		busy:   periphery.NewGPIO(config.BusyPin),
 		rect:   image.Rect(0, 0, config.Width, config.Height),
 		config: config,
 	}
@@ -245,7 +246,7 @@ func (d *EInk) Bounds() image.Rectangle {
 	return d.rect
 }
 
-// SendCommandArgs overrides peripheries.SPI send command with args method
+// SendCommandArgs overrides periphery.SPI send command with args method
 // by additionally sending signals to DC and CS GPIO pins.
 func (d *EInk) SendCommandArgs(cmd byte, data ...byte) error {
 	if !d.Active() {
@@ -263,7 +264,7 @@ func (d *EInk) SendCommandArgs(cmd byte, data ...byte) error {
 	return d.SendData(data...)
 }
 
-// SendCommand overrides peripheries.SPI send command method
+// SendCommand overrides periphery.SPI send command method
 // by additionally sending signals to DC and CS GPIO pins.
 func (d *EInk) SendCommand(cmd byte) (err error) {
 	if !d.Active() {
@@ -287,7 +288,7 @@ func (d *EInk) SendCommand(cmd byte) (err error) {
 	return d.SPI.SendCommand(cmd)
 }
 
-// SendData overrides peripheries.SPI send data method
+// SendData overrides periphery.SPI send data method
 // by additionally sending signals to DC and CS GPIO pins.
 func (d *EInk) SendData(data ...byte) (err error) {
 	if !d.Active() {

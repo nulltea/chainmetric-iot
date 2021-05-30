@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 	"github.com/timoth-y/go-eventdriver"
@@ -13,7 +13,7 @@ import (
 
 // moduleBase implements base functionality of the device.Module.
 type moduleBase struct {
-	*dev.Device
+	*device.Device
 	*sync.Once
 
 	mid string
@@ -31,7 +31,7 @@ func (m *moduleBase) MID() string {
 	return m.mid
 }
 
-func (m *moduleBase) Setup(device *dev.Device) error {
+func (m *moduleBase) Setup(device *device.Device) error {
 	m.Device = device
 
 	return nil

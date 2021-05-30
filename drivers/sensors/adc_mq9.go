@@ -5,11 +5,12 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -17,17 +18,17 @@ var (
 )
 
 type ADCMQ9 struct {
-	peripheries.ADC
+	periphery.ADC
 	samples int
 }
 
-func NewADCMQ9(addr uint16, bus int) sensor.Sensor {
+func NewADCMQ9(addr uint16, bus int) core.Sensor {
 	return &ADCMQ9{
-		ADC: peripheries.NewADC(addr, bus, peripheries.WithConversion(func(raw float64) float64 {
-			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
+		ADC: periphery.NewADC(addr, bus, periphery.WithConversion(func(raw float64) float64 {
+			volts := raw / periphery.ADS1115_SAMPLES_PER_READ * periphery.ADS1115_VOLTS_PER_SAMPLE
 			resAir := (ADC_MQ9_RESISTANCE - volts) / volts
 			return resAir / ADC_MQ9_SENSITIVITY * 1000
-		}), peripheries.WithBias(ADC_MQ9_BIAS), peripheries.WithI2CMutex(adcMQ9Mutex)),
+		}), periphery.WithBias(ADC_MQ9_BIAS), periphery.WithI2CMutex(adcMQ9Mutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }
@@ -41,7 +42,7 @@ func (s *ADCMQ9) Read() float64 {
 }
 
 func (s *ADCMQ9) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.AirPetroleumConcentration).Write(s.Read())
+	ctx.WriterFor(metrics.AirPetroleumConcentration).Write(s.Read())
 }
 
 func (s *ADCMQ9) Metrics() []models.Metric {

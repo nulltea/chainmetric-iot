@@ -6,16 +6,17 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 type (
 	I2CSensorMock struct {
-		*peripheries.I2C
+		*periphery.I2C
 		duration time.Duration
 		metrics  []models.Metric
 		active   bool
@@ -27,9 +28,9 @@ type (
 	}
 )
 
-func NewI2CSensorMock(addr uint16, bus int) sensor.Sensor {
+func NewI2CSensorMock(addr uint16, bus int) core.Sensor {
 	return &I2CSensorMock{
-		I2C:      peripheries.NewI2C(addr, bus),
+		I2C:      periphery.NewI2C(addr, bus),
 		duration: viper.GetDuration("mocks.sensor_duration"),
 		metrics:  []models.Metric{metrics.AirCO2Concentration, metrics.Luminosity, metrics.Magnetism},
 	}
@@ -49,7 +50,7 @@ func (s *I2CSensorMock) Harvest(ctx *sensor.Context) {
 	time.Sleep(s.duration)
 
 	for _, metric := range s.metrics {
-		ctx.For(metric).Write(rand.Float64())
+		ctx.WriterFor(metric).Write(rand.Float64())
 	}
 }
 
@@ -70,7 +71,7 @@ func (s *I2CSensorMock) Close() error {
 	return nil
 }
 
-func NewStaticSensorMock() sensor.Sensor {
+func NewStaticSensorMock() core.Sensor {
 	return &StaticSensorMock{
 		duration: viper.GetDuration("mocks.sensor_duration"),
 		metrics:  []models.Metric{metrics.Humidity, metrics.NoiseLevel, metrics.Vibration},
@@ -90,7 +91,7 @@ func (s *StaticSensorMock) Harvest(ctx *sensor.Context) {
 	time.Sleep(s.duration)
 
 	for _, metric := range s.metrics {
-		ctx.For(metric).Write(rand.Float64())
+		ctx.WriterFor(metric).Write(rand.Float64())
 	}
 }
 

@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models/requests"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -19,9 +19,9 @@ type CacheManager struct {
 }
 
 // WithCacheManager can be used to setup CacheManager logical device.Module onto the device.Device.
-func WithCacheManager() dev.Module {
+func WithCacheManager() device.Module {
 	return &CacheManager{
-		moduleBase: withModuleBase("cache_manager"),
+		moduleBase: withModuleBase("CACHE_MANAGER"),
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
@@ -17,9 +17,9 @@ type LocationManager struct {
 
 
 // WithLocationManager can be used to setup LocationManager logical device.Module onto the device.Device.
-func WithLocationManager() dev.Module {
+func WithLocationManager() device.Module {
 	return &LocationManager{
-		moduleBase: withModuleBase("location_manager"),
+		moduleBase: withModuleBase("LOCATION_MANAGER"),
 	}
 }
 

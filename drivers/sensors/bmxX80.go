@@ -5,13 +5,14 @@ import (
 	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 	"periph.io/x/periph/conn/physic"
 	"periph.io/x/periph/devices/bmxx80"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -19,13 +20,13 @@ var (
 )
 
 type BMP280 struct {
-	*peripheries.I2C
+	*periphery.I2C
 	*bmxx80.Dev
 }
 
-func NewBMXX80(addr uint16, bus int) sensor.Sensor {
+func NewBMXX80(addr uint16, bus int) core.Sensor {
 	return &BMP280{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(bmp280Mutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(bmp280Mutex)),
 	}
 }
 
@@ -57,10 +58,10 @@ func (s *BMP280) Harvest(ctx *sensor.Context) {
 		return
 	}
 
-	ctx.For(metrics.Pressure).Write(float64(env.Pressure))
-	ctx.For(metrics.Altitude).Write(s.pressureToAltitude(float64(env.Pressure)))
-	ctx.For(metrics.Temperature).Write(env.Temperature.Celsius())
-	// ctx.For(metrics.Humidity).Write(float64(env.Humidity)) TODO: test compatibility
+	ctx.WriterFor(metrics.Pressure).Write(float64(env.Pressure))
+	ctx.WriterFor(metrics.Altitude).Write(s.pressureToAltitude(float64(env.Pressure)))
+	ctx.WriterFor(metrics.Temperature).Write(env.Temperature.Celsius())
+	// ctx.WriterFor(metrics.Humidity).Write(float64(env.Humidity)) TODO: test compatibility
 }
 
 func (s *BMP280) Metrics() []models.Metric {

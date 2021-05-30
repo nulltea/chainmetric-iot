@@ -5,11 +5,12 @@ import (
 	"sync"
 
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -17,12 +18,12 @@ var (
 )
 
 type MAX44009 struct {
-	*peripheries.I2C
+	*periphery.I2C
 }
 
-func NewMAX44009(addr uint16, bus int) sensor.Sensor {
+func NewMAX44009(addr uint16, bus int) core.Sensor {
 	return &MAX44009{
-		I2C: peripheries.NewI2C(addr, bus, peripheries.WithMutex(max44009Mutex)),
+		I2C: periphery.NewI2C(addr, bus, periphery.WithMutex(max44009Mutex)),
 	}
 }
 
@@ -51,7 +52,7 @@ func (s *MAX44009) Read() (float64, error) {
 }
 
 func (s *MAX44009) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Luminosity).WriteWithError(s.Read())
+	ctx.WriterFor(metrics.Luminosity).WriteWithError(s.Read())
 }
 
 func (s *MAX44009) Metrics() []models.Metric {

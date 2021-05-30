@@ -11,9 +11,9 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/gui"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/network"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
+	"github.com/timoth-y/chainmetric-sensorsys/core/net"
 	"github.com/timoth-y/chainmetric-sensorsys/model"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
@@ -28,13 +28,13 @@ type LifecycleManager struct {
 }
 
 // WithLifecycleManager can be used to setup LifecycleManager logical device.Module onto the device.Device.
-func WithLifecycleManager() dev.Module {
+func WithLifecycleManager() device.Module {
 	return &LifecycleManager{
-		moduleBase: withModuleBase("lifecycle-manager"),
+		moduleBase: withModuleBase("LIFECYCLE_MANAGER"),
 	}
 }
 
-func (m *LifecycleManager) Setup(device *dev.Device) error {
+func (m *LifecycleManager) Setup(device *device.Device) error {
 	var (
 		deviceName = viper.GetString("bluetooth.device_name")
 	)
@@ -168,7 +168,7 @@ func (m *LifecycleManager) proceedToDeviceRegistration(ctx context.Context) {
 }
 
 func (m *LifecycleManager) discoverDeviceSpecs() (*model.DeviceSpecs, error) {
-	net, err := network.GetNetworkEnvironmentInfo(); if err != nil {
+	net, err := net.GetNetworkEnvironmentInfo(); if err != nil {
 		return nil, errors.Wrap(err, "failed to get network info")
 	}
 

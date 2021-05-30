@@ -8,25 +8,25 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 	"github.com/timoth-y/chainmetric-core/utils"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
 )
 
-// RemoteCommandsHandler implements device.Module for device.Device remote commands handling.
-type RemoteCommandsHandler struct {
+// RemoteController implements device.Module for device.Device remote commands handling.
+type RemoteController struct {
 	moduleBase
 }
 
-// WithRemoteCommandsHandler can be used to setup RemoteCommandsHandler logical device.Module onto the device.Device.
-func WithRemoteCommandsHandler() dev.Module {
-	return &RemoteCommandsHandler{
-		moduleBase: withModuleBase("remote_commands_handler"),
+// WithRemoteController can be used to setup RemoteController logical device.Module onto the device.Device.
+func WithRemoteController() device.Module {
+	return &RemoteController{
+		moduleBase: withModuleBase("REMOTE_CONTROLLER"),
 	}
 }
 
-func (m *RemoteCommandsHandler) Start(ctx context.Context) {
+func (m *RemoteController) Start(ctx context.Context) {
 	go m.Do(func() {
 		if !m.trySyncWithDeviceLifecycle(ctx, m.Start) {
 			return
@@ -50,7 +50,7 @@ func (m *RemoteCommandsHandler) Start(ctx context.Context) {
 	})
 }
 
-func (m *RemoteCommandsHandler) handleBluetoothPairingCmd(ctx context.Context, cmdID string) {
+func (m *RemoteController) handleBluetoothPairingCmd(ctx context.Context, cmdID string) {
 	var (
 		results = requests.DeviceCommandResultsSubmitRequest{
 			Status: models.DeviceCmdCompleted,

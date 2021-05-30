@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/storage"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/storage"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -25,14 +25,14 @@ type FailoverHandler struct {
 }
 
 // WithFailoverHandler can be used to setup FailoverHandler logical device.Module onto the device.Device.
-func WithFailoverHandler() dev.Module {
+func WithFailoverHandler() device.Module {
 	return &FailoverHandler{
-		moduleBase: withModuleBase("failover_handler"),
+		moduleBase: withModuleBase("FAILOVER_HANDLER"),
 		ctx: context.Background(),
 	}
 }
 
-func (m *FailoverHandler) Setup(device *dev.Device) error {
+func (m *FailoverHandler) Setup(device *device.Device) error {
 	if shared.LevelDB == nil {
 		return errors.New("module won't work without LevelDB available")
 	}

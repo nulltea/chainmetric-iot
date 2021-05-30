@@ -5,11 +5,12 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -17,16 +18,16 @@ var (
 )
 
 type ADCFlame struct {
-	peripheries.ADC
+	periphery.ADC
 	samples int
 }
 
-func NewADCFlame(addr uint16, bus int) sensor.Sensor {
+func NewADCFlame(addr uint16, bus int) core.Sensor {
 	return &ADCFlame{
-		ADC: peripheries.NewADC(addr, bus, peripheries.WithConversion(func(raw float64) float64 {
-			volts := raw / peripheries.ADS1115_SAMPLES_PER_READ * peripheries.ADS1115_VOLTS_PER_SAMPLE
+		ADC: periphery.NewADC(addr, bus, periphery.WithConversion(func(raw float64) float64 {
+			volts := raw / periphery.ADS1115_SAMPLES_PER_READ * periphery.ADS1115_VOLTS_PER_SAMPLE
 			return volts
-		}), peripheries.WithBias(ADC_FLAME_BIAS), peripheries.WithI2CMutex(adcFlameMutex)),
+		}), periphery.WithBias(ADC_FLAME_BIAS), periphery.WithI2CMutex(adcFlameMutex)),
 		samples: viper.GetInt("sensors.analog.samples_per_read"),
 	}
 }
@@ -40,7 +41,7 @@ func (s *ADCFlame) Read() float64 {
 }
 
 func (s *ADCFlame) Harvest(ctx *sensor.Context) {
-	ctx.For(metrics.Flame).Write(s.Read())
+	ctx.WriterFor(metrics.Flame).Write(s.Read())
 }
 
 func (s *ADCFlame) Metrics() []models.Metric {

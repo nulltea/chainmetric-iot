@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	dev "github.com/timoth-y/chainmetric-sensorsys/drivers/device"
+	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
 	"github.com/timoth-y/chainmetric-sensorsys/model/events"
 	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
 	"github.com/timoth-y/chainmetric-sensorsys/shared"
@@ -21,9 +21,9 @@ type EventsObserver struct {
 }
 
 // WithEventsObserver can be used to setup EventsObserver logical device.Module onto the device.Device.
-func WithEventsObserver() dev.Module {
+func WithEventsObserver() device.Module {
 	return &EventsObserver{
-		moduleBase: withModuleBase("events_observer"),
+		moduleBase: withModuleBase("EVENTS_OBSERVER"),
 	}
 }
 

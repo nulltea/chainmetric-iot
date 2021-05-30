@@ -6,11 +6,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
+	"github.com/timoth-y/chainmetric-sensorsys/core"
 
 	"github.com/timoth-y/chainmetric-core/models/metrics"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/peripheries"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/core/sensor"
+	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
 )
 
 var (
@@ -18,13 +19,13 @@ var (
 )
 
 type HDC1080 struct {
-	*peripheries.I2C
+	*periphery.I2C
 	attempts int
 }
 
-func NewHDC1080(addr uint16, bus int) sensor.Sensor {
+func NewHDC1080(addr uint16, bus int) core.Sensor {
 	return &HDC1080{
-		I2C:      peripheries.NewI2C(addr, bus, peripheries.WithMutex(hdc1080Mutex)),
+		I2C:      periphery.NewI2C(addr, bus, periphery.WithMutex(hdc1080Mutex)),
 		attempts: 10,
 	}
 }
@@ -112,12 +113,12 @@ func (s *HDC1080) Harvest(ctx *sensor.Context) {
 	wg.Add(2)
 
 	go func() {
-		ctx.For(metrics.Temperature).WriteWithError(s.ReadTemperature())
+		ctx.WriterFor(metrics.Temperature).WriteWithError(s.ReadTemperature())
 		wg.Done()
 	}()
 
 	go func() {
-		ctx.For(metrics.Humidity).WriteWithError(s.ReadHumidity())
+		ctx.WriterFor(metrics.Humidity).WriteWithError(s.ReadHumidity())
 		wg.Done()
 	}()
 
