@@ -218,8 +218,8 @@ github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
-github.com/timoth-y/chainmetric-core v0.0.0-20210530155337-e273c5b042d5 h1:dWrwSLdtDrWXyMWB8S46ISJR2f6T1ajfT1dGo0/tBe0=
-github.com/timoth-y/chainmetric-core v0.0.0-20210530155337-e273c5b042d5/go.mod h1:JTkODhgmOvwCeSDewwAWaWnwkWW9UG6Zpa8Yck2dD5I=
+github.com/timoth-y/chainmetric-core v0.0.0-20210530221945-2cc111d49b87 h1:R1fhZx6e9dsxP9cb5AQ+rK2swK0n3m0tckSRr0w6itA=
+github.com/timoth-y/chainmetric-core v0.0.0-20210530221945-2cc111d49b87/go.mod h1:JTkODhgmOvwCeSDewwAWaWnwkWW9UG6Zpa8Yck2dD5I=
 github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019 h1:N4MsfGXOB8Pmv67qpdx7IJ+RtSAgBMWpG/HjUus+9UY=
 github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019/go.mod h1:eLDP5rAzzBDJk1AOOHBNMTDZrrhTMmry4OnySLOH/SI=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae h1:ePgxzI5zYM/fuRQclwMK4NWVw1eH4a7AUPVNqJJV3ps=
