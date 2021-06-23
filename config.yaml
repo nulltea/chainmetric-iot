@@ -17,8 +17,8 @@ blockchain:
     certificate: ../identity.pem
     private_key: ../identity.key
     user_id: device
-    org_id: supplier
-    msp_id: supplierMSP
+    org_id: chipa-inu
+    msp_id: chipa-inu
   channel_id: supply-channel
   wallet_path: ../keystore
 

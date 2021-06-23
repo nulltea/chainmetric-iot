@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
-	dev2 "github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	core "github.com/timoth-y/chainmetric-sensorsys/core/dev"
 	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
@@ -22,7 +22,7 @@ var (
 	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
-	display dev2.Display
+	display core.Display
 	device  *dev.Device
 
 	done = make(chan struct{}, 1)
