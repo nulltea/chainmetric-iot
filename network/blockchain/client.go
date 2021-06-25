@@ -6,10 +6,9 @@ import (
 
 	fabconfig "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	"github.com/spf13/viper"
 
 	"github.com/pkg/errors"
-
-	cnf "github.com/timoth-y/chainmetric-sensorsys/model/config"
 )
 
 // Client defines an interface for communicating with blockchain network.
@@ -20,8 +19,9 @@ type Client struct {
 }
 
 var (
-	client = &Client{}
-	config cnf.BlockchainConfig
+	client     = &Client{}
+	connConfig *viper.Viper
+	userID     string
 
 	// Contracts exposes blockchain network SmartContracts pool.
 	Contracts = struct {
@@ -38,36 +38,69 @@ var (
 )
 
 // Init performs initialization sequence of the blockchain client with given config.
-func Init(cnf cnf.BlockchainConfig) error {
-	config = cnf
-
-	var (
-		err error
-		configProvider = fabconfig.FromFile(config.ConnectionConfig)
-		identity *gateway.X509Identity
-	)
-
-	if client.wallet, err = gateway.NewFileSystemWallet(config.WalletPath); err != nil {
-		return errors.Wrapf(err, "failed to create new wallet on %s", config.WalletPath)
+func Init() (err error) {
+	connConfig = viper.New()
+	connConfig.SetConfigFile(viper.GetString("blockchain.connection_config"))
+	if err := connConfig.ReadInConfig(); err != nil {
+		return errors.Wrapf(
+			err, "failed to get connection config from path '%s'",
+			viper.GetString("blockchain.connection_config"),
+		)
 	}
 
-	if identity, err = newX509Identity(config.Identity); err != nil {
-		return errors.Wrap(err, "failed to build X509 identity")
+	if client.wallet, err = gateway.NewFileSystemWallet(viper.GetString("blockchain.wallet_path")); err != nil {
+		return errors.Wrapf(
+			err, "failed to create new wallet on %s",
+			viper.GetString("blockchain.wallet_path"),
+		)
 	}
 
-	if err = client.wallet.Put(config.Identity.UserID, identity); err != nil {
+	if !connConfig.IsSet("client.organization") {
+		return errors.New("connection config missing 'client.organization' property")
+	}
+
+	identity := gateway.NewX509Identity(connConfig.GetString("client.organization"), "", "")
+
+	if payload, err := ioutil.ReadFile(viper.GetString("blockchain.identity.certificate")); err != nil {
+		return errors.Wrapf(
+			err, "failed to load certificate from path: %s",
+			viper.GetString("blockchain.identity.certificate"),
+		)
+	} else {
+		identity.Credentials.Certificate = string(payload)
+	}
+
+	if payload, err := ioutil.ReadFile(viper.GetString("blockchain.identity.private_key")); err != nil {
+		return errors.Wrapf(
+			err, "failed to load private key from path: %s",
+			viper.GetString("blockchain.identity.private_key"),
+		)
+	} else {
+		identity.Credentials.Key = string(payload)
+	}
+
+	userID = connConfig.GetString("x-device-userID")
+
+	if err = client.wallet.Put(userID, identity); err != nil {
 		return errors.Wrap(err, "failed to put identity to wallet")
 	}
 
 	if client.gateway, err = gateway.Connect(
-		gateway.WithConfig(configProvider),
-		gateway.WithIdentity(client.wallet, config.Identity.UserID),
+		gateway.WithConfig(fabconfig.FromFile(viper.GetString("blockchain.connection_config"))),
+		gateway.WithIdentity(client.wallet, userID),
 	); err != nil {
 		return errors.Wrap(err, "failed to connect to blockchain gateway")
 	}
 
-	if client.network, err = client.gateway.GetNetwork(config.ChannelID); err != nil {
-		return errors.Wrapf(err, "failed to create new client of channel %s", config.ChannelID)
+	if !connConfig.IsSet("client.channel") {
+		return errors.New("connection config missing 'client.organization' property")
+	}
+
+	if client.network, err = client.gateway.GetNetwork(connConfig.GetString("client.channel")); err != nil {
+		return errors.Wrapf(
+			err, "failed to create new client of channel %s",
+			connConfig.GetString("client.channel"),
+		)
 	}
 
 	Contracts.Assets.init()
@@ -81,18 +114,6 @@ func Init(cnf cnf.BlockchainConfig) error {
 // Close closes connection to blockchain network and clears allocated resources.
 func Close() {
 	client.gateway.Close()
-}
-
-func newX509Identity(identity cnf.BlockchainIdentityConfig) (*gateway.X509Identity, error) {
-	cert, err := ioutil.ReadFile(identity.Certificate); if err != nil {
-		return nil, err
-	}
-
-	key, err := ioutil.ReadFile(identity.PrivateKey); if err != nil {
-		return nil, err
-	}
-
-	return gateway.NewX509Identity(identity.MspID, string(cert), string(key)), nil
 }
 
 func eventFilter(prefix, action string) string {

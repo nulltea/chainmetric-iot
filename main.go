@@ -19,7 +19,6 @@ import (
 )
 
 var (
-	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
 	display core.Display
@@ -32,7 +31,6 @@ var (
 func init() {
 	shared.InitCore()
 
-	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
 	device = dev.New(
@@ -71,7 +69,7 @@ func startup() {
 	}
 
 	shared.MustExecute(func() error {
-		return blockchain.Init(bcf)
+		return blockchain.Init()
 	}, "failed initializing blockchain client")
 
 	device.Start()

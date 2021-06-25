@@ -16,10 +16,6 @@ blockchain:
   identity:
     certificate: ../identity.pem
     private_key: ../identity.key
-    user_id: device
-    org_id: chipa-inu
-    msp_id: chipa-inu
-  channel_id: supply-channel
   wallet_path: ../keystore
 
 bluetooth:
@@ -41,7 +37,7 @@ display:
   bus: SPI0.0
   dc_pin: 25
   cs_pin: 8
-  reset_pin: 22
-  busy_pin: 18
+  reset_pin: 17
+  busy_pin: 24
 
 local_events_buffer_size: 50
