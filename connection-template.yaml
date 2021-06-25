@@ -1,0 +1,55 @@
+# Docs: https://hyperledger-fabric.readthedocs.io/en/release-2.2/developapps/connectionprofile.html
+# Example: https://github.com/hyperledger/fabric/blob/main/internal/peer/chaincode/testdata/connectionprofile.yaml
+
+name: edge-device.${ORG}.org.${DOMAIN}
+
+version: 1.0.0
+
+client:
+  organization: ${ORG}
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+  credentialStore:
+    cryptoStore:
+      path: keystore
+
+organizations:
+  ${ORG}:
+    mspid: ${ORG}
+    peers:
+      - peer0.${ORG}.org.${DOMAIN}
+    certificateAuthorities:
+      - ca.${ORG}.org.${DOMAIN}
+
+orderers:
+  orderer.${DOMAIN}:
+    url: grpcs://orderer.${DOMAIN}:443
+    tlsCACerts:
+      pem: |
+        ${TLS_ORDERER_ROOT_CERT}
+    grpcOptions:
+      ssl-target-name-override: orderer.${DOMAIN}
+      hostnameOverride: orderer.$DOMAIN
+
+peers:
+  peer0.${ORG}.org.${DOMAIN}:
+    url: grpcs://peer0.${ORG}.org.${DOMAIN}:443
+    tlsCACerts:
+      pem: |
+            ${TLS_PEER_ROOT_CERT}
+    grpcOptions:
+      ssl-target-name-override: peer0.${ORG}.org.${DOMAIN}
+      hostnameOverride: peer0.$ORG.org.$DOMAIN
+
+certificateAuthorities:
+  ca.${ORG}.org.${DOMAIN}:
+    url: https://ca.${ORG}.org.${DOMAIN}:443
+    caName: ca-${ORG}
+    tlsCACerts:
+      pem:
+        - |
+          ${TLS_CA_ROOT_CERT}
+    httpOptions:
+      verify: false

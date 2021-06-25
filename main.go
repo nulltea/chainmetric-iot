@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/device/modules"
 	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
-	dev2 "github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	core "github.com/timoth-y/chainmetric-sensorsys/core/dev"
 	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
 	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
 
@@ -19,10 +19,9 @@ import (
 )
 
 var (
-	bcf config.BlockchainConfig
 	dcf config.DisplayConfig
 
-	display dev2.Display
+	display core.Display
 	device  *dev.Device
 
 	done = make(chan struct{}, 1)
@@ -32,7 +31,6 @@ var (
 func init() {
 	shared.InitCore()
 
-	shared.MustUnmarshalFromConfig("blockchain", &bcf)
 	shared.MustUnmarshalFromConfig("display", &dcf)
 
 	device = dev.New(
@@ -71,7 +69,7 @@ func startup() {
 	}
 
 	shared.MustExecute(func() error {
-		return blockchain.Init(bcf)
+		return blockchain.Init()
 	}, "failed initializing blockchain client")
 
 	device.Start()
