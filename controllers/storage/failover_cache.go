@@ -12,7 +12,7 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
 
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // ReadingsCacheIteratorFunc defines function called by sensor readings cache iterator.

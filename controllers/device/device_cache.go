@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-iot/model"
 )
 
 type (

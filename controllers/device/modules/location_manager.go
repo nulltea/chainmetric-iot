@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/network/localnet"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // LocationManager implements device.Module for device.Device location management.

@@ -7,7 +7,7 @@ import (
 	"github.com/go-ble/ble"
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // Bluetooth defines BLE peripheral interface.

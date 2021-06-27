@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	"github.com/timoth-y/chainmetric-iot/core/dev"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
-	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-iot/drivers/periphery"
+	"github.com/timoth-y/chainmetric-iot/model/config"
 )
 
 // EInk is an implementation of dev.Display driver for E-Ink 2.13" display.

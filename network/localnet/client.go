@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/drivers/periphery"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // Client defines the interface for low range network communication.

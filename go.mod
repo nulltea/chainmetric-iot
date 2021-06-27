@@ -1,4 +1,4 @@
-module github.com/timoth-y/chainmetric-sensorsys
+module github.com/timoth-y/chainmetric-iot
 
 go 1.16
 
@@ -18,7 +18,7 @@ require (
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/syndtr/goleveldb v1.0.0
-	github.com/timoth-y/chainmetric-core v0.0.0-20210530221945-2cc111d49b87
+	github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d
 	github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect

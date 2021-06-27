@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // Context defines structure for the sensor.Sensor reading context.

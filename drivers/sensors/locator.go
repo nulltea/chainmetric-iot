@@ -3,7 +3,7 @@ package sensors
 import (
 	"github.com/spf13/viper"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-iot/core/dev/sensor"
 )
 
 var i2cSensorsLocatorMap = map[uint16][]sensor.Factory {

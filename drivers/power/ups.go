@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
+	"github.com/timoth-y/chainmetric-iot/drivers/periphery"
 )
 
 // UPSController defines driver for UPS shield device with MAX17040 chip inside.

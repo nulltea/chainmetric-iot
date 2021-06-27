@@ -9,11 +9,11 @@ import (
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
-	dev2 "github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	dev2 "github.com/timoth-y/chainmetric-iot/core/dev"
 	"golang.org/x/image/font/gofont/gomedium"
 	"golang.org/x/image/font/gofont/goregular"
 
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 var (
@@ -153,5 +153,5 @@ func clearFrame() {
 }
 
 func iconPath(icon string) string {
-	return fmt.Sprintf("drivers/gui/assets/%s.png", icon)
+	return fmt.Sprintf("controllers/gui/assets/%s.png", icon)
 }

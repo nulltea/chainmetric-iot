@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/model/events"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/model/events"
+	"github.com/timoth-y/chainmetric-iot/shared"
 	"github.com/timoth-y/go-eventdriver"
 )
 

@@ -6,12 +6,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/core/io"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/model/events"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-iot/core/io"
+	"github.com/timoth-y/chainmetric-iot/drivers/sensors"
+	"github.com/timoth-y/chainmetric-iot/model/events"
+	"github.com/timoth-y/chainmetric-iot/shared"
 	"github.com/timoth-y/go-eventdriver"
 )
 

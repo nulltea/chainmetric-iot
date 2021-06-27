@@ -220,6 +220,8 @@ github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFd
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/timoth-y/chainmetric-core v0.0.0-20210530221945-2cc111d49b87 h1:R1fhZx6e9dsxP9cb5AQ+rK2swK0n3m0tckSRr0w6itA=
 github.com/timoth-y/chainmetric-core v0.0.0-20210530221945-2cc111d49b87/go.mod h1:JTkODhgmOvwCeSDewwAWaWnwkWW9UG6Zpa8Yck2dD5I=
+github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d h1:UGEpGYw4n3rdp5Xaok4/JMIyManiZlqqyW3RnadGjMc=
+github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d/go.mod h1:JTkODhgmOvwCeSDewwAWaWnwkWW9UG6Zpa8Yck2dD5I=
 github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019 h1:N4MsfGXOB8Pmv67qpdx7IJ+RtSAgBMWpG/HjUus+9UY=
 github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019/go.mod h1:eLDP5rAzzBDJk1AOOHBNMTDZrrhTMmry4OnySLOH/SI=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae h1:ePgxzI5zYM/fuRQclwMK4NWVw1eH4a7AUPVNqJJV3ps=
