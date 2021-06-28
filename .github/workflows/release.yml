@@ -13,10 +13,6 @@ jobs:
       matrix:
         goos: [linux]
         goarch: [arm, arm64]
-        goarm: [6]
-        exclude:  
-          - goarm: 6
-            goarch: arm64 
     steps:
     - uses: actions/checkout@v2
 
@@ -32,7 +28,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goarm: ${{ matrix.goarm }}
         build_flags: -v
         ldflags: -X "main.appVersion=${{ env.APP_VERSION }}" -X "main.buildTime=${{ env.BUILD_TIME }}" -X main.gitCommit=${{ github.sha }} -X main.gitRef=${{ github.ref }}
         extra_files: LICENSE README.md
