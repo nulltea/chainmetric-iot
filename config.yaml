@@ -7,6 +7,7 @@ device:
   ping_timer_interval: 10s
   assets_locate_distance: 50.0
   battery_check_interval: 1m
+  gui_update_interval: 10s
 
 engine:
   sensor_sleep_standby_timeout: 1m
@@ -32,8 +33,8 @@ sensors:
 
 display:
   enabled: true
-  width: 128
-  height: 250
+  width: 250
+  height: 128
   bus: SPI0.0
   dc_pin: 25
   cs_pin: 8

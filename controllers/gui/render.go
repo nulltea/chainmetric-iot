@@ -1,30 +1,34 @@
 package gui
 
 import (
+	"bytes"
 	"fmt"
 	"image"
+	"image/png"
 	"math"
+	"os"
+	"strings"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
-	dev2 "github.com/timoth-y/chainmetric-iot/core/dev"
+	core "github.com/timoth-y/chainmetric-iot/core/dev"
+	"github.com/timoth-y/chainmetric-iot/shared"
+	"github.com/wcharczuk/go-chart"
 	"golang.org/x/image/font/gofont/gomedium"
 	"golang.org/x/image/font/gofont/goregular"
-
-	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 var (
-	dev         dev2.Display
-	frameWidth  int
+	dev         core.Display
 	frameHeight int
+	frameWidth  int
 	ctx         *gg.Context
 )
 
 // Init initialises GUI agent.
-func Init(display dev2.Display) {
+func Init(display core.Display) {
 	dev = display
 	initContext()
 }
@@ -37,14 +41,86 @@ func RenderText(msg string) {
 	if err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to parse font"))
 	}
+
 	face := truetype.NewFace(font, &truetype.Options{
 		Size: 18,
 	})
 	ctx.SetFontFace(face)
-	tw, th := ctx.MeasureString(msg)
-	ctx.DrawString(msg, float64(frameHeight/ 2) - tw / 2, float64(frameWidth/ 2) + th / 2)
+
+	var (
+		vIndent = 0.0
+	)
+
+	for _, line := range strings.Split(msg, "\n") {
+		tw, th := ctx.MeasureString(line)
+		ctx.DrawString(line, float64(frameWidth/ 2) - tw / 2, float64(frameHeight/ 2) + th / 2 + vIndent)
+		vIndent += th + 5
+	}
 
 	ShowFrame()
+}
+
+// RenderWithChart displays frame with chart and `msg` text.
+func RenderWithChart(msg string, v ...float64) {
+	initContext()
+
+	font, err := truetype.Parse(gomedium.TTF)
+	if err != nil {
+		shared.Logger.Error(errors.Wrap(err, "failed to parse font"))
+	}
+
+	face := truetype.NewFace(font, &truetype.Options{
+		Size: 14,
+	})
+	ctx.SetFontFace(face)
+
+	var vIndent = 0.0
+
+	for _, line := range strings.Split(msg, "\n") {
+		_, th := ctx.MeasureString(line)
+		ctx.DrawString(line, 0, 0 + th + vIndent)
+		vIndent += th + 2
+	}
+
+	xValues := make([]float64, len(v))
+	for i := range v {
+		xValues[i] = float64(i)
+	}
+
+	chart.DefaultFillColor = chart.ColorBlack
+	graph := chart.Chart{
+		Series: []chart.Series{
+			chart.ContinuousSeries{
+				XValues: xValues,
+				YValues: v,
+				Style: chart.Style{
+					Show: true,
+					StrokeWidth: 3,
+					DotColor: chart.ColorBlack,
+					StrokeColor: chart.ColorBlack,
+				},
+			},
+		},
+		Height: frameHeight / 2,
+		Width: frameWidth,
+	}
+
+	buffer := bytes.NewBuffer([]byte{})
+	if err = graph.Render(chart.PNG, buffer); err != nil {
+		shared.Logger.Error(errors.Wrap(err, "failed to render chart"))
+	}
+
+	if img, _, err := image.Decode(buffer); err != nil {
+		shared.Logger.Error(errors.Wrap(err, "failed to decode chart image"))
+	} else {
+		ctx.DrawImage(img, 0, int(float64(frameHeight/ 2)))
+	}
+
+	ShowFrame()
+}
+
+func RenderTextf(format string, a ...interface{}) {
+	RenderText(fmt.Sprintf(format, a...))
 }
 
 // RenderTextWithIcon displays frame with `msg` text and `icon` image.
@@ -67,7 +143,7 @@ func RenderTextWithIcon(text, icon string) {
 
 	var (
 		tw, th = ctx.MeasureString(text)
-		tx, ty = float64(frameHeight/ 2) - tw / 2, float64(frameWidth/ 2) - th
+		tx, ty = float64(frameWidth/ 2) - tw / 2, float64(frameHeight/ 2) - th
 	)
 
 	if iconImg, err = gg.LoadPNG(iconPath); err != nil {
@@ -77,8 +153,8 @@ func RenderTextWithIcon(text, icon string) {
 
 	var (
 		ib = iconImg.Bounds()
-		ix = int(math.Round(float64(frameHeight/ 2) - float64(ib.Dy()) / 2))
-		iy = int(math.Round(float64(frameWidth / 2)))
+		ix = int(math.Round(float64(frameWidth/ 2) - float64(ib.Dx()) / 2))
+		iy = int(math.Round(float64(frameHeight / 2)))
 	)
 
 	ctx.SetFontFace(face)
@@ -111,9 +187,9 @@ func RenderQRCode(data string) {
 	}
 
 	var (
-		qrImg = qr.Image(frameWidth)
-		x = int(math.Round(float64(frameHeight/ 2) - float64(qrImg.Bounds().Dy()) / 2))
-		y = int(math.Round(float64(frameWidth/ 2) - float64(qrImg.Bounds().Dx()) / 2))
+		qrImg = qr.Image(frameHeight)
+		x = int(math.Round(float64(frameWidth/ 2) - float64(qrImg.Bounds().Dx()) / 2))
+		y = int(math.Round(float64(frameHeight/ 2) - float64(qrImg.Bounds().Dy()) / 2))
 	)
 
 	ctx.DrawImage(qrImg, x, y)
@@ -125,6 +201,9 @@ func RenderQRCode(data string) {
 // ShowFrame displays frame with rendered context.
 func ShowFrame() {
 	ctx.Fill()
+	f, _ := os.Create("display.png")
+	png.Encode(f, ctx.Image())
+	f.Close()
 	shared.MustExecute(func() error {
 		return dev.DrawAndRefresh(ctx.Image())
 	}, "failed to draw and refresh frame")
@@ -141,9 +220,6 @@ func initContext() {
 	ctx = gg.NewContext(frameWidth, frameHeight)
 
 	clearFrame()
-
-	ctx.Rotate(gg.Radians(90))
-	ctx.Translate(0.0, -float64(frameHeight/2))
 }
 
 func clearFrame() {
