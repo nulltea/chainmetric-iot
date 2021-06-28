@@ -4,9 +4,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
-	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/model"
+	"github.com/timoth-y/chainmetric-iot/network/blockchain"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // UpdateDeviceModel updates Device data model (models.Device).

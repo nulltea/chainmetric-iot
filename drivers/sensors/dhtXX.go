@@ -10,7 +10,7 @@ package sensors
 //
 // 	"github.com/timoth-y/chainmetric-core/models/metrics"
 //
-// 	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
+// 	"github.com/timoth-y/chainmetric-iot/core/dev/sensor"
 // )
 //
 // var (

@@ -7,9 +7,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/timoth-y/chainmetric-core/models"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/power"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/drivers/power"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // PowerManager implements device.Module for device.Device battery management.
@@ -67,7 +67,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 			plugged := m.ups.IsPlugged()
 
 			if err = m.SetBattery(models.DeviceBattery{
-				Level: &level,
+				Level: level,
 				PluggedIn: plugged,
 			}); err != nil {
 				shared.Logger.Error(err)

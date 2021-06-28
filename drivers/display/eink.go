@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev"
+	"github.com/timoth-y/chainmetric-iot/core/dev"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/periphery"
-	"github.com/timoth-y/chainmetric-sensorsys/model/config"
+	"github.com/timoth-y/chainmetric-iot/drivers/periphery"
+	"github.com/timoth-y/chainmetric-iot/model/config"
 )
 
 // EInk is an implementation of dev.Display driver for E-Ink 2.13" display.
@@ -37,7 +37,7 @@ func NewEInk(config config.DisplayConfig) dev.Display {
 		cs:     periphery.NewGPIO(config.CSPin),
 		rst:    periphery.NewGPIO(config.ResetPin),
 		busy:   periphery.NewGPIO(config.BusyPin),
-		rect:   image.Rect(0, 0, config.Width, config.Height),
+		rect:   image.Rect(0, 0, config.Height, config.Width),
 		config: config,
 	}
 }
@@ -76,30 +76,29 @@ func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error
 	var (
 		xStart = sp.X
 		yStart = sp.Y
-		imageW = r.Dx() & 0xF8
-		imageH = r.Dy()
-		w      = d.rect.Dx()
-		h      = d.rect.Dy()
+		bitMap = image1bit.NewVerticalLSB(src.Bounds())
+		byteToSend byte = 0x00
 	)
 
-
-	xEnd := xStart + imageW - 1
-	if xStart+imageW >= w {
-		xEnd = w - 1
+	draw.Src.Draw(bitMap, r, src, sp)
+	for i := 0; i < 3; i++ {
+		bitMap = rotateBitMap(bitMap)
 	}
 
-	yEnd := yStart + imageH - 1
-	if yStart+imageH >= h {
-		yEnd = h - 1
+	xEnd := xStart + bitMap.Rect.Dx() - 1
+	if xStart + bitMap.Rect.Dx() >= d.rect.Dx() {
+		xEnd = bitMap.Rect.Dx() - 1
+	}
+
+	yEnd := yStart + bitMap.Rect.Dy() - 1
+	if yStart + bitMap.Rect.Dy() >= d.rect.Dy() {
+		yEnd = bitMap.Rect.Dy() - 1
 	}
 
 	if err := d.setMemoryArea(xStart, yStart, xEnd, yEnd); err != nil {
 		return err
 	}
 
-	next := image1bit.NewVerticalLSB(d.rect)
-	draw.Src.Draw(next, r, src, sp)
-	var byteToSend byte = 0x00
 	for y := yStart; y < yEnd+1; y++ {
 		if err := d.setMemoryPointer(xStart, y); err != nil {
 			return err
@@ -108,7 +107,7 @@ func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error
 			return err
 		}
 		for x := xStart; x < xEnd+1; x++ {
-			bit := next.BitAt(x-xStart, y-yStart)
+			bit := bitMap.BitAt(x - xStart, y - yStart)
 
 			if bit {
 				byteToSend |= 0x80 >> (uint32(x) % 8)
@@ -129,7 +128,7 @@ func (d *EInk) DrawRaw(r image.Rectangle, src image.Image, sp image.Point) error
 // Draw sends `src` image binary representation to EInk display buffer.
 // Use Refresh() or DrawAndRefresh() to display image.
 func (d *EInk) Draw(src image.Image) error {
-	return d.DrawRaw(d.Bounds(), src, image.Point{})
+	return d.DrawRaw(src.Bounds(), src, image.Point{})
 }
 
 // DrawAndRefresh sends `src` image binary representation to EInk display buffer
@@ -241,7 +240,7 @@ func (d *EInk) ColorModel() color.Model {
 
 // Bounds implements display.Drawer. Min is guaranteed to be {0, 0}.
 func (d *EInk) Bounds() image.Rectangle {
-	return d.rect
+	return image.Rect(0, 0, d.rect.Dy(), d.rect.Dx())
 }
 
 // SendCommandArgs overrides periphery.SPI send command with args method
@@ -375,6 +374,24 @@ func (d *EInk) init() error {
 	}
 
 	return d.setMemoryPointer(0, 0)
+}
+
+func rotateBitMap(bitMap *image1bit.VerticalLSB) *image1bit.VerticalLSB {
+	next := image1bit.NewVerticalLSB(image.Rect(
+		bitMap.Rect.Min.Y,
+		bitMap.Rect.Min.X,
+		bitMap.Rect.Max.Y,
+		bitMap.Rect.Max.X,
+	))
+
+	for x := bitMap.Rect.Min.X; x < bitMap.Rect.Max.X; x++ {
+		for y := bitMap.Rect.Min.Y; y < bitMap.Rect.Max.Y; y++ {
+			bit := bitMap.BitAt(x, y)
+			next.SetBit(bitMap.Rect.Max.Y - 1 - y, x, bit)
+		}
+	}
+
+	return next
 }
 
 func (d *EInk) setMemoryPointer(x, y int) error {

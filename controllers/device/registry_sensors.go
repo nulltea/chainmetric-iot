@@ -3,9 +3,9 @@ package device
 import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models/requests"
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-iot/network/blockchain"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // RegisteredSensors returns map with sensors registered on the Device.
@@ -56,6 +56,7 @@ func (d *Device) updateSupportedMetrics() {
 	}); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to update supported metrics"))
 	}
+	d.specs.Supports = d.sensors.SupportedMetrics()
 }
 
 // StaticSensors returns map with sensors statically registered on the Device.

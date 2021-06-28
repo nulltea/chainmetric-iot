@@ -69,12 +69,12 @@ $ make crypto-sync
 
 ## Roadmap
 
-- [x] Caching on network connection absence [(#3)](https://github.com/timoth-y/chainmetric-sensorsys/pull/3)
-- [x] Sensor modules hot-swap support [(#1)](https://github.com/timoth-y/chainmetric-sensorsys/pull/1)
-- [x] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115] [(#4)]( https://github.com/timoth-y/chainmetric-sensorsys/pull/4)
-- [x] [E-Ink display][e-ink display] support [(#5)](https://github.com/timoth-y/chainmetric-sensorsys/pull/5)
-- [x] GUI for displaying statistics data and emergency warnings [(#9)](https://github.com/timoth-y/chainmetric-sensorsys/pull/9)
-- [x] Location tracking via bluetooth pairing with [mobile app][chainmetric app repo] [(#10)](https://github.com/timoth-y/chainmetric-sensorsys/pull/10)
+- [x] Caching on network connection absence [(#3)](https://github.com/timoth-y/chainmetric-iot/pull/3)
+- [x] Sensor modules hot-swap support [(#1)](https://github.com/timoth-y/chainmetric-iot/pull/1)
+- [x] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115] [(#4)]( https://github.com/timoth-y/chainmetric-iot/pull/4)
+- [x] [E-Ink display][e-ink display] support [(#5)](https://github.com/timoth-y/chainmetric-iot/pull/5)
+- [x] GUI for displaying statistics data and emergency warnings [(#9)](https://github.com/timoth-y/chainmetric-iot/pull/9)
+- [x] Location tracking via bluetooth pairing with [mobile app][chainmetric app repo] [(#10)](https://github.com/timoth-y/chainmetric-iot/pull/10)
 - [ ] A device as a blockchain node
 - [ ] Video-camera driver
 
@@ -94,9 +94,9 @@ Licensed under the [Apache 2.0][license file].
 [hardware badge]: https://img.shields.io/badge/Hardware-Raspberry%20Pi-informational?style=flat&logo=Raspberry%20Pi&color=953347
 [license badge]: https://img.shields.io/badge/License-Apache%202.0-informational?style=flat&color=blue
 
-[device photo]: https://github.com/timoth-y/chainmetric-sensorsys/blob/main/docs/device.png?raw=true
+[device photo]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/device.png?raw=true
 
-[this repo]: https://github.com/timoth-y/chainmetric-sensorsys
+[this repo]: https://github.com/timoth-y/chainmetric-iot
 [golang]: https://golang.org
 [repo commit activity]: https://github.com/timoth-y/kicksware-api/graphs/commit-activity
 [raspberry pi]: https://www.raspberrypi.org
@@ -142,4 +142,4 @@ Licensed under the [Apache 2.0][license file].
 [st7789]: https://www.newhavendisplay.com/appnotes/datasheets/LCDs/ST7789V.pdf
 
 
-[license file]: https://github.com/timoth-y/chainmetric-sensorsys/blob/main/LICENSE
+[license file]: https://github.com/timoth-y/chainmetric-iot/blob/main/LICENSE

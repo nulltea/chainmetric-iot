@@ -8,7 +8,7 @@ import (
 	"github.com/MichaelS11/go-ads"
 	"github.com/pkg/errors"
 
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // ADS1115 ADC chip constants.

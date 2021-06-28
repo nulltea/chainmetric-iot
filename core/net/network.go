@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/timoth-y/chainmetric-sensorsys/model"
+	"github.com/timoth-y/chainmetric-iot/model"
 )
 
 func GetNetworkEnvironmentInfo() (*model.Network, error) {

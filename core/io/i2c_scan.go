@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/viper"
 	"periph.io/x/periph/conn/i2c/i2creg"
 
-	"github.com/timoth-y/chainmetric-sensorsys/core/dev/sensor"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/core/dev/sensor"
+	"github.com/timoth-y/chainmetric-iot/drivers/sensors"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // I2CDetectResults stores I2C identified I2C-based peripheral devices.

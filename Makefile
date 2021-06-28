@@ -26,6 +26,8 @@ setup-device: build
 
 	$(MAKE) sync
 
+update-device: build sync
+
 run:
 	sudo "./$(OUTPUT)"
 

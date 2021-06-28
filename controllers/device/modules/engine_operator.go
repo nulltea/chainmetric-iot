@@ -7,12 +7,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/utils"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/engine"
-	"github.com/timoth-y/chainmetric-sensorsys/model"
-	"github.com/timoth-y/chainmetric-sensorsys/model/events"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/controllers/engine"
+	"github.com/timoth-y/chainmetric-iot/model"
+	"github.com/timoth-y/chainmetric-iot/model/events"
+	"github.com/timoth-y/chainmetric-iot/network/blockchain"
+	"github.com/timoth-y/chainmetric-iot/shared"
 	"github.com/timoth-y/go-eventdriver"
 )
 
@@ -91,6 +91,7 @@ func (m *EngineOperator) actOnRequest(ctx context.Context, request model.Sensors
 	var (
 		handler = func(readings engine.ReadingResults) {
 			m.postReadings(request.AssetID, readings)
+			eventdriver.EmitEvent(ctx, events.RequestHandled, nil)
 		}
 	)
 
@@ -134,7 +135,8 @@ func (m *EngineOperator) postReadings(assetID string, readings engine.ReadingRes
 				Error: err,
 			})
 		} else {
-			shared.Logger.Error(errors.Wrap(err, "failed to post readings"))
+			shared.Logger.Error(errors.Wrapf(err, "failed to post readings with id %s%s", utils.Hash(record.AssetID),
+				utils.Hash(string(record.Encode()))))
 		}
 		return
 	}

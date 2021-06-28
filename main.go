@@ -5,17 +5,17 @@ import (
 	"os/signal"
 
 	"github.com/spf13/viper"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device/modules"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/gui"
-	core "github.com/timoth-y/chainmetric-sensorsys/core/dev"
-	dsp "github.com/timoth-y/chainmetric-sensorsys/drivers/display"
-	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
+	"github.com/timoth-y/chainmetric-iot/controllers/device/modules"
+	"github.com/timoth-y/chainmetric-iot/controllers/gui"
+	core "github.com/timoth-y/chainmetric-iot/core/dev"
+	dsp "github.com/timoth-y/chainmetric-iot/drivers/display"
+	"github.com/timoth-y/chainmetric-iot/network/localnet"
 
-	dev "github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/drivers/sensors"
-	"github.com/timoth-y/chainmetric-sensorsys/model/config"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	dev "github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/drivers/sensors"
+	"github.com/timoth-y/chainmetric-iot/model/config"
+	"github.com/timoth-y/chainmetric-iot/network/blockchain"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 var (
@@ -43,6 +43,7 @@ func init() {
 		modules.WithLocationManager(),
 		modules.WithPowerManager(),
 		modules.WithFailoverHandler(),
+		modules.WithGUIRenderer(),
 	)
 
 	display = dsp.NewEInk(dcf)

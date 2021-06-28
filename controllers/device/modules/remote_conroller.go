@@ -8,10 +8,10 @@ import (
 	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-core/models/requests"
 	"github.com/timoth-y/chainmetric-core/utils"
-	"github.com/timoth-y/chainmetric-sensorsys/controllers/device"
-	"github.com/timoth-y/chainmetric-sensorsys/network/blockchain"
-	"github.com/timoth-y/chainmetric-sensorsys/network/localnet"
-	"github.com/timoth-y/chainmetric-sensorsys/shared"
+	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/network/blockchain"
+	"github.com/timoth-y/chainmetric-iot/network/localnet"
+	"github.com/timoth-y/chainmetric-iot/shared"
 )
 
 // RemoteController implements device.Module for device.Device remote commands handling.
