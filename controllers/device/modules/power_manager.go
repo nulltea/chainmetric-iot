@@ -67,7 +67,7 @@ func (m *PowerManager) Start(ctx context.Context) {
 			plugged := m.ups.IsPlugged()
 
 			if err = m.SetBattery(models.DeviceBattery{
-				Level: &level,
+				Level: level,
 				PluggedIn: plugged,
 			}); err != nil {
 				shared.Logger.Error(err)

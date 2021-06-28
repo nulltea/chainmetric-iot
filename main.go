@@ -43,6 +43,7 @@ func init() {
 		modules.WithLocationManager(),
 		modules.WithPowerManager(),
 		modules.WithFailoverHandler(),
+		modules.WithGUIRenderer(),
 	)
 
 	display = dsp.NewEInk(dcf)

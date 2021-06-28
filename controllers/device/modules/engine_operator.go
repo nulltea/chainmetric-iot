@@ -91,6 +91,7 @@ func (m *EngineOperator) actOnRequest(ctx context.Context, request model.Sensors
 	var (
 		handler = func(readings engine.ReadingResults) {
 			m.postReadings(request.AssetID, readings)
+			eventdriver.EmitEvent(ctx, events.RequestHandled, nil)
 		}
 	)
 

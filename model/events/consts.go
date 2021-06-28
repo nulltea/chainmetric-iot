@@ -22,6 +22,9 @@ const (
 	// DeviceRemovedFromNetwork identifies event for the removal of the models.Device from network.
 	DeviceRemovedFromNetwork = "device.removed"
 
-	// CacheChanged identifies event changes parameters cache.
+	// CacheChanged identifies event for changes parameters cache.
 	CacheChanged = "cache.changed"
+
+	// RequestHandled identifies event on handling metric reading request
+	RequestHandled = "request.handled"
 )
