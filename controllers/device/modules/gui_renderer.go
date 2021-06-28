@@ -70,8 +70,8 @@ LOOP:
 
 		gui.RenderWithChart(fmt.Sprintf(
 `IP: %s
-Metrics supported: %d
-Throughput (requests\min): %d`,
+Supported: %d metrics
+Thoughput: %d requests\min`,
 				m.Specs().IPAddress,
 				len(m.Specs().Supports),
 				int(m.requestsThroughput[len(m.requestsThroughput) - 1] * 60 / interval.Seconds()),

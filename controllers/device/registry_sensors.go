@@ -56,6 +56,7 @@ func (d *Device) updateSupportedMetrics() {
 	}); err != nil {
 		shared.Logger.Error(errors.Wrap(err, "failed to update supported metrics"))
 	}
+	d.specs.Supports = d.sensors.SupportedMetrics()
 }
 
 // StaticSensors returns map with sensors statically registered on the Device.
