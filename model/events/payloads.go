@@ -26,7 +26,7 @@ type AssetsChangedPayload struct {
 
 // RequirementsChangedPayload defines payload for RequirementsChanged event.
 type RequirementsChangedPayload struct {
-	Requests []model.SensorsReadingRequest
+	Requests []*model.SensorsReadingRequest
 }
 
 // SensorsRegisterChangedPayload defines payload for SensorsRegisterChanged event.

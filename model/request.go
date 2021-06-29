@@ -17,13 +17,19 @@ type SensorsReadingRequest struct {
 }
 
 // Cancel calls assigned cancel func to cancel request receiver routine.
-func (sr SensorsReadingRequest) Cancel() {
-	if sr.cancel != nil {
+func (sr *SensorsReadingRequest) Cancel() {
+	if sr.IsProcessed() {
 		sr.cancel()
 	}
 }
 
 // SetCancel sets `cancel` func for canceling request receiver routine.
-func (sr SensorsReadingRequest) SetCancel(cancel context.CancelFunc) {
+func (sr *SensorsReadingRequest) SetCancel(cancel context.CancelFunc) {
 	sr.cancel = cancel
 }
+
+// IsProcessed determines whether the request is being already processed.
+func (sr *SensorsReadingRequest) IsProcessed() bool {
+	return sr.cancel != nil
+}
+

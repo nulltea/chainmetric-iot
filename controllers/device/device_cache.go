@@ -25,7 +25,7 @@ type (
 	// requirementsCache defines structure for storing models.Requirements records data taken from blockchain.
 	requirementsCache struct {
 		mutex sync.Mutex
-		data  map[string]model.SensorsReadingRequest
+		data  map[string]*model.SensorsReadingRequest
 	}
 )
 
@@ -38,7 +38,7 @@ func newCacheLayer() cacheLayer {
 		},
 		requests: &requirementsCache{
 			mutex: sync.Mutex{},
-			data:  make(map[string]model.SensorsReadingRequest),
+			data:  make(map[string]*model.SensorsReadingRequest),
 		},
 	}
 }
@@ -97,12 +97,12 @@ func (c *cacheLayer) FlushAssetsCache() {
 }
 
 // GetCachedRequirements returns data of cached models.Requirements records as model.SensorsReadingRequest.
-func (c *cacheLayer) GetCachedRequirements() []model.SensorsReadingRequest {
+func (c *cacheLayer) GetCachedRequirements() []*model.SensorsReadingRequest {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
 	var (
-		reqs = make([]model.SensorsReadingRequest, len(c.requests.data))
+		reqs = make([]*model.SensorsReadingRequest, len(c.requests.data))
 		i    = 0
 	)
 
@@ -115,12 +115,12 @@ func (c *cacheLayer) GetCachedRequirements() []model.SensorsReadingRequest {
 }
 
 // GetCachedRequirementsFor returns models.Requirements cached data for given `assetIDs` as model.SensorsReadingRequest.
-func (c *cacheLayer) GetCachedRequirementsFor(assetIDs ...string) []model.SensorsReadingRequest {
+func (c *cacheLayer) GetCachedRequirementsFor(assetIDs ...string) []*model.SensorsReadingRequest {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
 	var (
-		reqs = make([]model.SensorsReadingRequest, 0)
+		reqs = make([]*model.SensorsReadingRequest, 0)
 	)
 
 	for _, req := range c.requests.data {
@@ -136,7 +136,7 @@ func (c *cacheLayer) GetCachedRequirementsFor(assetIDs ...string) []model.Sensor
 
 // GetRequirementsFromCache tries to retrieve single models.Requirements from cache by given `id`,
 // where it is stored as a model.SensorsReadingRequest record.
-func (c *cacheLayer) GetRequirementsFromCache(id string) (model.SensorsReadingRequest, bool) {
+func (c *cacheLayer) GetRequirementsFromCache(id string) (*model.SensorsReadingRequest, bool) {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
@@ -146,12 +146,12 @@ func (c *cacheLayer) GetRequirementsFromCache(id string) (model.SensorsReadingRe
 
 // PutRequirementsToCache puts models.Requirements records to local cache
 // and return requests as they are stored.
-func (c *cacheLayer) PutRequirementsToCache(reqs ...*models.Requirements) (requests []model.SensorsReadingRequest) {
+func (c *cacheLayer) PutRequirementsToCache(reqs ...*models.Requirements) (requests []*model.SensorsReadingRequest) {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
 	for _, req := range reqs {
-		request := model.SensorsReadingRequest{
+		request := &model.SensorsReadingRequest{
 			AssetID: req.AssetID,
 			Metrics: req.Metrics.Metrics(),
 			Period:  time.Second * time.Duration(req.Period),
@@ -177,5 +177,5 @@ func (c *cacheLayer) FlushRequirementsCache() {
 	c.requests.mutex.Lock()
 	defer c.requests.mutex.Unlock()
 
-	c.requests.data = make(map[string]model.SensorsReadingRequest)
+	c.requests.data = make(map[string]*model.SensorsReadingRequest)
 }

@@ -85,8 +85,8 @@ func (r *SensorsReader) SubscribeReceiver(
 	metrics ...models.Metric,
 ) context.CancelFunc {
 	ctx, cancel := context.WithCancel(ctx)
-	go func() {
-		for {
+	go func(ctx context.Context) {
+		LOOP: for {
 			r.requests <- request{
 				Metrics: metrics,
 				Handler: handler,
@@ -94,12 +94,12 @@ func (r *SensorsReader) SubscribeReceiver(
 
 			select {
 			case <- ctx.Done():
-				return
+				break LOOP
 			default:
 				time.Sleep(interval)
 			}
 		}
-	}()
+	}(ctx)
 
 	return cancel
 }

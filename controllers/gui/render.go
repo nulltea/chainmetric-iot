@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	"image/png"
 	"math"
-	"os"
 	"strings"
 
 	"github.com/fogleman/gg"
@@ -201,9 +199,11 @@ func RenderQRCode(data string) {
 // ShowFrame displays frame with rendered context.
 func ShowFrame() {
 	ctx.Fill()
-	f, _ := os.Create("display.png")
-	png.Encode(f, ctx.Image())
-	f.Close()
+
+	if !Available() {
+		return
+	}
+
 	shared.MustExecute(func() error {
 		return dev.DrawAndRefresh(ctx.Image())
 	}, "failed to draw and refresh frame")
