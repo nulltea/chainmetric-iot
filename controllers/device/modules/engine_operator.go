@@ -81,13 +81,16 @@ func (m *EngineOperator) Start(ctx context.Context) {
 		if m.waitUntilSensorsDetected() {
 			m.engine.RegisterSensors(m.RegisteredSensors().ToList()...)
 			m.engine.Run(ctx)
-			m.actOnCachedRequests(ctx)
 		}
 	})
 }
 
 
-func (m *EngineOperator) actOnRequest(ctx context.Context, request model.SensorsReadingRequest) {
+func (m *EngineOperator) actOnRequest(ctx context.Context, request *model.SensorsReadingRequest) {
+	if request.IsProcessed() {
+		return
+	}
+
 	var (
 		handler = func(readings engine.ReadingResults) {
 			m.postReadings(request.AssetID, readings)
