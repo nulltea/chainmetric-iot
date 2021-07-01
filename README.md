@@ -94,7 +94,7 @@ Licensed under the [Apache 2.0][license file].
 [hardware badge]: https://img.shields.io/badge/Hardware-Raspberry%20Pi-informational?style=flat&logo=Raspberry%20Pi&color=953347
 [license badge]: https://img.shields.io/badge/License-Apache%202.0-informational?style=flat&color=blue
 
-[device photo]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/device.png?raw=true
+[device photo]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/edge-device-betav1.png?raw=true
 
 [this repo]: https://github.com/timoth-y/chainmetric-iot
 [golang]: https://golang.org
