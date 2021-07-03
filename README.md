@@ -228,7 +228,7 @@ and is capable of mutating state of the `Device`.
 Logical modules can be registered on the device instance conditionally, e.g. depending on the device hardware specs or deployment environment.
 
 ```go
-device := device.New(
+Device := device.New(
     modules.WithLifecycleManager(),
     modules.WithEngineOperator(),
     modules.WithCacheManager(),
@@ -338,7 +338,7 @@ $ make kill
 ## Usage
 
 - The device should be deployed in the same area with controlled assets (warehouse, delivery truck, etc)
-- In case the device is being used for the first time it must be registered via [dedicated mobile application][chainmetric app repo] via QR code which will be automatically displayed on the embedded screen (currently [ST7789][st7789] is the only supported driver). The generated QR code will contain the device's specification: network info, supported metrics, etc.
+- In case the device is being used for the first time it must be registered via [dedicated mobile application][chainmetric app repo] via QR code which will be automatically displayed on the display. The generated QR code will contain the device's specification: network info, supported metrics, etc.
 - It is allowed to use any `I²C` bus (or USB port) for any sensor modules, the device will perform a scan to detect the location of sensors on startup.
 - As soon as the device will be registered on the network it will detect surrounding assets and requirements assigned to them and will start posting sensor reading to the blockchain
 - Further device management and issuing remote commands can be performed from [dedicated mobile application][chainmetric app repo]
