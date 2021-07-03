@@ -7,7 +7,7 @@
 
 ## Overview
 
-_**Chainmetric IoT**_, being an embedded sensors-equipped device firmware, designed to be compatible with a permissioned blockchain network based on Hyperledger Fabric stack. 
+_**Chainmetric IoT**_ being an embedded sensors-equipped device firmware, designed to be compatible with a permissioned blockchain network based on Hyperledger Fabric stack. 
 
 By leveraging highly concurrent engine driver such implementation is ideal for harvesting environmental surrounding conditions and further publishing them onto the distributed, immutable ledger, where such data can be validated by on-chain Smart Contacts against previously assigned requirements. 
 
