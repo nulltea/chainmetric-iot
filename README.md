@@ -7,7 +7,7 @@
 
 ## Overview
 
-_**Chainmetric Sensor System**_, being an embedded IoT sensors-equipped device, designed to be compatible with a permissioned blockchain network based on Hyperledger Fabric stack. 
+_**Chainmetric IoT**_, being an embedded sensors-equipped device firmware, designed to be compatible with a permissioned blockchain network based on Hyperledger Fabric stack. 
 
 By leveraging highly concurrent engine driver such implementation is ideal for harvesting environmental surrounding conditions and further publishing them onto the distributed, immutable ledger, where such data can be validated by on-chain Smart Contacts against previously assigned requirements. 
 
@@ -225,6 +225,23 @@ and is capable of mutating state of the `Device`.
 | `LOCATION_MANAGER`  | Manages device physical location, updates device state on chain                                                                 | [`modules/location_manager`][modules/location_manager]    |
 | `GUI_RENDERER`      | Displays device specs, requests throughput, and other useful data on the display if such is available                           | [`modules/gui_renderer`][modules/gui_renderer]            |
 
+Logical modules can be registered on the device instance conditionally, e.g. depending on the device hardware specs or deployment environment.
+
+```go
+device := device.New(
+    modules.WithLifecycleManager(),
+    modules.WithEngineOperator(),
+    modules.WithCacheManager(),
+    modules.WithEventsObserver(),
+    modules.WithHotswapDetector(),
+    modules.WithRemoteController(),
+    modules.WithLocationManager(),
+    modules.WithPowerManager(),
+    modules.WithFailoverHandler(),
+    modules.WithGUIRenderer(),
+)
+```
+
 Logical modules are implemented in such a way, so they cannot directly communicate with each other
 and foremost not being aware of other modules' existence. Yet, some functionality requires exactly that,
 e.g. requires intermediate input or must be triggered by some occurred event.
@@ -232,7 +249,7 @@ e.g. requires intermediate input or must be triggered by some occurred event.
 For such purposes modules can utilize shared state of the device or more often local operational events.
 Such idea is borrowed from the Event Driven Architecture (EDA) and is achieved with help of [`timoth-y/go-eventdriver`](https://github.com/timoth-y/go-eventdriver) package.
 
-Although such approach definitely can increase complexity of the codebase it still has some major benefits,
+Although such approach definitely can increase complexity of the codebase it on the other hand provides some major benefits,
 which have been considered to be worth-taking trade off. Some of them are stronger abstraction, low logic blocks coupling,
 higher extensibility with lower risc of broking something, and more.
 
@@ -261,34 +278,70 @@ and for multiply subscribers at the same time, while not blocking other componen
 - Sensors modules mentioned in the [above section](#supported-io)
 - Assigned additional I²C buses [by utilizing spare GPIO pins][multiple i2c buses]
 - Deployed and available [Blockchain network][chainmetric network repo] with its [specification configured][network spec] in `connection.yaml` file in the root directory
+- Optionally connected display with supported chip, battery or UPS.
 
 ## Deployment
 
 The Makefile in the root directory contains rule `sync` for syncing local project codebase with a remote device via IP address, which can be set as environmental variables:
+```dotenv
+DOMAIN=chainmetric.network
+ORG=chipa-inu
+USER_ID=User1
+REMOTE_IP=192.168.50.61
+CRYPTO_DIR=../network/.crypto-config.chainmetric.network
 ```
-$ export REMOTE_IP '192.168.31.180'
-$ export REMOTE_DIR '/home/pi/sensorsys'
+For initial setup rule `setup-device` can be used, which performs `build`, sends cryptographic materials,
+generates `connection.yaml` with [`fabnctl`](https://github.com/timoth-y/fabnctl) utility based on previously setup env vars,
+and finally executes `sync` rule:
+```shell
+$ make setup-device
+```
 
-$ make sync
-```
-For the building step, there are two options either to build directly from the device on native ARM architecture via `build` make-rule or use `build-remote` to build on x86 processors with `GOARCH=arm64` option.
-
-```
+While development to build rule `build` is available which will perform build for GOARCH=ARM
+```shell
 $ make build
 ```
-To send cryptographic materials in the device for it to be able to connect to permissioned blockchain network use `crypto-sync` make-rule:
+
+To build and send binaries to device rule `update-device` can be used:
+```shell
+$ make update-device
 ```
-$ export CRYPTO_DIR '../network/crypto-config/...'
-$ make crypto-sync
+
+The firmware configuration can be changed directly in `config.yaml` file:
+```yaml
+...
+device:
+  hotswap_detect_interval: 500ms
+  battery_check_interval: 2m
+  gui_update_interval: 10s
+
+engine:
+  sensor_sleep_standby_timeout: 3m
+...
+```
+
+Or via exporting env variables (use `_` where yaml has `.`):
+```shell
+$ export ENGINE_HOTSWAP_DETECT_INTERVAL 500ms
+```
+
+After the device has been set up and contains binaries with configuration, the firmware is ready to be `run`:
+```shell
+$ make run
+```
+
+For force stop of the firmware use `kill` rule:
+```shell
+$ make kill
 ```
 
 ## Usage
 
 - The device should be deployed in the same area with controlled assets (warehouse, delivery truck, etc)
 - In case the device is being used for the first time it must be registered via [dedicated mobile application][chainmetric app repo] via QR code which will be automatically displayed on the embedded screen (currently [ST7789][st7789] is the only supported driver). The generated QR code will contain the device's specification: network info, supported metrics, etc.
-- It is allowed to use any I²C bus for any sensor modules, the device will perform a scan to detect the location of sensors on startup.
+- It is allowed to use any `I²C` bus (or USB port) for any sensor modules, the device will perform a scan to detect the location of sensors on startup.
 - As soon as the device will be registered on the network it will detect surrounding assets and requirements assigned to them and will start posting sensor reading to the blockchain
-- Further device management can be performed from [dedicated mobile application][chainmetric app repo]
+- Further device management and issuing remote commands can be performed from [dedicated mobile application][chainmetric app repo]
 - The registered device will automatically post its status on the startup and shutdown
 
 ## Roadmap
@@ -304,7 +357,10 @@ $ make crypto-sync
 
 ## Wrap up
 
-Chainmetric device is designed for providing a real-time continuous stream of sensor-sourced environmental metrics readings to the [distributed secure ledger][chainmetric network repo] for further validation by on-chain [Smart Contracts][chainmetric contracts repo]. Such a core-concept in combination with a dedicated cross-platform [mobile application][chainmetric app repo] makes Chainmetric project an ambitious general-purpose requirements control solution for supply-chains.
+Chainmetric device is designed for providing a real-time continuous stream of sensor-sourced environmental metrics readings
+to the [distributed secure ledger][chainmetric network repo] for further validation by on-chain [Smart Contracts][chainmetric contracts repo].
+Such a core-concept in combination with a dedicated cross-platform [mobile application][chainmetric app repo] makes
+Chainmetric project an ambitious general-purpose requirements control solution for supply-chains.
 
 ## License
 
