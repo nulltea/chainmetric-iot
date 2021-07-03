@@ -286,7 +286,7 @@ The Makefile in the root directory contains rule `sync` for syncing local projec
 ```dotenv
 DOMAIN=chainmetric.network
 ORG=chipa-inu
-USER_ID=User1
+USER_ID=edge-device1
 REMOTE_IP=192.168.50.61
 CRYPTO_DIR=../network/.crypto-config.chainmetric.network
 ```
