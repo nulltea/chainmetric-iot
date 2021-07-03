@@ -54,20 +54,20 @@ to be detectable by, the ADC chip does. So, the solution here is to attach ADC c
 and setup different address for each used sensor. There is a limitation in this method, since ADC available addresses is finite.
 For [ADS1115][ads1115] used this project we are bounded to 4 addresses (0x48, 0x49, 0x4A, 0x4B).
 
-[max44009 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/max44009.png?raw=true
-[si1145 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/si1145.png?raw=true
-[hdc1080 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/hdc1080.png?raw=true
-[dht11 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/dht11.png?raw=true
-[ccs811 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/ccs811.png?raw=true
-[bmp280 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/bmp280.png?raw=true
-[adxl345 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/adxl345.png?raw=true
-[lsm303c image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/lsm303c.png?raw=true
-[max30102 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/max30102.png?raw=true
-[analog hall image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/analog-hall.png?raw=true
-[analog mic image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/analog-microphone.png?raw=true
-[analog piezo image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/analog-piezo.png?raw=true
-[analog mq9 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/analog-mq-9.png?raw=true
-[analog flame image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/analog-flame.png?raw=true
+[max44009 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/max44009.png?raw=true
+[si1145 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/si1145.png?raw=true
+[hdc1080 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/hdc1080.png?raw=true
+[dht11 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/dht11.png?raw=true
+[ccs811 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/ccs811.png?raw=true
+[bmp280 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/bmp280.png?raw=true
+[adxl345 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/adxl345.png?raw=true
+[lsm303c image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/lsm303c.png?raw=true
+[max30102 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/max30102.png?raw=true
+[analog hall image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/analog-hall.png?raw=true
+[analog mic image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/analog-microphone.png?raw=true
+[analog piezo image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/analog-piezo.png?raw=true
+[analog mq9 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/analog-mq-9.png?raw=true
+[analog flame image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/analog-flame.png?raw=true
 
 [max44009]: https://datasheets.maximintegrated.com/en/ds/MAX44009.pdf
 [si1145]: https://cdn-shop.adafruit.com/datasheets/Si1145-46-47.pdf
@@ -128,7 +128,7 @@ For [ADS1115][ads1115] used this project we are bounded to 4 addresses (0x48, 0x
 | :---------------- | :------------------- | :-------- | :---------------------   | :--------------------------------------- |
 | ![ups-lite image] | [MAX17040][max17040] | `I²C`     | [UPS-Lite][ups-lite]     | [Custom implementation][max17040 driver] |
 
-[ups-lite image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/ups-lite.png?raw=true
+[ups-lite image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/ups-lite.png?raw=true
 [ups-lite]: https://hackaday.io/project/173847-ups-lite
 [max17040]: https://cdn.hackaday.io/files/1738477437870048/MAX17040.pdf
 [max17040 driver]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/power/ups.go
@@ -140,8 +140,8 @@ For [ADS1115][ads1115] used this project we are bounded to 4 addresses (0x48, 0x
 | [![e-ink image]][e-ink display] | [e-Ink (EPD)][e-ink]   | `SPI`     | [2.13' e-Paper HAT][e-ink display] | [Custom implementation][e-ink driver]    |
 | [![st7789 image]][lcd display]  | [ST7789][st7789]       | `SPI`     | [2' IPS LCD][lcd display]          | [Custom implementation][st7789 driver]   |
 
-[e-ink image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/e-ink.png?raw=true
-[st7789 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/st7789.png?raw=true
+[e-ink image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/e-ink.png?raw=true
+[st7789 image]: https://github.com/timoth-y/chainmetric-iot/blob/main/docs/st7789.png?raw=true
 
 [e-ink]: https://www.waveshare.com/w/upload/e/e6/2.13inch_e-Paper_Datasheet.pdf
 [st7789]: https://www.buydisplay.com/download/ic/ST7789.pdf
