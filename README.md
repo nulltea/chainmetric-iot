@@ -34,15 +34,25 @@ The device itself is intended for deployment in the areas where assets requiring
 | ![lsm303c image]  | [LSM303C][lsm303c]   | `I²C`       | ![acceleration badge][] ![magnetism badge][] ![temp badge][]        | Fork [bskari/go-lsm303](https://github.com/bskari/go-lsm303) with [custom wrapper][lsm303c driver] |
 | ![max30102 image] | [MAX30102][max30102] | `I²C`       | ![heart rate badge][] ![blood oxidation badge][]                    | Library [cgxeiji/max3010x](https://github.com/cgxeiji/max3010x) with [custom wrapper][max30102 driver] |
 
+Digital sensors natively supports hotswap, so that it is possible to add, replace, or remove such sensors on fly,
+without device restart or reconfiguration. This is possible due to combination of the address assigned for each `I²C` chip
+and `CHIP_ID` register, which together should be unique. The exception is of course sensors based on `1-Wire` communication
+interface, they must instead be registered as static sensors.
+
 ### Analog sensors
 
-| 📷                    | Sensor                             | Interface                        | Metrics                | Driver                                       | ADC Driver                                                        |
-| :-------------------- | :--------------------------------- | :------------------------------- | :--------------------- | :------------------------------------------- | :---------------------------------------------------------------- |
-| ![analog hall image]  | [Hall Effect][analog hall]         | Analog with `I²C` [ADC][ads1115] | ![magnetism badge][]   | [Custom implementation][analog hall driver]  | Library [MichaelS11/go-ads](https://github.com/MichaelS11/go-ads) |
-| ![analog mic image]   | [Microphone][analog mic]           | Analog with `I²C` [ADC][ads1115] | ![noise level badge][] | [Custom implementation][analog mic driver]   | Library [MichaelS11/go-ads](https://github.com/MichaelS11/go-ads) |
-| ![analog piezo image] | [Piezoelectric film][analog piezo] | Analog with `I²C` [ADC][ads1115] | ![vibration badge][]   | [Custom implementation][analog piezo driver] | Library [MichaelS11/go-ads](https://github.com/MichaelS11/go-ads) |
-| ![analog mq9 image]   | [Gas (MQ-9)][analog mq9]           | Analog with `I²C` [ADC][ads1115] | ![lpg badge][]         | [Custom implementation][analog mq9 driver]   | Library [MichaelS11/go-ads](https://github.com/MichaelS11/go-ads) |
-| ![analog flame image] | [Flame detector][analog flame]     | Analog with `I²C` [ADC][ads1115] | ![flame badge][]       | [Custom implementation][analog flame driver] | Library [MichaelS11/go-ads](https://github.com/MichaelS11/go-ads) |
+| 📷                    | Sensor                             | Interface                        | Metrics                | Driver                                       | ADC Driver                              |
+| :-------------------- | :--------------------------------- | :------------------------------- | :--------------------- | :------------------------------------------- | :-------------------------------------- |
+| ![analog hall image]  | [Hall Effect][analog hall]         | Analog with `I²C` [ADC][ads1115] | ![magnetism badge][]   | [Custom implementation][analog hall driver]  | Library [MichaelS11/go-ads][go-ads lib] |
+| ![analog mic image]   | [Microphone][analog mic]           | Analog with `I²C` [ADC][ads1115] | ![noise level badge][] | [Custom implementation][analog mic driver]   | Library [MichaelS11/go-ads][go-ads lib] |
+| ![analog piezo image] | [Piezoelectric film][analog piezo] | Analog with `I²C` [ADC][ads1115] | ![vibration badge][]   | [Custom implementation][analog piezo driver] | Library [MichaelS11/go-ads][go-ads lib] |
+| ![analog mq9 image]   | [Gas (MQ-9)][analog mq9]           | Analog with `I²C` [ADC][ads1115] | ![lpg badge][]         | [Custom implementation][analog mq9 driver]   | Library [MichaelS11/go-ads][go-ads lib] |
+| ![analog flame image] | [Flame detector][analog flame]     | Analog with `I²C` [ADC][ads1115] | ![flame badge][]       | [Custom implementation][analog flame driver] | Library [MichaelS11/go-ads][go-ads lib] |
+
+Hotswap capabilities is also supported for analog sensors, and although these do not have any unique identifier
+to be detectable by, the ADC chip does. So, the solution here is to attach ADC chip to each analog sensor
+and setup different address for each used sensor. There is a limitation in this method, since ADC available addresses is finite.
+For [ADS1115][ads1115] used this project we are bounded to 4 addresses (0x48, 0x49, 0x4A, 0x4B).
 
 [max44009 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/max44009.png?raw=true
 [si1145 image]: https://github.com/timoth-y/chainmetric-iot/blob/github/update_readme/docs/si1145.png?raw=true
@@ -109,6 +119,7 @@ The device itself is intended for deployment in the areas where assets requiring
 [analog mq9 driver]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/sensors/adc_mq9.go
 [analog flame driver]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/sensors/adc_flame.go
 
+[go-ads lib]: https://github.com/MichaelS11/go-ads
 [adc driver]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/periphery/adc.go
 
 ### Power
@@ -143,14 +154,107 @@ The device itself is intended for deployment in the areas where assets requiring
 
 ### Bluetooth
 
-| Protocol | Service          | UUID                                   | Driver                                          | Description                                        |
-| :------- | :--------------- | :------------------------------------- | :---------------------------------------------- | :------------------------------------------------- |
-| BLE      | Location service | `F8AE4978-5AAB-46C3-A8CB-127F347EAA01` | Library [go-ble](https://github.com/go-ble/ble) | Enables location tethering with mobile application |
+| Protocol | Service          | UUID                                   | Description                                        | Driver                                          |
+| :------- | :--------------- | :------------------------------------- | :------------------------------------------------- | :---------------------------------------------- |
+| BLE      | Location service | `F8AE4978-5AAB-46C3-A8CB-127F347EAA01` | Enables location tethering with mobile application | Library [go-ble](https://github.com/go-ble/ble) |
 
 
 ## Firmware architecture
 
+The design decisions firmware development was mostly based on the idea of enabling wide range of use cases for IoT device.
+With that in mind the architecture itself is based on the concept of modularity, thus allowing feature set to be
+easily extendable and adaptable for new hardware, areas of application, and deployment environments.
 
+### Drivers
+
+On the lower level we got drivers, which of course implementing direct communication and control of the hardware:
+
+- [`drivers/periphery`][drivers/periphery] - communication protocols implementation and wrappers (`I²C`, `SPI`, `GPIO`)
+- [`drivers/sensors`][drivers/sensors] - each sensor custom drivers or library wrappers reduced to a single interface structure
+- [`drivers/display`][drivers/display] - possible visual output drivers 
+- [`drivers/power`][drivers/power] - UPS's and power management drivers
+
+[drivers/periphery]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/periphery
+[drivers/sensors]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/sensors
+[drivers/display]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/sensors
+[drivers/power]: https://github.com/timoth-y/chainmetric-iot/blob/main/drivers/power
+
+### Network
+
+Since being a firmware oriented on IoT device in the Blockchain infrastructure,
+it is of course cannot come without network layer:
+
+- [`network/blockchain`][network/blockchain] - the Hyperledger Fabric related clients as well as Smart Contract RPCs.
+- [`network/localnet`][network/localnet] - package proving interface for low range radius communication with other devices
+
+[network/blockchain]: https://github.com/timoth-y/chainmetric-iot/blob/main/network/blockchain
+[network/localnet]: https://github.com/timoth-y/chainmetric-iot/blob/main/network/localnet
+
+### Controllers
+
+Lastly, on the higher level we got business logic driven controllers, which by taking favor of the previous layers
+define required feature set of the IoT device.
+
+Besides [`controllers/gui`][controllers/gui] and [`controllers/storage`][controllers/storage],
+which by definition do exactly what their names stand for, this layer holds [`controllers/device`][controllers/device],
+which is the controller for device itself where the most of the domain logic are.
+This is the place where the mentioned above modularity really starts to shine.
+
+[controllers/device]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device
+[controllers/gui]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/gui
+[controllers/storage]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/storage
+[controllers/engine]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/engine
+
+#### Logical modules
+
+While the `Device` type holds the current state of the device, along with cached operational data,
+up-to-date sensors registry and the main context, it actually does not hold any feature-related functionality.
+Instead, it delegates that to the *logical modules*, each containing its own atomic portion of the business logic, responsibilities,
+and is capable of mutating state of the `Device`.
+
+| Module              | Description                                                                                                                     | Implementation                                            |
+| :------------------ | :------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------- |
+| `LIFECYCLE_MANAGER` | Manages device initialization, registration on network, updates device state on startup and shutdown                            | [`modules/lifecycle_manager`][modules/lifecycle_manager]  |
+| `ENGINE_OPERATOR`   | Operates `SensorsReader` engine, handles readings requests and posts results on chain                                           | [`modules/engine_operator`][modules/engine_operator]      |
+| `EVENTS_OBSERVER`   | Listens to changes in assets, requirements or device state on the Blockchain, handles them accordingly                          | [`modules/events_observer`][modules/events_observer]      |
+| `CACHE_MANAGER`     | Caches operational data on device startup, updates or flushes cache when needed                                                 | [`modules/cache_manager`][modules/cache_manager]          |
+| `FAILOVER_HANDLER`  | Handles network issues which lead to inability of posting readings by storing them in the persistent storage (embedded LevelDB) | [`modules/failover_handler`][modules/failover_handler]    |
+| `HOTSWAP_DETECTOR`  | Monitors and detects changes in device's periphery, updates available sensors pool                                              | [`modules/hotswap_detector`][modules/hotswap_detector]    |
+| `REMOTE_CONTROLLER` | Listens to remote commands directed to the current device, performs command execution against the device                        | [`modules/remote_controller`][modules/remote_controller]  |
+| `POWER_MANAGER`     | Monitors device power consumption and battery level, updates device state on chain                                              | [`modules/power_manager`][modules/power_manager]          |
+| `LOCATION_MANAGER`  | Manages device physical location, updates device state on chain                                                                 | [`modules/location_manager`][modules/location_manager]    |
+| `GUI_RENDERER`      | Displays device specs, requests throughput, and other useful data on the display if such is available                           | [`modules/gui_renderer`][modules/gui_renderer]            |
+
+Logical modules are implemented in such a way, so they cannot directly communicate with each other
+and foremost not being aware of other modules' existence. Yet, some functionality requires exactly that,
+e.g. requires intermediate input or must be triggered by some occurred event.
+
+For such purposes modules can utilize shared state of the device or more often local operational events.
+Such idea is borrowed from the Event Driven Architecture (EDA) and is achieved with help of [`timoth-y/go-eventdriver`](https://github.com/timoth-y/go-eventdriver) package.
+
+Although such approach definitely can increase complexity of the codebase it still has some major benefits,
+which have been considered to be worth-taking trade off. Some of them are stronger abstraction, low logic blocks coupling,
+higher extensibility with lower risc of broking something, and more.
+
+#### Sensors reading engine
+
+One other essential component of the device functionality is the [`controllers/engine`][controllers/engine] package,
+whose responsibility includes proving interface to receive sensor reading requests, subscribe handlers for outcome results,
+control, initialize and deallocate physical sensor modules if such are on stand-by for certain amount of time.
+
+Engine leverages the convenience of the Go concurrency model, allowing to harvest data from multiply sensors
+and for multiply subscribers at the same time, while not blocking other components and modules execution. 
+
+[modules/lifecycle_manager]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/lifecycle_manager.go
+[modules/engine_operator]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/engine_operator.go
+[modules/events_observer]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/events_observer.go
+[modules/cache_manager]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/cache_manager.go
+[modules/failover_handler]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/failover_handler.go
+[modules/hotswap_detector]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/hotswap_detector.go
+[modules/remote_controller]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/remote_controller.go
+[modules/power_manager]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/power_manager.go
+[modules/location_manager]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/location_manager.go
+[modules/gui_renderer]: https://github.com/timoth-y/chainmetric-iot/blob/main/controllers/device/modules/gui_renderer.go
 
 ## Requirements
 - [Raspberry Pi 3/4/Zero][raspberry pi] or other microcomputer board with `GPIO`, `I²C`, and `SPI` available, as well as Internet connection capabilities, preferably with Wi-Fi module. Based on considerations of portability and relative cheapness this project intends to use [RPi Zero W][rpi zero w]
