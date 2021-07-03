@@ -346,13 +346,14 @@ $ make kill
 
 ## Roadmap
 
-- [x] Caching on network connection absence [(#3)](https://github.com/timoth-y/chainmetric-iot/pull/3)
+- [x] Failover caching on network connection absence [(#3)](https://github.com/timoth-y/chainmetric-iot/pull/3)
 - [x] Sensor modules hot-swap support [(#1)](https://github.com/timoth-y/chainmetric-iot/pull/1)
 - [x] Analog sensors ([Hall-effect sensor][hall-effect], microphone) support via ~~[MCP3008][mcp3008]~~ [ADS1115][ads1115] [(#4)]( https://github.com/timoth-y/chainmetric-iot/pull/4)
 - [x] [E-Ink display][e-ink display] support [(#5)](https://github.com/timoth-y/chainmetric-iot/pull/5)
 - [x] GUI for displaying statistics data and emergency warnings [(#9)](https://github.com/timoth-y/chainmetric-iot/pull/9)
 - [x] Location tracking via bluetooth pairing with [mobile app][chainmetric app repo] [(#10)](https://github.com/timoth-y/chainmetric-iot/pull/10)
 - [ ] A device as a blockchain node
+- [ ] Load distribution across nearby devices
 - [ ] Video-camera driver
 
 ## Wrap up
