@@ -1,4 +1,4 @@
-# ChainMetric: IoT
+# Chainmetric: IoT
 
 [![golang badge]][golang]&nbsp;
 [![commit activity badge]][repo commit activity]&nbsp;
