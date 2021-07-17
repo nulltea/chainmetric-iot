@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/timoth-y/chainmetric-core/models"
 	"github.com/timoth-y/chainmetric-iot/controllers/device"
 	"github.com/timoth-y/chainmetric-iot/controllers/gui"
 	"github.com/timoth-y/chainmetric-iot/model/events"
@@ -20,6 +21,7 @@ import (
 type GUIRenderer struct {
 	moduleBase
 	viewLock *sync.Mutex
+	timeoutLock *sync.Mutex
 
 	requestsThroughput []float64
 }
@@ -29,6 +31,7 @@ func WithGUIRenderer() device.Module {
 	return &GUIRenderer{
 		moduleBase: withModuleBase("GUI_RENDERER"),
 		viewLock: &sync.Mutex{},
+		timeoutLock: &sync.Mutex{},
 	}
 }
 
@@ -68,21 +71,43 @@ func (m *GUIRenderer) Start(ctx context.Context) {
 			return eventdriver.ErrIncorrectPayload
 		})
 
-		m.renderStats(true)
+		m.renderStatsUI(true)
 		m.renderLoop(ctx)
 	})
 }
 
 func (m *GUIRenderer) renderLoop(ctx context.Context) {
 	var (
-		ticker = time.NewTicker(viper.GetDuration("device.gui_update_interval"))
+		ticker      = time.NewTicker(viper.GetDuration("device.gui_update_interval"))
+		hotswapCh   = eventdriver.SubscribeChannel(events.SensorsRegisterChanged)
+		bluetoothCh = eventdriver.SubscribeChannel(events.BluetoothPairingStarted)
+		locationCh  = eventdriver.SubscribeChannel(events.LocationUpdateReceived)
 	)
 
 LOOP:
 	for {
 		select {
 		case <- ticker.C:
-			m.renderStats(true)
+			m.renderStatsUI(true)
+		case v := <- hotswapCh:
+			if payload, ok := v.(events.SensorsRegisterChangedPayload); ok {
+				m.decorateWithNotificationTimeout(func() {
+					m.renderHotswapNotification(payload)
+				}, 6 * time.Second)
+			}
+		case <- bluetoothCh:
+			m.decorateWithNotificationTimeout(func() {
+				gui.RenderTextWithIcon("Bluetooth pairing started...", "bluetooth")
+			}, 6 * time.Second)
+		case v := <- locationCh:
+			if payload, ok := v.(models.Location); ok {
+				m.decorateWithNotificationTimeout(func() {
+					gui.RenderTextWithIcon(
+						fmt.Sprintf("Location updated:\n%s", payload.Name),
+						"location",
+					)
+				}, 6 * time.Second)
+			}
 		case <- ctx.Done():
 			shared.Logger.Debug("GUI renderer module routine ended")
 			break LOOP
@@ -90,7 +115,7 @@ LOOP:
 	}
 }
 
-func (m *GUIRenderer) renderStats(reread bool) {
+func (m *GUIRenderer) renderStatsUI(reread bool) {
 	var (
 		builder  = strings.Builder{}
 		interval = viper.GetDuration("device.gui_update_interval")
@@ -124,48 +149,38 @@ func (m *GUIRenderer) renderHotswapNotification(event events.SensorsRegisterChan
 		attached []string
 	)
 
-	m.viewLock.Lock()
-	m.viewLock.Unlock()
-
 	for i := range event.Added {
 		attached = append(attached, event.Added[i].ID())
 	}
 
 	if len(attached) > 0 {
-		var (
-			word = "have"
-		)
-
-		if len(attached) > 1 {
-			word = "have"
-		}
-
-		builder.WriteString(fmt.Sprintf("%s %s just been attached",
+		builder.WriteString(fmt.Sprintf("%s attached",
 			strings.Join(attached, ","),
-			word,
 		))
 	}
 
 	if len(event.Removed) > 0 {
-		var (
-			word = "was"
-		)
-
-		if len(attached) > 1 {
-			word = "were"
-		}
 
 		builder.WriteString("\n")
-		builder.WriteString(fmt.Sprintf("%s %s removed",
+		builder.WriteString(fmt.Sprintf("%s removed",
 			strings.Join(event.Removed, ","),
-			word,
 		))
 	}
 
 	gui.RenderTextWithIcon(builder.String(), "hotswap")
+}
+
+func (m *GUIRenderer) decorateWithNotificationTimeout(renderFunc func(), d time.Duration) {
+	m.viewLock.Lock()
+	defer m.viewLock.Unlock()
+
+	renderFunc()
 
 	go func() {
-		time.Sleep(6 * time.Second)
-		m.renderStats(false)
+		m.timeoutLock.Lock()
+		defer m.timeoutLock.Unlock()
+
+		time.Sleep(d)
+		m.renderStatsUI(false)
 	}()
 }

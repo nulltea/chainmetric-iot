@@ -7,7 +7,7 @@ device:
   ping_timer_interval: 10s
   assets_locate_distance: 50.0
   battery_check_interval: 1m
-  gui_update_interval: 30s
+  gui_update_interval: 1m
 
 engine:
   sensor_sleep_standby_timeout: 1m
