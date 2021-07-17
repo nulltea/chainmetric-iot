@@ -68,7 +68,7 @@ func (m *GUIRenderer) Start(ctx context.Context) {
 			return eventdriver.ErrIncorrectPayload
 		})
 
-		m.renderStats()
+		m.renderStats(true)
 		m.renderLoop(ctx)
 	})
 }
@@ -82,7 +82,7 @@ LOOP:
 	for {
 		select {
 		case <- ticker.C:
-			m.renderStats()
+			m.renderStats(true)
 		case <- ctx.Done():
 			shared.Logger.Debug("GUI renderer module routine ended")
 			break LOOP
@@ -90,7 +90,7 @@ LOOP:
 	}
 }
 
-func (m *GUIRenderer) renderStats() {
+func (m *GUIRenderer) renderStats(reread bool) {
 	var (
 		builder  = strings.Builder{}
 		interval = viper.GetDuration("device.gui_update_interval")
@@ -110,9 +110,12 @@ func (m *GUIRenderer) renderStats() {
 		int(throughput[len(m.requestsThroughput) - 1]),
 	))
 
+	gui.SetBatteryLevel(m.Battery().Level)
 	gui.RenderWithChart(builder.String(), m.requestsThroughput...)
 
-	m.requestsThroughput = append(m.requestsThroughput, 0)
+	if reread {
+		m.requestsThroughput = append(m.requestsThroughput, 0)
+	}
 }
 
 func (m *GUIRenderer) renderHotswapNotification(event events.SensorsRegisterChangedPayload) {
@@ -122,7 +125,7 @@ func (m *GUIRenderer) renderHotswapNotification(event events.SensorsRegisterChan
 	)
 
 	m.viewLock.Lock()
-	defer m.viewLock.Unlock()
+	m.viewLock.Unlock()
 
 	for i := range event.Added {
 		attached = append(attached, event.Added[i].ID())
@@ -160,4 +163,9 @@ func (m *GUIRenderer) renderHotswapNotification(event events.SensorsRegisterChan
 	}
 
 	gui.RenderTextWithIcon(builder.String(), "hotswap")
+
+	go func() {
+		time.Sleep(6 * time.Second)
+		m.renderStats(false)
+	}()
 }

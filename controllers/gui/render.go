@@ -114,6 +114,8 @@ func RenderWithChart(msg string, v ...float64) {
 		ctx.DrawImage(img, 0, int(float64(frameHeight/ 2)))
 	}
 
+	renderBatteryLevel()
+
 	ShowFrame()
 }
 
