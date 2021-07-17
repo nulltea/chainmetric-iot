@@ -25,6 +25,12 @@ const (
 	// CacheChanged identifies event for changes parameters cache.
 	CacheChanged = "cache.changed"
 
-	// RequestHandled identifies event on handling metric reading request
+	// RequestHandled identifies event on handling metric reading request.
 	RequestHandled = "request.handled"
+
+	// BluetoothPairingStarted identifies event for Bluetooth pairing process started.
+	BluetoothPairingStarted = "bluetooth.pairing.started"
+
+	// LocationUpdateReceived identifies event for device location being updated.
+	LocationUpdateReceived = "location.update.received"
 )

@@ -141,10 +141,7 @@ func RenderTextWithIcon(text, icon string) {
 		return
 	}
 
-	var (
-		tw, th = ctx.MeasureString(text)
-		tx, ty = float64(frameWidth/ 2) - tw / 2, float64(frameHeight/ 2) - th
-	)
+	ctx.SetFontFace(face)
 
 	if iconImg, err = gg.LoadPNG(iconPath); err != nil {
 		shared.Logger.Error(errors.Wrapf(err, "failed to load from path '%s'", iconPath))
@@ -154,11 +151,25 @@ func RenderTextWithIcon(text, icon string) {
 	var (
 		ib = iconImg.Bounds()
 		ix = int(math.Round(float64(frameWidth/ 2) - float64(ib.Dx()) / 2))
-		iy = int(math.Round(float64(frameHeight / 2)))
+		iy = int(math.Round(float64(frameHeight / 2))) - ib.Dy() / 2
+
+		vIndent = 0.0
 	)
 
-	ctx.SetFontFace(face)
-	ctx.DrawString(text, tx, ty)
+	for _, line := range strings.Split(text, "\n") {
+		var (
+			tw, th  = ctx.MeasureString(line)
+
+			tx = float64(frameWidth/ 2) - tw / 2
+			ty = float64(frameHeight/ 2 - ib.Dy() / 2) - th
+		)
+
+		ctx.DrawString(line, tx, ty + th + vIndent)
+
+		vIndent += th + 2
+		iy += int(th) + 2
+	}
+
 	ctx.DrawImage(iconImg, ix, iy)
 
 	ShowFrame()

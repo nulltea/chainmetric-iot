@@ -458,8 +458,8 @@ github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpP
 github.com/tilinna/clock v1.0.2/go.mod h1:ZsP7BcY7sEEz7ktc0IVy8Us6boDrK8VradlKRUGfOao=
 github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d h1:UGEpGYw4n3rdp5Xaok4/JMIyManiZlqqyW3RnadGjMc=
 github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d/go.mod h1:JTkODhgmOvwCeSDewwAWaWnwkWW9UG6Zpa8Yck2dD5I=
-github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019 h1:N4MsfGXOB8Pmv67qpdx7IJ+RtSAgBMWpG/HjUus+9UY=
-github.com/timoth-y/go-eventdriver v0.0.0-20210529163340-f8edf26ba019/go.mod h1:eLDP5rAzzBDJk1AOOHBNMTDZrrhTMmry4OnySLOH/SI=
+github.com/timoth-y/go-eventdriver v0.0.0-20210717165448-98fbcdcdc673 h1:BX+4UL2hl3X8Q6mZj8ipRYMTuG14SzzA/cyrRO4qNhM=
+github.com/timoth-y/go-eventdriver v0.0.0-20210717165448-98fbcdcdc673/go.mod h1:eLDP5rAzzBDJk1AOOHBNMTDZrrhTMmry4OnySLOH/SI=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae h1:ePgxzI5zYM/fuRQclwMK4NWVw1eH4a7AUPVNqJJV3ps=
 github.com/timoth-y/go-lsm303 v0.0.0-20210422225024-536b80bd6cae/go.mod h1:IweJTld107kaNnjWLSBLBbY+Pzey7iNliRKApPdsNjo=
 github.com/timoth-y/max3010x v0.0.0-20210310203014-cf62a2a2aea3 h1:GtacNzrLUCoLWunuZQYP9vVF/yhJTrqos/3BPVBfjw4=
