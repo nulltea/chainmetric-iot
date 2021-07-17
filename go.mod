@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/timoth-y/chainmetric-core v0.0.0-20210627221658-07365c2edb0d
-	github.com/timoth-y/go-eventdriver v0.0.0-20210717152232-0381cbae66cc
+	github.com/timoth-y/go-eventdriver v0.0.0-20210717165448-98fbcdcdc673
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
