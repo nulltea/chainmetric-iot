@@ -9,9 +9,11 @@ import (
 	"github.com/timoth-y/chainmetric-core/models/requests"
 	"github.com/timoth-y/chainmetric-core/utils"
 	"github.com/timoth-y/chainmetric-iot/controllers/device"
+	"github.com/timoth-y/chainmetric-iot/model/events"
 	"github.com/timoth-y/chainmetric-iot/network/blockchain"
 	"github.com/timoth-y/chainmetric-iot/network/localnet"
 	"github.com/timoth-y/chainmetric-iot/shared"
+	"github.com/timoth-y/go-eventdriver"
 )
 
 // RemoteController implements device.Module for device.Device remote commands handling.
@@ -56,6 +58,8 @@ func (m *RemoteController) handleBluetoothPairingCmd(ctx context.Context, cmdID 
 			Status: models.DeviceCmdCompleted,
 		}
 	)
+
+	eventdriver.EmitEvent(ctx, events.BluetoothPairingStarted, nil)
 
 	if err := localnet.Pair(ctx); err != nil && errors.Cause(err) != context.DeadlineExceeded {
 		results.Status = models.DeviceCmdFailed
