@@ -82,7 +82,7 @@ func RenderWithChart(msg string, v ...float64) {
 
 	xValues := make([]float64, len(v))
 	for i := range v {
-		xValues[i] = float64(i)
+		xValues[i] = float64(i) + 1
 	}
 
 	chart.DefaultFillColor = chart.ColorBlack
@@ -114,6 +114,8 @@ func RenderWithChart(msg string, v ...float64) {
 		ctx.DrawImage(img, 0, int(float64(frameHeight/ 2)))
 	}
 
+	renderBatteryLevel()
+
 	ShowFrame()
 }
 
@@ -130,7 +132,7 @@ func RenderTextWithIcon(text, icon string) {
 		iconPath = iconPath(icon)
 		font, err = truetype.Parse(goregular.TTF)
 		face = truetype.NewFace(font, &truetype.Options{
-			Size: 18,
+			Size: 14,
 		})
 	)
 

@@ -18,7 +18,7 @@ setup-device: build
 	$(eval userIdentity := $(USER_ID)@$(orgHostname))
 	$(eval mspPath := $(CRYPTO_DIR)/peerOrganizations/$(orgHostname)/users/$(userIdentity)/msp)
 
-	../network/fabnctl gen connection -f ../network/network-config.yaml -n edge-device \
+	fabnctl gen connection -f ../network/network-config.yaml -n edge-device \
 		-c supply-channel -o chipa-inu -x=device-userID=edge-device ../network
 
 	scp $(mspPath)/signcerts/$(userIdentity)-cert.pem pi@$(REMOTE_IP):identity.pem

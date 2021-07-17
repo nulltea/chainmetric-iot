@@ -3,6 +3,8 @@ package modules
 import (
 	"context"
 	"fmt"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -17,6 +19,7 @@ import (
 // GUIRenderer implements device.Module for device.Device GUI controlling.
 type GUIRenderer struct {
 	moduleBase
+	viewLock *sync.Mutex
 
 	requestsThroughput []float64
 }
@@ -25,6 +28,7 @@ type GUIRenderer struct {
 func WithGUIRenderer() device.Module {
 	return &GUIRenderer{
 		moduleBase: withModuleBase("GUI_RENDERER"),
+		viewLock: &sync.Mutex{},
 	}
 }
 
@@ -54,37 +58,114 @@ func (m *GUIRenderer) Start(ctx context.Context) {
 			return nil
 		})
 
+		// Act on changes sensors pool to view hotswap notification:
+		eventdriver.SubscribeHandler(events.SensorsRegisterChanged, func(_ context.Context, v interface{}) error {
+			if payload, ok := v.(events.SensorsRegisterChangedPayload); ok {
+				m.renderHotswapNotification(payload)
+				return nil
+			}
+
+			return eventdriver.ErrIncorrectPayload
+		})
+
+		m.renderStats(true)
 		m.renderLoop(ctx)
 	})
 }
 
 func (m *GUIRenderer) renderLoop(ctx context.Context) {
 	var (
-		interval = viper.GetDuration("device.gui_update_interval")
-		startTime  time.Time
+		ticker = time.NewTicker(viper.GetDuration("device.gui_update_interval"))
 	)
 
 LOOP:
 	for {
-		startTime = time.Now()
-
-		gui.RenderWithChart(fmt.Sprintf(
-`IP: %s
-Supported: %d metrics
-Thoughput: %d requests\min`,
-				m.Specs().IPAddress,
-				len(m.Specs().Supports),
-				int(m.requestsThroughput[len(m.requestsThroughput) - 1] * 60 / interval.Seconds()),
-			), m.requestsThroughput...,
-		)
-
-		m.requestsThroughput = append(m.requestsThroughput, 0)
-
 		select {
-		case <- time.After(interval - time.Since(startTime)):
+		case <- ticker.C:
+			m.renderStats(true)
 		case <- ctx.Done():
 			shared.Logger.Debug("GUI renderer module routine ended")
 			break LOOP
 		}
 	}
+}
+
+func (m *GUIRenderer) renderStats(reread bool) {
+	var (
+		builder  = strings.Builder{}
+		interval = viper.GetDuration("device.gui_update_interval")
+		throughput []float64
+	)
+
+	m.viewLock.Lock()
+	defer m.viewLock.Unlock()
+
+	for _, count := range m.requestsThroughput {
+		throughput = append(throughput, count * 60 / interval.Seconds())
+	}
+
+	builder.WriteString(fmt.Sprintf("IP: %s\n", m.Specs().IPAddress))
+	builder.WriteString(fmt.Sprintf("Supported: %d metrics\n", len(m.Specs().Supports)))
+	builder.WriteString(fmt.Sprintf("Thoughput: %d requests\\min",
+		int(throughput[len(m.requestsThroughput) - 1]),
+	))
+
+	gui.SetBatteryLevel(m.Battery().Level)
+	gui.RenderWithChart(builder.String(), m.requestsThroughput...)
+
+	if reread {
+		m.requestsThroughput = append(m.requestsThroughput, 0)
+	}
+}
+
+func (m *GUIRenderer) renderHotswapNotification(event events.SensorsRegisterChangedPayload) {
+	var (
+		builder = strings.Builder{}
+		attached []string
+	)
+
+	m.viewLock.Lock()
+	m.viewLock.Unlock()
+
+	for i := range event.Added {
+		attached = append(attached, event.Added[i].ID())
+	}
+
+	if len(attached) > 0 {
+		var (
+			word = "have"
+		)
+
+		if len(attached) > 1 {
+			word = "have"
+		}
+
+		builder.WriteString(fmt.Sprintf("%s %s just been attached",
+			strings.Join(attached, ","),
+			word,
+		))
+	}
+
+	if len(event.Removed) > 0 {
+		var (
+			word = "was"
+		)
+
+		if len(attached) > 1 {
+			word = "were"
+		}
+
+		builder.WriteString("\n")
+		builder.WriteString(fmt.Sprintf("%s %s removed",
+			strings.Join(event.Removed, ","),
+			word,
+		))
+	}
+
+	gui.RenderTextWithIcon(builder.String(), "hotswap")
+
+	go func() {
+		time.Sleep(6 * time.Second)
+		m.renderStats(false)
+	}()
 }
